@@ -1,0 +1,37 @@
+// ========================================================
+// 列表默认样式变量
+// ========================================================
+
+
+$list-border-radius:               2px !default;
+
+$item-font-size:                  14px !default;
+$item-border-width:                1px !default;
+$item-padding:                    12px !default;
+
+
+$item-inset-top-padding:           6px !default;
+$item-inset-left-padding:         80px !default;
+
+$item-label-height:               $line-height-computed !default;
+
+$item-button-font-size:           12px !default;
+$item-button-height:              30px !default;
+$item-button-line-height:         28px !default;
+$item-icon-font-size:             32px !default;
+$item-icon-fill-font-size:        28px !default;           
+
+$item-icon-accessory-color:       #ccc !default;
+$item-icon-accessory-font-size:   16px !default;
+
+$item-light-bg:                   $button-light-bg !default;
+$item-light-border:               $button-light-border !default;
+$item-light-text:                 $button-light-text !default;
+$item-light-active-bg:            $button-light-active-bg !default;
+$item-light-active-border:        $button-light-active-border !default;
+
+$item-default-bg:                 $item-light-bg !default;
+$item-default-border:             $item-light-border !default;
+$item-default-text:               $item-light-text !default;
+$item-default-active-bg:          #D9D9D9 !default;
+$item-default-active-border:      $item-light-active-border !default;

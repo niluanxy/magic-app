@@ -1,0 +1,39 @@
+{
+  "name": "magic-app",
+  "version": "0.2.0",
+  "description": "magic app 框架预览版",
+  "repository": {
+    "type": "git",
+    "url": "https://git.coding.net/niluanxy/magic-app.git"
+  },
+  "author": "木风 <smufeng@126.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer-loader": "^2.0.0",
+    "browser-sync": "^2.7.13",
+    "css-loader": "^0.14.5",
+    "del": "^1.2.0",
+    "file-loader": "^0.8.4",
+    "fs": "0.0.2",
+    "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^2.3.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-if": "^1.2.5",
+    "gulp-minify-css": "^1.2.0",
+    "gulp-minify-html": "^1.0.3",
+    "gulp-minify-inline": "^0.1.0",
+    "gulp-param": "^0.6.3",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.3",
+    "gulp-sass": "^2.0.3",
+    "gulp-uglify": "^1.2.0",
+    "gulp-webpack": "^1.5.0",
+    "hash-int": "^1.0.0",
+    "html-loader": "^0.3.0",
+    "q": "^1.4.1",
+    "sass-loader": "^1.0.2",
+    "style-loader": "^0.12.3",
+    "url-loader": "^0.5.6",
+    "webpack": "^1.10.0"
+  }
+}

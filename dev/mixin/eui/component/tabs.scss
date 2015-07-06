@@ -1,0 +1,111 @@
+// ========================================================
+// tab UI生成器
+// ========================================================
+@mixin tabs-style($name, $bg-color, $border-color, $color) {
+    &.tabs-#{$name} {
+        color: $color;
+        border-color: $border-color;
+        background-color: $bg-color;
+        background-image: linear-gradient(0deg, $border-color, $border-color 50%, transparent 50%);
+
+        // 设置视网膜屏幕下得上下border颜色
+        @include retina-border-color($border-color);
+
+        .tab-item {
+            color: $color;
+            opacity: 1;
+            background-color: $bg-color;
+
+            &.active {
+                 opacity: $active-opacity;
+            }
+        }
+    } 
+}
+
+@mixin tabs($styles: stable positive) {
+    line-height: $tabs-height;
+
+    z-index: $z-index-tabs;
+
+    display: flex;
+    flex-direction: row;
+
+    width: 100%;
+    height: $tabs-height;
+
+    text-align: center;
+
+    border-style: solid;
+    border-width: 1px 0 0 0;
+    background-size: 0;
+
+    @include retina-border(top, $bar-default-border);
+    @include retina-border(bottom, $bar-default-border);
+    
+    .tab-item {
+        display: block;
+        flex: 1;
+        color: $tabs-stable-text;
+        font-size: $tabs-text-font-size;
+        text-decoration: none;
+        @include text-ellipsis();
+
+        &.disabled,
+        &[disabled] {
+            opacity: .4;
+            cursor: default;
+            pointer-events: none;
+        }
+    }
+
+    .icon {
+        display: block;
+        font-size: $tabs-icon-size;
+        height: $tabs-icon-size;
+    }
+
+    &.tabs-icon-top,
+    &.tabs-icon {
+        .tab-item {
+            padding-top: $tabs-padding;
+            font-size: $tabs-text-font-size-side-icon;
+            line-height: $tabs-text-font-size;
+        }
+    }
+
+    &.tabs-icon-only {
+        .icon {
+            height: 100%;
+            line-height: inherit;
+            font-size: $tabs-icon-size-only;
+        }
+    }
+
+    &.tabs-header,
+    &.tabs-footer {
+        position: absolute;
+        left: 0; right: 0;
+    }
+
+    &.tabs-header {
+        top: 0;
+        @include retina-border-none(top);
+    }
+
+    &.tabs-footer {
+        bottom: 0;
+        @include retina-border-none(bottom);
+    }
+
+    @each $style in $styles {
+        @if $style == stable {
+            @include tabs-style($style, $tabs-stable-bg, $tabs-stable-border,
+                $tabs-stable-text);
+        }
+        @if $style == positive {
+            @include tabs-style($style, $tabs-positive-bg, $tabs-positive-border,
+                $tabs-positive-text);
+        }
+    }
+}

@@ -1,0 +1,174 @@
+// ========================================================
+// bar 工具栏UI生成器
+// ========================================================
+
+// 用于生成 工具栏 样式
+@mixin bar-style($name, $bg-color, $border-color, $color) {
+    // $name: 主题的名称
+    // $ba-color: 背景色
+    // $border-color: 边框色
+    // $color: 内容的字体颜色
+    &.bar-#{$name} {
+        color: $color;
+        border-color: $border-color;
+        background-color: $bg-color;
+        background-image: linear-gradient(0deg, $border-color, $border-color 50%, transparent 50%);
+
+        .title {
+            color: $color;
+        }
+
+        &.bar-footer {
+            background-image: linear-gradient(180deg, $border-color, $border-color 50%, transparent 50%);
+        }
+
+        &.bar-header, &.bar-footer {
+            @include retina-border-color($border-color);
+        }
+
+        .button {
+            color: $color;
+        }
+    }
+}
+
+
+@mixin bar($styles: stable positive ) {
+    position: absolute;
+    z-index: $z-index-bar;
+    right: 0; left: 0;
+
+    overflow: hidden;
+
+    height: $bar-height;
+    padding: $bar-padding-portrait;
+
+    background-color: $color-light;
+    background-size: 0;
+
+    user-select: none;
+    @include retina-border(top, $bar-default-border);
+    @include retina-border(bottom, $bar-default-border);
+
+    // Title inside of a bar is centered
+    .title {
+        font-size: $bar-title-font-size;
+        line-height: $bar-height - $bar-padding-portrait*2 - 1;
+
+        display: block;
+        z-index: $z-index-bar-title;
+
+        width: 100%;
+        height: 100%;
+
+        text-align: center;
+
+        @include text-ellipsis;
+
+        &.title-left {
+            text-align: left;
+        }
+
+        &.title-right {
+            text-align: right;
+        }
+    }
+
+    @each $style in $styles {
+        @if $style == stable {
+            @include bar-style($style,
+            $bar-stable-bg, $bar-stable-border, $bar-stable-text);
+        }
+
+        @if $style == positive {
+            @include bar-style($style,
+            $bar-positive-bg, $bar-positive-border, $bar-positive-text);
+        }
+    }
+
+    @at-root {
+        .bar-header {
+            top: 0;
+
+            @include retina-border-none(top);
+
+            & + .content {
+                top: $bar-height;
+            }
+        }
+
+        .bar-footer {
+            bottom: 0;
+
+            background-position: top;
+
+            @include retina-border-none(bottom);
+
+            &.item-input-inset {
+                position: absolute;
+            }
+        }
+    }
+
+    &.inline {
+        padding: $bar-padding-portrait;
+
+        .button {
+            min-height: $bar-height - $bar-padding-portrait * 2 - 2;
+            line-height: $bar-height - $bar-padding-portrait * 2 - 2;
+        }
+    }
+
+    &.text-button {
+        .text, .button {
+            display: inline-block;
+        }
+
+        .text {
+            width: 60%;
+            height: 100%;
+            padding-right: $padding-base-horizontal;
+        }
+
+        .button {
+            width: 40%;
+            font-size: $font-size-base;
+        }
+    }
+
+    .button {
+        font-size: $bar-title-font-size;
+        font-weight: 400;
+        line-height: $bar-button-height;
+
+        position: absolute;
+        z-index: $z-index-bar-button;
+
+        top: $bar-padding-portrait;
+        min-height: $bar-button-height - 1;
+        padding: 0 $bar-button-padding;
+
+        &:first-child {
+            left: $bar-padding-portrait;
+        }
+
+        &:last-child {
+            right: $bar-padding-portrait;
+        }
+        
+        &:after {
+            height: $bar-height;
+        }
+    
+        &:before,
+        .icon:before {
+            font-size: $bar-button-icon-size;
+            line-height: $bar-button-height;
+        }
+        
+        &.button-clear:before {
+            padding: 0;
+            font-size: $bar-button-icon-clear-size;
+        }
+    }
+}

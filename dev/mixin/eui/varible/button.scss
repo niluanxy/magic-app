@@ -1,0 +1,69 @@
+// ========================================================
+// 按钮默认样式变量
+// ========================================================
+
+
+$button-color:                    #222 !default;
+$button-block-margin:             10px !default;
+$button-clear-padding:            6px !default;
+$button-border-radius:            2px !default;
+$button-border-width:             1px !default;
+$button-icon-padding:             0.2em !default;
+
+$button-font-size:                16px !default;
+$button-height:                   42px !default;
+$button-padding:                  10px !default;
+$button-icon-size:                24px !default;
+
+$button-large-font-size:          24px !default;
+$button-large-height:             54px !default;
+$button-large-padding:            16px !default;
+$button-large-icon-size:          32px !default;
+
+$button-small-font-size:          12px !default;
+$button-small-height:             28px !default;
+$button-small-padding:            4px !default;
+$button-small-icon-size:          16px !default;
+
+$button-light-bg:                 $color-light !default;
+$button-light-text:               #444 !default;
+$button-light-border:             #ddd !default;
+$button-light-active-bg:          #fafafa !default;
+$button-light-active-border:      #ccc !default;
+
+$button-stable-bg:                $color-stable !default;
+$button-stable-text:              #444 !default;
+$button-stable-border:            #b2b2b2 !default;
+$button-stable-active-bg:         #e5e5e5 !default;
+$button-stable-active-border:     #a2a2a2 !default;
+
+$button-positive-bg:              $color-positive !default;
+$button-positive-text:            #fff !default;
+$button-positive-border:          darken($color-positive, 15%) !default;
+$button-positive-active-bg:       darken($color-positive, 15%) !default;
+$button-positive-active-border:   darken($color-positive, 15%) !default;
+
+$button-energized-bg:             $color-energized !default;
+$button-energized-text:           #fff !default;
+$button-energized-border:         darken($color-energized, 5%) !default;
+$button-energized-active-bg:      darken($color-energized, 5%) !default;
+$button-energized-active-border:  darken($color-energized, 5%) !default;
+
+$button-assertive-bg:             $color-assertive !default;
+$button-assertive-text:           #fff !default;
+$button-assertive-border:         darken($color-assertive, 10%) !default;
+$button-assertive-active-bg:      darken($color-assertive, 10%) !default;
+$button-assertive-active-border:  darken($color-assertive, 10%) !default;
+
+$button-orange-bg:                $color-orange !default;
+$button-orange-text:              #fff !default;
+$button-orange-border:            darken($color-orange, 10%) !default;
+$button-orange-active-bg:         darken($color-orange, 10%) !default;
+$button-orange-active-border:     darken($color-orange, 10%) !default;
+
+
+$button-default-bg:               $button-stable-bg !default;
+$button-default-text:             $button-stable-text !default;
+$button-default-border:           $button-stable-border !default;
+$button-default-active-bg:        $button-stable-active-bg !default;
+$button-default-active-border:    $button-stable-active-border !default;

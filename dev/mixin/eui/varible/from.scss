@@ -1,0 +1,16 @@
+// ========================================================
+// 表单元素 默认样式变量
+// ========================================================
+
+$input-height-base:               ($line-height-computed + ($padding-base-vertical * 2) + 2) !default;
+$input-height-large:              (floor($font-size-large * $line-height-large) + ($padding-large-vertical * 2) + 2) !default;
+$input-height-small:              (floor($font-size-small * $line-height-small) + ($padding-small-vertical * 2) + 2) !default;
+
+$input-bg:                        $color-light !default;
+$input-bg-disabled:               $color-stable !default;
+
+$input-color:                     #111 !default;
+$input-border-color:              $border-default-color !default;
+$input-border-width:              $border-default-width !default;
+$input-label-color:               $color-dark !default;
+$input-color-placeholder:         lighten($color-dark, 40%) !default;

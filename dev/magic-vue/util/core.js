@@ -1,0 +1,1 @@
+require("./key.js");            // key 全局存储方法

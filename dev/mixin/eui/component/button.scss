@@ -1,0 +1,167 @@
+// ========================================================
+// button 按钮UI生成器
+// ========================================================
+@mixin button-style($name, $bg-color, $border-color, $active-bg-color, $active-border-color, $color) {
+    &.button-#{""+$name} {
+        color: $color !important;
+        border-color: $border-color;
+        background-color: $bg-color;
+
+        &.active,
+        &.activated {
+            border-color: $active-border-color;
+            background-color: $active-bg-color;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        &.button-clear {
+            color: $border-color !important;
+        }
+    }
+}
+@mixin button($styles: stable positive energized assertive orange) {
+    font-size: $button-font-size;
+    line-height: $button-height - $button-border-width * 2;
+
+    position: relative;
+
+    display: inline-block;
+
+    min-height: $button-height;
+    padding: 0 $button-padding;
+
+    cursor: pointer;
+    text-align: center;
+    vertical-align: top;
+    text-overflow: ellipsis;
+    text-decoration: none;
+
+    color: $button-default-text;
+    border: $button-border-width solid $button-default-border;
+    border-radius: $button-border-radius;
+    background-color: $button-default-bg;
+
+    &.active,
+    &.activated {
+        border-color: $button-default-active-border;
+        background-color: $button-default-active-bg;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, .15);
+    }
+
+    // 添加一个隐藏的区域，增大按钮的点击面积
+    &:after {
+        position: absolute;
+        top: -($button-padding / 2);
+        right: -($button-padding / 2);
+        bottom: -($button-padding / 2);
+        left: -($button-padding / 2);
+
+        content: ' ';
+    }
+
+    &:before {
+        font-size: $button-icon-size;
+        pointer-events: none;
+        line-height: inherit;
+        float: left;
+    }
+    
+
+    // 图标设置
+    &.icon-left:before {
+        margin-right: $button-icon-padding;
+        margin-left: 0;
+    }
+
+    &.icon-right:before {
+        margin-left: $button-icon-padding;
+        margin-right: 0;
+        float: right;
+    }
+
+    @each $style in $styles {
+        @if $style == stable {
+            @include button-style($style, $button-stable-bg, $button-stable-border,
+            $button-stable-active-bg, $button-stable-active-border, $button-stable-text);
+        }
+        @if $style == positive {
+            @include button-style($style, $button-positive-bg, $button-positive-border,
+            $button-positive-active-bg, $button-positive-active-border, $button-positive-text);
+        }
+        @if $style == energized {
+            @include button-style($style, $button-energized-bg, $button-energized-border,
+            $button-energized-active-bg, $button-energized-active-border, $button-energized-text);
+        }
+        @if $style == assertive {
+            @include button-style($style, $button-assertive-bg, $button-assertive-border,
+            $button-assertive-active-bg, $button-assertive-active-border, $button-assertive-text);
+        }
+        @if $style == orange {
+            @include button-style($style, $button-orange-bg, $button-orange-border,
+            $button-orange-active-bg, $button-orange-active-border, $button-orange-text);
+        }
+    }
+    
+    @at-root {
+        .button-block {
+            display: block;
+
+            width: 100%;
+            margin-bottom: $margin-base;
+        }
+
+        .button-small {
+            font-size: $button-small-font-size;
+            line-height: $button-small-height - $button-border-width * 2;
+
+            min-width: $button-small-height;
+            min-height: $button-small-height + 2;
+            padding: 2px $button-small-padding 1px;
+
+            &.icon-left:before,
+            &.icon-right:before {
+                font-size: $button-small-font-size;
+                line-height: $button-small-height - $button-border-width * 2;
+            }
+        }
+
+        .button-large {
+            font-size: $button-large-font-size;
+            line-height: $button-large-height - $button-border-width * 2;
+
+            min-width: ($button-large-padding * 3) + $button-large-font-size;
+            min-height: $button-large-height + 5;
+            padding: 0 $button-large-padding;
+
+            &.icon-left:before,
+            &.icon-right:before {
+                font-size: $button-large-font-size;
+                line-height: $button-large-height - $button-border-width * 2;
+            }
+        }
+
+        .button.disabled,
+        .button[disabled] {
+            cursor: default !important;
+            pointer-events: none;
+
+            opacity: .4;
+        }
+
+        .button-clear {
+            padding: 0 $button-clear-padding;
+
+            color: $button-default-text;
+            border-width: 0;
+            background: none !important;
+            box-shadow: none !important;
+
+            transition: opacity .1s;
+
+            &.active,
+            &.activated {
+                opacity: $active-opacity;
+            }
+        }
+    }
+}

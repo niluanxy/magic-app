@@ -1,0 +1,43 @@
+# 过滤 node 依赖工具
+/node_modules
+
+# 过滤 sass 编译生成的临时文件
+/.sass-cache
+
+# APP目录忽略设置
+/app/dist/*
+/app/pub/main.css
+/app/pub/lib/magic.js
+/app/pub/lib/magic.vue.js
+/app/pub/lib/magic.css
+
+# GoodSync临时目录
+_gsdata_
+
+# 忽略debug文件
+npm-debug.log
+
+# 忽略掉设置文件夹
+.settings
+.project
+.idea
+
+# CORDOVA目录忽略文件夹
+/cordova/hooks
+/cordova/plugins/*
+
+# 对 AndroidManifest.xml 修改的文件
+!/cordova/plugins/android.json
+
+/cordova/platforms/platforms.json
+/cordova/platforms/ios/*
+/cordova/platforms/android/*
+
+# AndroidManifest.xml 文件，必须和 android.json 一致
+!/cordova/platforms/android/AndroidManifest.xml
+
+/cordova/www
+/config.xml
+/plugins
+/www
+/gen

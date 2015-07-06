@@ -1,0 +1,48 @@
+// 页面基本属性设置
+
+$font-family-icon:                "Ionicons";
+$font-family-sans-serif:          "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif !default;
+$font-family-light-sans-serif:    "Helvetica Neue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif !default;
+$font-family-serif:               Georgia, "Times New Roman", Times, serif !default;
+$font-family-monospace:           Monaco, Menlo, Consolas, "Courier New", monospace !default;
+
+$font-family-base:                $font-family-sans-serif !default;
+$font-size-base:                  14px !default;
+$font-size-large:                 18px !default;
+$font-size-small:                 11px !default;
+
+$line-height-base:                1.428571429 !default; // 20/14
+$line-height-computed:            floor($font-size-base * $line-height-base) !default; // ~20px
+$line-height-large:               1.33 !default;
+$line-height-small:               1.5 !default;
+
+$headings-font-family:            $font-family-base !default;
+$headings-font-weight:            500 !default;
+$headings-line-height:            1.2 !default;
+
+$base-background-color:           #fff !default;
+$base-color:                      #000 !default;
+
+$link-color:                      $color-positive !default;
+$link-hover-color:                darken($link-color, 15%) !default;
+
+$padding-base-vertical:           6px !default;
+$padding-base-horizontal:         12px !default;
+
+$padding-large-vertical:          10px !default;
+$padding-large-horizontal:        16px !default;
+
+$padding-small-vertical:          5px !default;
+$padding-small-horizontal:        10px !default;
+
+$content-padding:                 10px !default;
+
+$border-default-color:            #ddd !default;
+$border-default-width:             1px !default;
+
+$border-radius-base:              4px !default;
+$border-radius-large:             6px !default;
+$border-radius-small:             3px !default;
+
+$margin-base:                     20px !default;
+$active-opacity:                    .3 !default;

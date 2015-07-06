@@ -1,0 +1,86 @@
+// ========================================================
+// list 列表元素UI
+// ========================================================
+
+@mixin list() {
+    display: block;
+    overflow: hidden;
+    margin-bottom: $margin-base;
+    background-color: #FFF;
+
+
+    &.list-inset {
+        border: 1px solid $item-default-border;
+        border-radius: $list-border-radius;
+
+        >.item:last-child {
+            border-bottom-width: 0;
+        }
+
+        >.item:first-child {
+            border-top-width: 0;
+        }
+    }
+
+    .item {
+        display: block;
+        position: relative;
+        z-index: $z-index-item;
+
+        font-size: $item-font-size;
+        padding: $item-padding;
+        border-color: $item-default-border;
+        border-style: solid;
+        border-width: 0 0 1px 0;
+
+        &:first-child {
+            border-top-width: 1px;
+        }
+
+        &.item-input {
+            padding: $item-inset-top-padding $item-padding;
+
+            input {
+                font-size: inherit;
+            }
+        }
+
+        &.label-left {
+            padding-left: $item-inset-left-padding;
+
+            .label {
+                display: block;
+                position: absolute;
+                left: $item-padding;
+                min-height: $item-label-height;
+                line-height: $item-label-height;
+                top:50%;
+                transform: translate(0,-50%);
+            }
+        }
+
+        &.item-button-right {
+            padding-right: $item-inset-left-padding;
+
+            .button {
+                position: absolute;
+                right: $item-padding;
+                top:50%;
+                transform: translate(0,-50%);
+                font-size: $item-button-font-size;
+                padding: 0 $button-padding/2;
+                line-height: $item-button-height;
+                min-height: $item-button-height;
+
+                &.button-clear {
+                    padding: 0;
+                    font-size: $item-font-size;
+
+                    &:before {
+                        line-height: inherit !important;
+                    }
+                }
+            }
+        }
+    }
+}

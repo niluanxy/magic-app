@@ -1,0 +1,100 @@
+// ========================================================
+// 常用工具样式
+// ========================================================
+// 
+
+// 文字超过指定行。。。显示
+@mixin text-ellipsis($line: 1) {
+	// $line: number
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	@if $line > 1 {
+		display: -webkit-box;
+		-webkit-line-clamp: $line;
+  		-webkit-box-orient: vertical;
+	}
+}
+
+
+// 文字对齐方式
+@mixin text-align($dir) {
+	// $dir: left | right | center | justify
+	text-align: $dir !important;
+}
+
+// retina 屏幕下 border 具体生成代码
+@mixin retina-border-content($ratio, $color) {
+    content: " ";
+    position: absolute;
+    left: 0px; right: 0px;
+    border-top: 1px solid $color;
+    transform: scaleY(.5);
+}
+
+@mixin retina-border-color($color) {
+    &:before, &:after {
+        border-color: $color;
+    }
+}
+
+// 修复 retina 屏幕下 border 变宽的问题
+@mixin retina-border($pos, $color) {
+	// $pos: top | bottom
+	// $color: color
+	$pixel-ratio: 2;	// 缩放系数
+	
+	border-#{$pos}: 1px solid $color;
+	@media (-webkit-min-device-pixel-ratio: $pixel-ratio),
+         (min-device-pixel-ratio: $pixel-ratio) {
+		
+		border-#{$pos}-width: 0px;
+	}
+
+    @if $pos == top {
+        &:before {
+            @media (-webkit-min-device-pixel-ratio: $pixel-ratio),
+                (min-device-pixel-ratio: $pixel-ratio) {
+                
+                @include retina-border-content($pixel-ratio, $color);
+                top: 0;
+                transform-origin: 0 0;
+            }
+        }
+    }
+
+    @if $pos == bottom {
+        &:after {
+            @media (-webkit-min-device-pixel-ratio: $pixel-ratio),
+                (min-device-pixel-ratio: $pixel-ratio) {
+                
+                @include retina-border-content($pixel-ratio, $color);
+                bottom: 0;
+                transform-origin: 0 100%;   // 修复下边距差0.5px的bug
+            }
+        }
+    }
+}
+
+// 清除 retina 屏幕下的 border
+@mixin retina-border-none($pos: all) {
+	@if $pos == all {
+		border-top-width: 0px;
+		border-bottom-width: 0px;
+
+		&:before, &:after {
+			border-top-width: 0px;
+		}
+	}@else if $pos == top {
+		border-top-width: 0px;
+		&:before {
+			border-top-width: 0px;
+		}
+	}@else if $pos == bottom {
+		border-bottom-width: 0px;
+		&:after {
+			border-top-width: 0px;
+		}
+	}
+}

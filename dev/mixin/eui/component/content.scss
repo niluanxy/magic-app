@@ -1,0 +1,29 @@
+// ========================================================
+// content 内容UI生成器
+// ========================================================
+
+@mixin content() {
+    position: absolute;
+    top: 0; right: 0;
+    bottom: 0; left: 0;
+    overflow: hidden;
+
+    margin-top: -1px;
+    padding-top:1px;
+
+    &.padding > *:first-child {
+        padding: $content-padding;
+    }
+
+    &.has-header {
+        top: $bar-height;
+    }
+    &.has-footer {
+        bottom: $bar-height;
+    }
+
+    >*:first-child {
+        padding-bottom: 1px;
+    }
+}
+

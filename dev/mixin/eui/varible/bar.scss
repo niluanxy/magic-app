@@ -1,0 +1,33 @@
+// ========================================================
+// bar 工具栏默认变量
+// ========================================================
+
+
+$bar-height:                      44px !default;
+$bar-title-font-size:             16px !default;
+$bar-padding-portrait:            5px !default;
+$bar-padding-landscape:           5px !default;
+$bar-transparency:                1 !default;
+
+$bar-default-bg:                  rgba($color-light, $bar-transparency) !default;
+$bar-default-text:                #444 !default;
+$bar-default-border:              #ddd !default;
+$bar-default-active-bg:           #fafafa !default;
+$bar-default-active-border:       #ccc !default;
+
+$bar-stable-bg:                   rgba($color-stable, $bar-transparency) !default;
+$bar-stable-text:                 #444 !default;
+$bar-stable-border:               #b2b2b2 !default;
+$bar-stable-active-bg:            #e5e5e5 !default;
+$bar-stable-active-border:        #a2a2a2 !default;
+
+$bar-positive-bg:                 rgba($color-positive, $bar-transparency) !default;
+$bar-positive-text:               #fff !default;
+$bar-positive-border:             darken($color-positive, 15%) !default;
+$bar-positive-active-bg:          darken($color-positive, 15%) !default;
+$bar-positive-active-border:      darken($color-positive, 15%) !default;
+
+$bar-button-height:               32px !default;
+$bar-button-padding:              8px !default;
+$bar-button-icon-size:            20px !default;
+$bar-button-icon-clear-size:      24px !default;

@@ -1,0 +1,30 @@
+// ========================================================
+// slider 轮播组件
+// ========================================================
+
+@mixin slider() {
+    display: block;
+
+    .slider-item {
+        display: none;
+        position: relative;
+
+        .show {
+            width: 100%;
+            display: block;
+        }
+
+        .desc {
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            color: #FFF;
+            position: absolute;
+            background: rgba(0,0,0,.6);
+        }
+
+        &.active {
+            display: block;
+        }
+    }
+}
