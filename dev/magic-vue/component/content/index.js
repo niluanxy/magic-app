@@ -13,7 +13,7 @@ module.exports = (function() {
                 $el.addClass("has-header");
             }
             if ($parent.find("mg-footer").length || 
-                $parent.find("mg-tabs").length) {
+                $parent.find("tabs-footer").length) {
                 $el.addClass("has-footer");
             }
 

@@ -361,6 +361,7 @@
 
 // retina 屏幕下 border 具体生成代码
 @mixin retina-border-content($ratio, $color) {
+    z-index: 1;
     content: " ";
     position: absolute;
     left: 0px; right: 0px;
@@ -639,9 +640,9 @@ $bar-button-icon-clear-size:      24px !default;
 // 表单元素 默认样式变量
 // ========================================================
 
-$input-height-base:               ($line-height-computed + ($padding-base-vertical * 2) + 2) !default;
-$input-height-large:              (floor($font-size-large * $line-height-large) + ($padding-large-vertical * 2) + 2) !default;
-$input-height-small:              (floor($font-size-small * $line-height-small) + ($padding-small-vertical * 2) + 2) !default;
+$input-height-base:               $line-height-computed + ($padding-base-vertical * 2) !default;
+$input-height-large:              (floor($font-size-large * $line-height-large) + ($padding-large-vertical * 2)) !default;
+$input-height-small:              (floor($font-size-small * $line-height-small) + ($padding-small-vertical * 2)) !default;
 
 $input-bg:                        $color-light !default;
 $input-bg-disabled:               $color-stable !default;
@@ -663,20 +664,27 @@ $item-font-size:                  14px !default;
 $item-border-width:                1px !default;
 $item-padding:                    12px !default;
 
+$item-line-height:                $line-height-computed !default;
+$item-min-height:                 $item-padding*2 + $item-line-height !default;
+
+$item-avator-fix:                  3px !default;
+$item-avator:                     $item-line-height*2.6 !default;
+$item-avator-large:               $item-line-height*3.3 !default;
 
 $item-inset-top-padding:           6px !default;
 $item-inset-left-padding:         80px !default;
 
-$item-label-height:               $line-height-computed !default;
-
 $item-button-font-size:           12px !default;
 $item-button-height:              30px !default;
-$item-button-line-height:         28px !default;
-$item-icon-font-size:             32px !default;
-$item-icon-fill-font-size:        28px !default;           
 
-$item-icon-accessory-color:       #ccc !default;
-$item-icon-accessory-font-size:   16px !default;
+$item-icon-font-size:             32px !default;
+$item-icon-padding:               $item-padding + $item-icon-font-size + 3px !default;
+
+$item-icon-font-small:            20px !default;
+$item-icon-padding-small:         $item-padding + $item-icon-font-small + 5px !default;
+
+$item-icon-right-font-size:       16px !default;
+$item-icon-right-padding:         $item-padding + $item-icon-right-font-size + 5px !default;
 
 $item-light-bg:                   $button-light-bg !default;
 $item-light-border:               $button-light-border !default;
@@ -708,10 +716,15 @@ $tabs-height:                     44px !default;
 $tabs-padding:                     2px !default; 
 $tabs-text-font-size:             14px !default;
 $tabs-text-font-size-side-icon:   12px !default;
+
 $tabs-icon-size:                  24px !default;
 $tabs-icon-size-only:             28px !default;
+
 $tabs-badge-padding:              1px 6px !default;
 $tabs-badge-font-size:            12px !default;
+
+$tabs-striped-height:              3px !default;
+$tabs-striped-width:               70% !default;
 
 $tabs-stable-bg:                  $button-stable-bg !default;
 $tabs-stable-border:              $button-stable-border !default;
@@ -1124,24 +1137,18 @@ $tabs-positive-text:              $button-positive-text !default;
 // list 列表元素UI
 // ========================================================
 
+
 @mixin list() {
     display: block;
     overflow: hidden;
     margin-bottom: $margin-base;
     background-color: #FFF;
+    border: 1px solid $item-default-border;
+    border-width: 1px 0;
 
-
-    &.list-inset {
-        border: 1px solid $item-default-border;
+    &.list-radius {
+        border-width: 1px;
         border-radius: $list-border-radius;
-
-        >.item:last-child {
-            border-bottom-width: 0;
-        }
-
-        >.item:first-child {
-            border-top-width: 0;
-        }
     }
 
     .item {
@@ -1149,16 +1156,30 @@ $tabs-positive-text:              $button-positive-text !default;
         position: relative;
         z-index: $z-index-item;
 
+        line-height: $item-line-height;
+        min-height: $item-min-height;
+
         font-size: $item-font-size;
         padding: $item-padding;
-        border-color: $item-default-border;
-        border-style: solid;
-        border-width: 0 0 1px 0;
+        border-bottom: 1px solid $item-default-border;
 
-        &:first-child {
-            border-top-width: 1px;
+        &:last-child {
+            border-bottom-width: 0;
         }
+    }
+    &.list-embed {
+        padding: 0 $item-padding;
 
+        .item {
+            padding: $item-padding 0;
+        }
+    }
+
+
+    /*====================================================
+     * item-input 相关代码
+     *====================================================*/
+    .item {
         &.item-input {
             padding: $item-inset-top-padding $item-padding;
 
@@ -1166,29 +1187,206 @@ $tabs-positive-text:              $button-positive-text !default;
                 font-size: inherit;
             }
         }
+    }
+    &.list-embed {
+        .item-input {
+            padding: $item-inset-top-padding 0;
+        }
+    }
 
+    /*====================================================
+     * item-avator 相关代码
+     *====================================================*/
+    .item {
+        &.item-avator,
+        &.item-avator-large {
+            .avator {
+                position: absolute;
+                top: $item-padding;
+                left: $item-padding;
+                bottom: $item-padding;
+
+                img {
+                    width: 100%;
+                }
+            }
+
+            >* {
+                @include text-ellipsis();
+                position: relative;
+
+                &:nth-child(2) {
+                    top: -$item-avator-fix;
+                }
+
+                &:last-child {
+                    bottom: -$item-avator-fix;
+                }
+            }
+        }
+
+        &.item-avator {
+            min-height: $item-padding*2 + $item-avator;
+            padding-left: $item-padding*2 + $item-avator;
+
+            .avator {
+                width: $item-avator;
+            }
+
+            >* {
+                line-height: $item-avator/2;
+            }
+        }
+
+        &.item-avator-large {
+            min-height: $item-padding*2 + $item-avator-large;
+            padding-left: $item-padding*2 + $item-avator-large;
+
+            .avator {
+                width: $item-avator-large;
+            }
+
+            >* {
+                line-height: $item-avator-large/3;
+            }
+        }
+    }
+    &.list-embed .item {
+        &.item-avator {
+            padding-left: $item-padding + $item-avator;
+        }
+
+        &.item-avator-large {
+            padding-left: $item-padding + $item-avator-large;
+        }
+
+        .avator {
+            left: 0;
+        }
+    }
+
+
+    /*====================================================
+     * label-left,icon-left 公用 相关代码
+     *====================================================*/
+    .item {
+        &.label-left .label,
+        &.icon-left .icon,
+        &.icon-left .icon-small {
+            position: absolute;
+            left: $item-padding;
+            top:50%;
+            transform: translate(0,-50%);
+        } 
+    }
+    &.list-embed .item {
+        &.label-left .label,
+        &.icon-left .icon,
+        &.icon-left .icon-small {
+            left: 0;
+        }
+    }
+
+
+    /*====================================================
+     * label-left 相关代码
+     *====================================================*/
+    .item {
         &.label-left {
             padding-left: $item-inset-left-padding;
 
             .label {
                 display: block;
-                position: absolute;
-                left: $item-padding;
-                min-height: $item-label-height;
-                line-height: $item-label-height;
-                top:50%;
-                transform: translate(0,-50%);
+                min-height: $item-line-height;
+                line-height: $item-line-height;
+            }
+        }
+    }
+    &.list-embed .item {
+        &.label-left {
+            padding-left: $item-inset-left-padding - $item-padding;
+        }
+    }
+
+
+    /*====================================================
+     * icon-left 相关代码
+     *====================================================*/
+    .item {
+        &.icon-left {
+            padding-left: $item-icon-padding;
+
+            .icon {
+                font-size: $item-icon-font-size;
             }
         }
 
+        &.icon-small {
+            padding-left: $item-icon-padding-small;
+
+            .icon {
+                font-size: $item-icon-font-small;
+            }
+        }
+    }
+    &.list-embed .item {
+        &.icon-left {
+            padding-left: $item-icon-padding - $item-padding;
+        }
+
+        &.icon-small {
+            padding-left: $item-icon-padding-small - $item-padding;
+        }
+    }
+
+
+    /*====================================================
+     * icon-right,item-button-right 公用 相关代码
+     *====================================================*/
+    .item {
+        &.icon-right .icon-right,
+        &.item-button-right .button {
+            position: absolute;
+            right: $item-padding;
+            top:50%;
+            transform: translate(0,-50%);
+        }
+    }
+    &.list-embed .item {
+        &.icon-right .icon-right,
+        &.item-button-right .button {
+            right: 0;
+        }
+    }
+    
+
+    /*====================================================
+     * icon-right 相关代码
+     *====================================================*/
+    .item {
+        &.icon-right {
+            padding-right: $item-icon-right-padding;
+
+            .icon-right {
+                font-size: $item-icon-right-font-size;
+            }
+        }
+    }
+    &.list-embed .item {
+        &.icon-right {
+            padding-right: $item-icon-right-padding - $item-padding;
+        }
+    }
+
+
+    /*====================================================
+     * item-button-right 相关代码
+     *====================================================*/
+    .item {
         &.item-button-right {
             padding-right: $item-inset-left-padding;
 
             .button {
-                position: absolute;
-                right: $item-padding;
-                top:50%;
-                transform: translate(0,-50%);
                 font-size: $item-button-font-size;
                 padding: 0 $button-padding/2;
                 line-height: $item-button-height;
@@ -1203,6 +1401,11 @@ $tabs-positive-text:              $button-positive-text !default;
                     }
                 }
             }
+        }
+    }
+    &.list-embed .item {
+        &.item-button-right {
+            padding-right: $item-inset-left-padding - $item-padding;
         }
     }
 }
@@ -1313,6 +1516,12 @@ $tabs-positive-text:              $button-positive-text !default;
                  opacity: $active-opacity;
             }
         }
+
+        &.tabs-striped, &.tabs-striped-top {
+            .tab-item.actived:before {
+                background-color: $color;
+            }
+        }
     } 
 }
 
@@ -1323,6 +1532,7 @@ $tabs-positive-text:              $button-positive-text !default;
 
     display: flex;
     flex-direction: row;
+    position: relative;
 
     width: 100%;
     height: $tabs-height;
@@ -1339,6 +1549,7 @@ $tabs-positive-text:              $button-positive-text !default;
     .tab-item {
         display: block;
         flex: 1;
+        position: relative;
         color: $tabs-stable-text;
         font-size: $tabs-text-font-size;
         text-decoration: none;
@@ -1391,6 +1602,30 @@ $tabs-positive-text:              $button-positive-text !default;
         @include retina-border-none(bottom);
     }
 
+    &.tabs-striped, &.tabs-striped-top {
+        .tab-item.actived:before {
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, 0);
+            content: ' ';
+            width: $tabs-striped-width;
+            height: $tabs-striped-height;
+            background-color: $tabs-stable-text;
+        }
+    }
+
+    &.tabs-striped {
+        .tab-item.actived:before {
+            bottom: 0;
+        }
+    }
+
+    &.tabs-striped-top {
+        .tab-item.actived:before {
+            top: 0;
+        }
+    }
+    
     @each $style in $styles {
         @if $style == stable {
             @include tabs-style($style, $tabs-stable-bg, $tabs-stable-border,

@@ -26,6 +26,7 @@
 
 // retina 屏幕下 border 具体生成代码
 @mixin retina-border-content($ratio, $color) {
+    z-index: 1;
     content: " ";
     position: absolute;
     left: 0px; right: 0px;

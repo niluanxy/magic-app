@@ -19,11 +19,10 @@ module.exports = (function() {
                 }
 
                 $child = $item.find(".icon");
-                toggle = $child.attr("toggle");
 
-                if ($child.length && toggle !== null) {
+                if ($child.length && $child.attr("toggle") !== null) {
                     var cls = {}, item, key, val;
-                    toggle = toggle.split(",");
+                    toggle = $child.attr("toggle").split(",");
 
                     for(var j=0; j<toggle.length; j++) {
                         item = toggle[j];
@@ -39,9 +38,9 @@ module.exports = (function() {
                         $child.removeClass(cls.on);
                         $child.addClass(cls.off);
                     }
-                }
 
-                $child.removeAttr("toggle");
+                    $child.removeAttr("toggle");
+                }
             }
 
             $el.addClass("tabs");
