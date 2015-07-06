@@ -9,20 +9,27 @@ $item-font-size:                  14px !default;
 $item-border-width:                1px !default;
 $item-padding:                    12px !default;
 
+$item-line-height:                $line-height-computed !default;
+$item-min-height:                 $item-padding*2 + $item-line-height !default;
+
+$item-avator-fix:                  3px !default;
+$item-avator:                     $item-line-height*2.6 !default;
+$item-avator-large:               $item-line-height*3.3 !default;
 
 $item-inset-top-padding:           6px !default;
 $item-inset-left-padding:         80px !default;
 
-$item-label-height:               $line-height-computed !default;
-
 $item-button-font-size:           12px !default;
 $item-button-height:              30px !default;
-$item-button-line-height:         28px !default;
-$item-icon-font-size:             32px !default;
-$item-icon-fill-font-size:        28px !default;           
 
-$item-icon-accessory-color:       #ccc !default;
-$item-icon-accessory-font-size:   16px !default;
+$item-icon-font-size:             32px !default;
+$item-icon-padding:               $item-padding + $item-icon-font-size + 3px !default;
+
+$item-icon-font-small:            20px !default;
+$item-icon-padding-small:         $item-padding + $item-icon-font-small + 5px !default;
+
+$item-icon-right-font-size:       16px !default;
+$item-icon-right-padding:         $item-padding + $item-icon-right-font-size + 5px !default;
 
 $item-light-bg:                   $button-light-bg !default;
 $item-light-border:               $button-light-border !default;
