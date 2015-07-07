@@ -165,6 +165,7 @@
 
             .label {
                 display: block;
+                width: $item-inset-left-padding - $item-padding;
                 min-height: $item-line-height;
                 line-height: $item-line-height;
             }
@@ -173,6 +174,10 @@
     &.list-embed .item {
         &.label-left {
             padding-left: $item-inset-left-padding - $item-padding;
+
+            .label {
+                width: $item-inset-left-padding - $item-padding*2;
+            }
         }
     }
 
