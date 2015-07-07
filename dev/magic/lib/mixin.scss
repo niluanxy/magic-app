@@ -1143,10 +1143,11 @@ $tabs-positive-text:              $button-positive-text !default;
     overflow: hidden;
     margin-bottom: $margin-base;
     background-color: #FFF;
-    border: 1px solid $item-default-border;
+    border-color: $item-default-border;
+    border-style: solid;
     border-width: 1px 0;
 
-    &.list-radius {
+    &.list-inset {
         border-width: 1px;
         border-radius: $list-border-radius;
     }
