@@ -23,7 +23,7 @@
         z-index: $z-index-item;
 
         line-height: $item-line-height;
-        min-height: $item-min-height;
+        min-height: $item-padding*2 + $item-line-height;
 
         font-size: $item-font-size;
         padding: $item-padding;
@@ -34,12 +34,30 @@
         &:last-child {
             border-bottom-width: 0;
         }
+
+        &.item-inline {
+            padding: $item-padding/3 $item-padding;
+            min-height: $item-padding/3 + $item-line-height;
+            border-bottom-width: 0;
+        }
+
+        &.inline-first {
+            margin-top: $item-padding/3*1.5;
+        }
+
+        &.inline-last {
+            margin-bottom: $item-padding/3*1.5;
+        }
     }
     &.list-embed {
         padding: 0 $item-padding;
 
         .item {
             padding: $item-padding 0;
+
+            &.item-inline {
+                padding: $item-padding/3 0;
+            }
         }
     }
 
