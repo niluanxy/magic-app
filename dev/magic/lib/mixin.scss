@@ -1161,7 +1161,9 @@ $tabs-positive-text:              $button-positive-text !default;
 
         font-size: $item-font-size;
         padding: $item-padding;
-        border-bottom: 1px solid $item-default-border;
+        border-color: $item-default-border;
+        border-style: solid;
+        border-width: 0 0 1px 0;
 
         &:last-child {
             border-bottom-width: 0;
