@@ -41,6 +41,8 @@ module.exports = (function() {
 
                     $child.removeAttr("toggle");
                 }
+
+                $item.removeAttr("match");
             }
 
             $el.addClass("tabs");
