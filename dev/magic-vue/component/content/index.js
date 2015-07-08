@@ -3,6 +3,7 @@ require("./style.scss");
 module.exports = (function() {
     Vue.component("mg-content", {
         template: "<div class='scroll_body'><content></content></div>",
+        inherit: true,
         ready: function() {
             var $el = $(this.$el), $scroll, $parent, handle;   // 定义操作对象
 
