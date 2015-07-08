@@ -1,6 +1,9 @@
 # 过滤 node 依赖工具
 /node_modules
 
+# 过滤 svn 文件
+/.svn
+
 # 过滤 sass 编译生成的临时文件
 /.sass-cache
 
