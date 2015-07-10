@@ -21,10 +21,11 @@ $.ready(function() {
                 $target.hasClass("tab-item") ||
                 $target.hasClass("item")) {
 
-                var $actobj = $target;
-                handle = setTimeout(function() {
-                    $actobj.addClass("active");
-                }, 60);
+                handle = setTimeout((function($actobj) {
+                    return function() {
+                        $actobj.addClass("active");
+                    }
+                })($target), 60);
                 $target.data("_active_handle", handle);
             }
 
@@ -73,8 +74,7 @@ $.ready(function() {
                     e.preventDefault();
                     var tohref = $target.attr("href");
                     // 手动跳转到指定页面
-                    if (tohref) location.href = tohref; 
-                    return false;           // 终止后续检测
+                    if (tohref) location.href = tohref;
                 }
 
                 $target = $target.parent();     // 向上递归检测
