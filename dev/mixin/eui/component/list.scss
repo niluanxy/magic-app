@@ -6,15 +6,15 @@
 @mixin list() {
     display: block;
     overflow: hidden;
+    color: $item-default-text;
+    position: relative;
     margin-bottom: $margin-base;
-    background-color: #FFF;
-    border-color: $item-default-border;
-    border-style: solid;
-    border-width: 1px 0;
+    background-color: $item-default-bg;
+    @include retina-border(top bottom, $item-default-border);
 
     &.list-inset {
-        border-width: 1px;
-        border-radius: $list-border-radius;
+        @include retina-border-width(all);
+        @include retina-border-radius($list-border-radius);
     }
 
     .item {
@@ -27,12 +27,15 @@
 
         font-size: $item-font-size;
         padding: $item-padding;
-        border-color: $item-default-border;
-        border-style: solid;
-        border-width: 0 0 1px 0;
+        @include retina-border(bottom, $item-default-border);
+    
+        >* {
+            z-index: 2;
+        }
 
         &:last-child {
             border-bottom-width: 0;
+            @include retina-border-width(bottom, 0);
         }
 
         &.item-inline {
@@ -53,7 +56,20 @@
         padding: 0 $item-padding;
 
         .item {
-            padding: $item-padding 0;
+            &.active {
+                @include retina-border-width(bottom, 0);
+
+                &:after {
+                    content: " ";
+                    position: absolute;
+                    z-index: 0;
+                    top: 0;
+                    height: 100%;
+                    left: -50%;
+                    width: 200%;
+                    background-color: $item-default-active-bg;
+                }
+            }
 
             &.item-inline {
                 padding: $item-padding/3 0;
@@ -74,11 +90,7 @@
             }
         }
     }
-    &.list-embed {
-        .item-input {
-            padding: $item-inset-top-padding 0;
-        }
-    }
+
 
     /*====================================================
      * item-avator 相关代码
@@ -137,19 +149,6 @@
             }
         }
     }
-    &.list-embed .item {
-        &.item-avator {
-            padding-left: $item-padding + $item-avator;
-        }
-
-        &.item-avator-large {
-            padding-left: $item-padding + $item-avator-large;
-        }
-
-        .avator {
-            left: 0;
-        }
-    }
 
 
     /*====================================================
@@ -165,13 +164,6 @@
             transform: translate(0,-50%);
         } 
     }
-    &.list-embed .item {
-        &.label-left .label,
-        &.icon-left .icon,
-        &.icon-left .icon-small {
-            left: 0;
-        }
-    }
 
 
     /*====================================================
@@ -186,15 +178,6 @@
                 width: $item-inset-left-padding - $item-padding;
                 min-height: $item-line-height;
                 line-height: $item-line-height;
-            }
-        }
-    }
-    &.list-embed .item {
-        &.label-left {
-            padding-left: $item-inset-left-padding - $item-padding;
-
-            .label {
-                width: $item-inset-left-padding - $item-padding*2;
             }
         }
     }
@@ -220,15 +203,6 @@
             }
         }
     }
-    &.list-embed .item {
-        &.icon-left {
-            padding-left: $item-icon-padding - $item-padding;
-        }
-
-        &.icon-small {
-            padding-left: $item-icon-padding-small - $item-padding;
-        }
-    }
 
 
     /*====================================================
@@ -243,12 +217,6 @@
             transform: translate(0,-50%);
         }
     }
-    &.list-embed .item {
-        &.icon-right .icon-right,
-        &.item-button-right .button {
-            right: 0;
-        }
-    }
     
 
     /*====================================================
@@ -261,11 +229,6 @@
             .icon-right {
                 font-size: $item-icon-right-font-size;
             }
-        }
-    }
-    &.list-embed .item {
-        &.icon-right {
-            padding-right: $item-icon-right-padding - $item-padding;
         }
     }
 
@@ -292,11 +255,6 @@
                     }
                 }
             }
-        }
-    }
-    &.list-embed .item {
-        &.item-button-right {
-            padding-right: $item-inset-left-padding - $item-padding;
         }
     }
 }

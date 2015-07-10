@@ -37,78 +37,100 @@
 	text-align: $dir !important;
 }
 
-// retina 屏幕下 border 具体生成代码
-@mixin retina-border-content($ratio, $color) {
-    z-index: 1;
-    content: " ";
-    position: absolute;
-    left: 0px; right: 0px;
-    border-top: 1px solid $color;
-    transform: scaleY(.5);
+
+
+/*====================================================
+ * retina-border 视网膜屏下 border 生成代码
+ *====================================================*/
+$retina-pixel-ratio: 2; // 缩放系数
+
+// 设置 retain 屏幕下的 边框颜色
+@mixin retina-border-color($color, $type: all) {
+    @each $pos in $type {
+        @if $pos == all {
+            &:before {
+                border-color: $color;
+            }
+        }@else {
+            &:before {
+                border-#{$pos}-color: $color;
+            }
+        }
+    }
 }
 
-@mixin retina-border-color($color) {
-    &:before, &:after {
-        border-color: $color;
+// 设置 retina 屏幕下的 边框大小
+@mixin retina-border-width($type, $size: 1px) {
+    @each $pos in $type {
+        @if $pos == all {
+            &:before {
+                border-width: $size;
+            }
+        }@else {
+            &:before {
+                border-#{$pos}-width: $size;
+            }
+        }
+    }
+}
+
+// 设置 retina 屏幕下 边框圆角
+@mixin retina-border-radius($size: 1px, $type: all) {
+    @each $pos in $type {
+        @if $pos == all {
+            border-radius: $size;
+
+            &:before {
+                border-radius: $size;
+
+                @media (-webkit-min-device-pixel-ratio: $retina-pixel-ratio),
+                (min-device-pixel-ratio: $retina-pixel-ratio) {
+                    border-radius: $size*2;
+                }
+            }
+        }@else {
+            border-radius: $size;
+
+            &:before {
+                border-#{$pos}-radius: $size;
+
+                @media (-webkit-min-device-pixel-ratio: $retina-pixel-ratio),
+                (min-device-pixel-ratio: $retina-pixel-ratio) {
+                    border-#{$pos}-radius: $size*2;
+                }
+            }
+        }
     }
 }
 
 // 修复 retina 屏幕下 border 变宽的问题
-@mixin retina-border($pos, $color) {
-	// $pos: top | bottom
+@mixin retina-border($type, $color) {
+	// $type: top | bottom
 	// $color: color
-	$pixel-ratio: 2;	// 缩放系数
-	
-	border-#{$pos}: 1px solid $color;
-	@media (-webkit-min-device-pixel-ratio: $pixel-ratio),
-         (min-device-pixel-ratio: $pixel-ratio) {
-		
-		border-#{$pos}-width: 0px;
-	}
 
-    @if $pos == top {
-        &:before {
-            @media (-webkit-min-device-pixel-ratio: $pixel-ratio),
-                (min-device-pixel-ratio: $pixel-ratio) {
-                
-                @include retina-border-content($pixel-ratio, $color);
-                top: 0;
-                transform-origin: 0 0;
+    &:before {
+        z-index: 1;
+        content: " ";
+        position: absolute;
+        border-style: solid;
+        border-color: $color;
+        border-width: 0;
+        pointer-events: none;
+
+        @media (-webkit-min-device-pixel-ratio: $retina-pixel-ratio),
+                (min-device-pixel-ratio: $retina-pixel-ratio) {
+
+            left: -50%; top: -50%;
+            width: 200%; height: 200%;
+            transform: scale(.5, .5);
+        }
+
+        @each $pos in $type {
+            @if $pos == all {
+                border-width: 1px;
+            }@else {
+                border-#{$pos}-width: 1px;
             }
         }
     }
-
-    @if $pos == bottom {
-        &:after {
-            @media (-webkit-min-device-pixel-ratio: $pixel-ratio),
-                (min-device-pixel-ratio: $pixel-ratio) {
-                
-                @include retina-border-content($pixel-ratio, $color);
-                bottom: 0;
-                transform-origin: 0 100%;   // 修复下边距差0.5px的bug
-            }
-        }
-    }
-}
-
-// 清除 retina 屏幕下的 border
-@mixin retina-border-none($pos: all) {
-	@if $pos == all {
-		border-top-width: 0px;
-		border-bottom-width: 0px;
-
-		&:before, &:after {
-			border-top-width: 0px;
-		}
-	}@else if $pos == top {
-		border-top-width: 0px;
-		&:before {
-			border-top-width: 0px;
-		}
-	}@else if $pos == bottom {
-		border-bottom-width: 0px;
-		&:after {
-			border-top-width: 0px;
-		}
-	}
 }

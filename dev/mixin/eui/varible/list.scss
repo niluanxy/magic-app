@@ -3,7 +3,7 @@
 // ========================================================
 
 
-$list-border-radius:               2px !default;
+$list-border-radius:               4px !default;
 
 $item-font-size:                  14px !default;
 $item-border-width:                1px !default;
@@ -30,14 +30,8 @@ $item-icon-padding-small:         $item-padding + $item-icon-font-small + 5px !d
 $item-icon-right-font-size:       16px !default;
 $item-icon-right-padding:         $item-padding + $item-icon-right-font-size + 5px !default;
 
-$item-light-bg:                   $button-light-bg !default;
-$item-light-border:               $button-light-border !default;
-$item-light-text:                 $button-light-text !default;
-$item-light-active-bg:            $button-light-active-bg !default;
-$item-light-active-border:        $button-light-active-border !default;
 
-$item-default-bg:                 $item-light-bg !default;
-$item-default-border:             $item-light-border !default;
-$item-default-text:               $item-light-text !default;
+$item-default-bg:                 #fff !default;
+$item-default-border:             #ddd !default;
+$item-default-text:               #444 !default;
 $item-default-active-bg:          #D9D9D9 !default;
-$item-default-active-border:      $item-light-active-border !default;
