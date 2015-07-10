@@ -17,6 +17,14 @@
         @include retina-border-radius($list-border-radius);
     }
 
+    &.active-none .item.active {
+        @include retina-border-width(bottom, 1px);
+
+        &:after {
+            display: none;
+        }
+    }
+
     .item {
         display: block;
         position: relative;
@@ -87,6 +95,14 @@
 
             input {
                 font-size: inherit;
+            }
+
+            &.active {
+                @include retina-border-width(bottom, 1px);
+
+                &:after {
+                    display: none;
+                }
             }
         }
     }
