@@ -10,7 +10,7 @@ module.exports = (function() {
      * @author      mufeng  <smufeng@gmail.com>
      * @version     0.1     <2015-04-10>
      */
-    util.dealyCall = function(func, wait) {
+    util.delayCall = function(func, wait) {
         var context, args, timeout, result;
         var previous = 0;
         var later = function() {
