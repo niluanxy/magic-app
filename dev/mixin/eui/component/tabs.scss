@@ -54,6 +54,9 @@
         text-decoration: none;
         @include text-ellipsis();
 
+        -webkit-user-drag: none;
+        user-select: none;
+
         &.disabled,
         &[disabled] {
             opacity: .4;

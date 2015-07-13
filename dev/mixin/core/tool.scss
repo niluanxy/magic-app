@@ -42,7 +42,7 @@
 /*====================================================
  * retina-border 视网膜屏下 border 生成代码
  *====================================================*/
-$retina-pixel-ratio: 2; // 缩放系数
+$retina-pixel-ratio: 2 !default; // 缩放系数
 
 // 设置 retain 屏幕下的 边框颜色
 @mixin retina-border-color($color, $type: all) {
@@ -103,30 +103,35 @@ $retina-pixel-ratio: 2; // 缩放系数
     }
 }
 
+// retina 屏幕下 视网膜屏幕边框 核心代码
+@mixin retina-border-content($color, $radio) {
+    z-index: 1;
+    content: " ";
+    position: absolute;
+    border-style: solid;
+    border-color: $color;
+    border-width: 0;
+    width: 100%;
+    height: 100%;
+    left: 0; top: 0;
+    pointer-events: none;
+
+    @media (-webkit-min-device-pixel-ratio: $radio),
+            (min-device-pixel-ratio: $radio) {
+
+        left: -50%; top: -50%;
+        width: 200%; height: 200%;
+        transform: scale(.5, .5);
+    }
+}
+
 // 修复 retina 屏幕下 border 变宽的问题
 @mixin retina-border($type, $color) {
 	// $type: top | bottom
 	// $color: color
 
     &:before {
-        z-index: 1;
-        content: " ";
-        position: absolute;
-        border-style: solid;
-        border-color: $color;
-        border-width: 0;
-        width: 100%;
-        height: 100%;
-        left: 0; top: 0;
-        pointer-events: none;
-
-        @media (-webkit-min-device-pixel-ratio: $retina-pixel-ratio),
-                (min-device-pixel-ratio: $retina-pixel-ratio) {
-
-            left: -50%; top: -50%;
-            width: 200%; height: 200%;
-            transform: scale(.5, .5);
-        }
+        @include retina-border-content($color, $retina-pixel-ratio);
 
         @each $pos in $type {
             @if $pos == all {

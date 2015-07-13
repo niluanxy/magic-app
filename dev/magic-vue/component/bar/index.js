@@ -1,6 +1,7 @@
 module.exports = (function() {
     Vue.component("mg-header", {
         template: "<content></content>",
+        replace: false,
         inherit: true,
         ready: function() {
             var $el = $(this.$el);
@@ -10,6 +11,7 @@ module.exports = (function() {
 
     Vue.component("mg-footer", {
         template: "<content></content>",
+        replace: false,
         inherit: true,
         ready: function() {
             var $el = $(this.$el);

@@ -1,6 +1,7 @@
 module.exports = (function() {
     Vue.component("mg-slider", {
         template: "<content></content>",
+        replace: false,
         inherit: true,
         ready: function() {
             var $el = $(this.$el), handle, $slider;

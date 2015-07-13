@@ -36,8 +36,13 @@
     text-overflow: ellipsis;
     text-decoration: none;
 
+    -webkit-user-drag: none;
+    user-select: none;
+
     color: $button-default-text;
-    border: $button-border-width solid $button-default-border;
+    border-width: $button-border-width;
+    border-style: solid;
+    border-color: $button-default-border;
     border-radius: $button-border-radius;
     background-color: $button-default-bg;
 

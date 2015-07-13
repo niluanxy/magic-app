@@ -6,3 +6,4 @@ require("./modal");             // MODAL组件
 require("./iframe");            // IFRAME组件
 require("./slider");            // SLIDER组件
 require("./confirm");           // CONFIRM组件
+require("./select");            // SELECT组件

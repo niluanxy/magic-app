@@ -27,9 +27,8 @@ $item-icon-padding:               $item-padding + $item-icon-font-size + 3px !de
 $item-icon-font-small:            20px !default;
 $item-icon-padding-small:         $item-padding + $item-icon-font-small + 5px !default;
 
-$item-icon-right-font-size:       16px !default;
+$item-icon-right-font-size:       $button-icon-size !default;
 $item-icon-right-padding:         $item-padding + $item-icon-right-font-size + 5px !default;
-
 
 $item-default-bg:                 #fff !default;
 $item-default-border:             #ddd !default;

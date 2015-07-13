@@ -71,9 +71,17 @@
         padding: 0 $item-padding;
 
         .item {
+            padding: $item-padding 0;
+
             &.item-inline {
                 padding: $item-padding/3 0;
             }
+        }
+    }
+    &.list-embed-left {
+        .item {
+            padding-left: 0;
+            margin-left: $item-padding;
         }
     }
 
@@ -149,6 +157,15 @@
             }
         }
     }
+    &.list-embed .item,
+    &.list-embed-left .item {
+        &.item-avator,
+        &.item-avator-large {
+            .avator {
+                left: 0;
+            }
+        }
+    }
 
 
     /*====================================================
@@ -162,6 +179,14 @@
             left: $item-padding;
             top:50%;
             transform: translate(0,-50%);
+        } 
+    }
+    &.list-embed .item,
+    &.list-embed-left .item {
+        &.label-left .label,
+        &.icon-left .icon,
+        &.icon-left .icon-small {
+            left: 0;
         } 
     }
 
@@ -215,6 +240,12 @@
             right: $item-padding;
             top:50%;
             transform: translate(0,-50%);
+        }
+    }
+    &.list-embed .item {
+        &.icon-right .icon-right,
+        &.item-button-right .button {
+            right: 0;
         }
     }
     

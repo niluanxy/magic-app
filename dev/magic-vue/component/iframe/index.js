@@ -11,6 +11,7 @@ module.exports = (function() {
 
     Vue.component("mg-iframe", {
         template: "<content></content>",
+        replace: false,
         inherit: true,
         ready: function() {
             var $el    = $(this.$el),

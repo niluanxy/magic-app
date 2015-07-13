@@ -1,6 +1,7 @@
 module.exports = (function() {
     Vue.component("mg-modal", {
         template: "<content></content>",
+        replace: false,
         inherit: true,
         ready: function() {
             var $el = $(this.$el), handle = $el.attr("handle");

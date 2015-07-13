@@ -170,6 +170,23 @@ require("extend");      // 原生对象扩展
                 }
             },
 
+            /* 获取当前元素在父类中的位置 */
+            index : function() {
+                var parent = this.parent()[0], items;
+
+                if (parent) {
+                    items = parent.children;
+
+                    for(var i=0; i<items.length; i++) {
+                        if (items[i] == this[0]) {
+                            return i;
+                        }
+                    }
+                }
+
+                return -1;  // 默认返回 -1
+            },
+
             /* 设置或读取元素的内联HTML内容 */
             html : function(html) {
                 if (!this[0]) return this;

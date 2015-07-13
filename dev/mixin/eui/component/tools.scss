@@ -34,4 +34,38 @@
     .text-center {
         text-align: center;
     }
+
+    *[class*="retina-border"] {
+        $ratio: 2 !default; // 缩放系数
+        $color: $border-default-color !default;
+
+        position: relative;
+        &:before {
+            @include retina-border-content($color, $ratio);
+        }
+    }
+
+    .retina-border {
+        @include retina-border-width(all);
+    }
+
+    .retina-border-top {
+        @include retina-border-width(top);
+    }
+
+    .retina-border-right {
+        @include retina-border-width(right);
+    }
+
+    .retina-border-bottom {
+        @include retina-border-width(bottom);
+    }
+
+    .retina-border-left {
+        @include retina-border-width(left);
+    }
+
+    .margin-none {
+        margin: 0 !important;
+    }
 }
