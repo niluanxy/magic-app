@@ -46,22 +46,27 @@
     }
 
     .retina-border {
+        border-width: 0 !important;
         @include retina-border-width(all);
     }
 
     .retina-border-top {
+        border-top-width: 0 !important;
         @include retina-border-width(top);
     }
 
     .retina-border-right {
+        border-right-width: 0 !important;
         @include retina-border-width(right);
     }
 
     .retina-border-bottom {
+        border-bottom-width: 0 !important;
         @include retina-border-width(bottom);
     }
 
     .retina-border-left {
+        border-left-width: 0 !important;
         @include retina-border-width(left);
     }
 

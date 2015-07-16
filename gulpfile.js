@@ -21,10 +21,11 @@ var DIR_APP       = __dirname + "/app/",
     DIR_MIXIN     = __dirname + "/dev/mixin/",
     DIR_MINJS     = __dirname + "/dev/minjs/",
     DIR_MAGIC     = __dirname + "/dev/magic/",
-    DIR_MAGIC_VUE = __dirname + "/dev/magic-vue/";
+    DIR_MAGIC_VUE = __dirname + "/dev/magic-vue/",
+    DIR_CORDOVA   = __dirname + "/cordova/";
 
 var release = false;    // 是否为发布输出，发布输出会压缩优化
-
+var cordova = false;    // APP打包是否为cordova输出
 /* mixin 想关任务方法 */
 function task_dev_mixin() {
     var defer = Q.defer();
@@ -139,6 +140,22 @@ gulp.task("dev-magic-vue", task_dev_magic_vue);
 
 
 /* APP 相关任务 */
+function task_dev_app_pub() {
+    var defer = Q.defer(),
+        fpath = cordova?DIR_CORDOVA+"www/":
+                        DIR_APP+"dist/";
+
+    gulp.src([DIR_APP+"pub/**/*", "!"+DIR_APP+"pub/main*",
+              "!"+DIR_APP+"pub/lib/magic*",
+              "!"+DIR_APP+"pub/lib/mixin.scss"])
+    .pipe(gulp.dest(fpath+"pub/"))
+    .on("finish", function() { defer.resolve() })
+
+    return defer.promise
+}
+gulp.task("dev-app-pub", task_dev_app_pub);
+
+
 function task_dev_app_html() {
     var inline = {
             js: {output: { comments: true }},
@@ -146,11 +163,13 @@ function task_dev_app_html() {
         },
         html = { conditionals: true, spare: true };
 
-    var defer = Q.defer(), dirpub = "pub";
+    var defer = Q.defer(),
+        fpath = cordova?DIR_CORDOVA+"www/":
+                        DIR_APP+"dist/";;
 
     gulp.src(DIR_APP+"index.html")
     .pipe(gulpif(release, mininline(inline)))
-    .pipe(gulp.dest(DIR_APP+"dist/"))
+    .pipe(gulp.dest(fpath))
     .on("finish", function() { defer.resolve() })
 
     return defer.promise
@@ -158,7 +177,9 @@ function task_dev_app_html() {
 gulp.task("dev-app-html", task_dev_app_html);
 
 function task_dev_app_css() {
-    var defer = Q.defer();
+    var defer = Q.defer(),
+        fpath = cordova?DIR_CORDOVA+"www/":
+                        DIR_APP+"dist/";;
 
     del(DIR_APP+"dist/page/main*.css", function() {
         gulp.src(DIR_APP+"pub/main.scss")
@@ -175,11 +196,11 @@ function task_dev_app_css() {
                       DIR_APP+"pub/main.css"])
             .pipe(concat(newn))
             .pipe(gulpif(release, minifycss()))
-            .pipe(gulp.dest(DIR_APP+"dist/page/"))
+            .pipe(gulp.dest(fpath+"page/"))
             .on("finish", function() {
-                gulp.src(DIR_APP+"dist/index.html")
+                gulp.src(fpath+"index.html")
                 .pipe(replace(/main.*\.css/, newn))
-                .pipe(gulp.dest(DIR_APP+"dist/"))
+                .pipe(gulp.dest(fpath))
 
                 defer.resolve();
             })
@@ -190,34 +211,29 @@ function task_dev_app_css() {
 }
 gulp.task("dev-app-css", task_dev_app_css);
 
-function task_dev_app_pub() {
-    var defer = Q.defer()
-
-    gulp.src([DIR_APP+"pub/**/*", "!"+DIR_APP+"pub/main*",
-              "!"+DIR_APP+"pub/lib/magic*",
-              "!"+DIR_APP+"pub/lib/mixin.scss"])
-    .pipe(gulp.dest(DIR_APP+"dist/pub/"))
-    .on("finish", function() {
-        defer.resolve()
-    })
-
-    return defer.promise
-}
-gulp.task("dev-app-pub", task_dev_app_pub);
-
 function task_dev_app_js() {
     var UglifyJsPlugin = require("webpack/lib/optimize/UglifyJsPlugin.js");
-    var pugl = new UglifyJsPlugin({ sourceMap: false, mangle: false });
+    var CordovaPlugin  = require('webpack-cordova-plugin');
+    var pugls = release ? [new UglifyJsPlugin({
+                             sourceMap: false,
+                             mangle: false 
+                            })] : [];
+
+    if (cordova) pugls.push(new CordovaPlugin({
+                                config: 'config.xml',
+                                src: 'index.html',
+                                platform: 'android',
+                                version: true,
+                            }));  
 
     var defer = Q.defer(),
+        fpath = cordova?DIR_CORDOVA+"www/":
+                        DIR_APP+"dist/",
         wname = release?"[name][hash:5].js":"[name].js";
 
-    del(DIR_APP+"dist/page/*.js", function() {
-        gulp.src(DIR_APP+"pub/lib/vue.min.js")
-            .pipe(gulp.dest(DIR_APP+"dist/pub/lib/"));
-
+    del(fpath+"page/*.js", function() {
         webpack({
-                entry: [DIR_APP  + "pub/main.js"],
+                entry: [DIR_APP + "pub/main.js"],
                 output: {
                     filename: wname,
                     publicPath: "./page/"
@@ -229,14 +245,14 @@ function task_dev_app_js() {
                         { test: /\.(png|jpg|gif)$/, loader: 'url-loader?limit=8192&name=../pub/img/[name].[ext]?[hash]'},
                     ]
                 },
-                plugins: release ?  [pugl] : [],
+                plugins: pugls,
             })
-        .pipe(gulp.dest(DIR_APP + "dist/page"))
+        .pipe(gulp.dest(fpath + "page"))
         .on("finish", function() {
             if (release /* 发布时才添加hash */) {
                 var hash = hashint((new Date).getTime())+"",
                     name = "main"+hash.substr(0, 5)+".js",
-                    path = DIR_APP+"dist/page/";
+                    path = fpath+"page/";
 
                 fs.readdir(path, function(error, files) {
                     for(var i=0; i<files.length; i++) {
@@ -245,9 +261,9 @@ function task_dev_app_js() {
                             fs.rename(path+str, path+name);
 
                             // 修改 index.html 中的引用
-                            gulp.src(DIR_APP+"dist/index.html")
+                            gulp.src(fpath+"index.html")
                             .pipe(replace(/main.*\.js/, name))
-                            .pipe(gulp.dest(DIR_APP+"dist/"))
+                            .pipe(gulp.dest(fpath))
 
                             break;      defer.resolve();
                         }
@@ -272,6 +288,25 @@ gulp.task("dev-app", function(rel) {
         task_dev_app_css(),
         task_dev_app_js()
     ])
+})
+
+gulp.task("cordova", function(rel) {
+    cordova = true; // 设置cordova打包模式
+    release = rel ? true : false;
+
+    del(DIR_CORDOVA+"www");
+
+    Q.all([
+        task_dev_app_pub(),
+        task_dev_app_html(),
+        task_dev_app_css(),
+        task_dev_app_js()
+    ]).then(function() {
+        // 删除自动生成的多余文件
+        del("www");
+        del("plugins");
+        del("config.xml");
+    })
 })
 
 
@@ -345,4 +380,11 @@ gulp.task("clean", function() {
     del(DIR_APP + "pub/main.css");
     del(DIR_APP + "pub/lib/magic*");
     del(DIR_APP + "pub/lib/mixin.scss");
+})
+
+gulp.task("clean.cordova", function() {
+    // 删除自动生成的多余文件
+    del("www");
+    del("plugins");
+    del("config.xml");
 })
