@@ -128,12 +128,24 @@ $(function() {
         }
     }
 
+    mvue.component = function(ids, opt) {
+        if (opt /* 参数默认值全局设置 */) {
+            if (opt.replace === undefined) {
+                opt.replace = false;
+            }
+            if (opt.inherit === undefined) {
+                opt.inherit = true;
+            }
+        }
+
+        return Vue.component(ids, opt);
+    }
+
     // 将方法暴漏出来
     window.loadView = loadView;
     window.$$       = mvue;
 
-    require("./util/core.js");      // 加载常用工具方法
+    require("./util/main.js");      // 加载常用工具方法
+    /* 加载默认的核心样式文件和组件 */
+    require("./component/main.js");
 });
-
-/* 加载默认的核心样式文件和组件 */
-require("./component/uicore.js");

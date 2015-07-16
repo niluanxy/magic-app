@@ -87,13 +87,14 @@ function task_dev_magic_js() {
             },
             resolve: {
                 alias: {
-                    util:  LIB_MINJS + "util.js",
-                    query: LIB_MINJS + "selector.js",
+                    util    :  LIB_MINJS + "util.js",
+                    query   : LIB_MINJS + "selector.js",
                     director: LIB_MINJS + "director.js",
                     domready: LIB_MINJS + "ondomready.js",
-                    extend:   LIB_MINJS + "extend.js",
-                    promise:  LIB_MINJS + "promise.js",
-                    jsonp  :  LIB_MINJS + "jsonp.js",
+                    dom     : LIB_MINJS + "dom.js",
+                    extend  :   LIB_MINJS + "extend.js",
+                    promise :  LIB_MINJS + "promise.js",
+                    jsonp   :  LIB_MINJS + "jsonp.js",
                 }
             },
             module: {
@@ -287,8 +288,8 @@ gulp.task("serve", function() {
     gulp.watch(["dev/minjs/*"], ["dev-minjs"])
 
     /* magic 动态刷新任务 */
-    gulp.watch(["dev/magic/**/*.scss"], ["dev-magic-css"])
-    gulp.watch(["dev/magic/**/*.js"], ["dev-magic-js"])
+    gulp.watch(["dev/magic/**/*.scss", "!dev/magic/mui"], ["dev-magic-css"])
+    gulp.watch(["dev/magic/**/*.js", "dev/magic/mui/**/*"], ["dev-magic-js"])
 
     /* magic-vue 动态刷新任务 */
     gulp.watch(["dev/magic-vue/**/*"], ["dev-magic-vue"])

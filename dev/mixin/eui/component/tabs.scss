@@ -12,12 +12,7 @@
 
         .tab-item {
             color: $color;
-            opacity: 1;
             background-color: $bg-color;
-
-            &.active {
-                 opacity: $active-opacity;
-            }
         }
 
         &.tabs-striped, &.tabs-striped-top {
@@ -48,6 +43,7 @@
     .tab-item {
         display: block;
         flex: 1;
+        opacity: 1;
         position: relative;
         color: $tabs-stable-text;
         font-size: $tabs-text-font-size;
@@ -56,6 +52,10 @@
 
         -webkit-user-drag: none;
         user-select: none;
+
+        &.active {
+            opacity: $active-opacity;
+        }
 
         &.disabled,
         &[disabled] {
@@ -94,14 +94,18 @@
         left: 0; right: 0;
     }
 
+    &.border-bottom,
+    &.tabs-header {
+        @include retina-border-width(top, 0);
+        @include retina-border-width(bottom);
+    }
+
     &.tabs-header {
         top: 0;
-        @include retina-border-width(top, 0);
     }
 
     &.tabs-footer {
         bottom: 0;
-        @include retina-border-width(bottom, 0);
     }
 
     &.tabs-striped, &.tabs-striped-top {

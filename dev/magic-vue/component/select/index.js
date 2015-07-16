@@ -1,111 +1,70 @@
-require("./style.scss");
-
 module.exports = (function() {
-    var SelectArray = {};   // 用于管理所有的 select 组件
+    var SelectMain = {
+        data: {},
 
-    // 用于切换 item 的状态，并返回当前选中的项目
-    function toggleSelect(items, init) {
-        var $that, $icon, cls, ret, val;
+        add : function(str, handle) {
+            var key = "_select_"+str.hashCode();
+            this.data[key] = handle;
+        },
 
-        for(var i=0; i<items.length; i++) {
-            $that = $(items[i]);
-            $icon = $that.find("[toggle]");
-            cls   = $icon.length?$$.parseJSON($icon.attr("toggle")):{};
+        get : function(str) {
+            var key = "_select_"+str.hashCode();
+            return this.data[key];
+        },
 
-            val = $that.attr("val");
-            if (i == init || val == init) {
-                // 用下标初始化，则返回值，否则返回下标
-                if (parseInt(init) !== NaN) ret = val;
-                else ret = i;
-
-                init = null; // 设置为空，防止后续初始化
-
-                $that.addClass("select")
-                if ($icon) {
-                    $icon.addClass(cls.on||'');
-                    $icon.removeClass(cls.off||'');
-                }
-            } else {
-                $that.removeClass("select")
-                if ($icon) {
-                    $icon.removeClass(cls.on||'');
-                    $icon.addClass(cls.off||'');
-                }
-            }
+        del : function(str) {
+            var key = "_select_"+str.hashCode();
+            this.data[key].destroy();
+            delete this.data[key];
         }
+    };
 
-        return ret;
-    }
-
-    // 通过创建一个唯一的字符串来连接组件
-    function makeBind(str) {
-        return "_select_"+str.hashCode();
-    }
-
-    Vue.component("mg-select", {
-        template: "<div class='mg-scroll'><div class='list list-embed'><content></content></div></div>",
-        replace: false,
-        inherit: true,
+    $$.component("mg-select", {
+        template: "<content></content>",
         ready: function() {
-            var $el = $(this.$el), vmod, index,
-                bind, $bind, handle, key, ret;
+            var $el = $(this.$el), opt = {}, $bind,
+                $val, $pos, val, bind, handle, mult, $call;
 
-            vmod  = $$.objParse(this, $el.attr("value"));
-            index = $$.objParse(this, $el.attr("index"));
+            mult  = !!$el.attr("multiple");
             bind  = $el.attr("bind");
+            val   = $el.attr("value");
+            $call = $$.objParse(this, $el.attr("call"));
+            $pos  = $$.objParse(this, $el.attr("index"));
+            $val  = $$.objParse(this, val);
             $bind = $$.objParse(this, bind);
+            if($bind) $val = $bind; // 重置句柄
 
-            $el.addClass("mg-select");
+            if ($bind || $val) {
+                opt.modal = $bind?true:false;
+                opt.mult  = mult;
+                opt.init  = $val ? $val.val : 
+                           ($pos ? $pos.val : null);
 
-            if ($bind /* 采用 bind 方式说明是弹框select */) {
-                $el.addClass("modal hideOut")
-                   .children().addClass("modal_body");
-
-                vmod = $$.objParse(this, $el.attr("bind"));
-                key = makeBind(bind);   // 创建唯一的key
-
-                SelectArray[key] = {
-                    modal : $el.modal(),
-                    scroll: $el.children().scroll()
-                };
-            }
-
-            $el.on("tap", function(e) {
-                var items = $el.query("item"),
-                    $sel  = $(e._target),
-                    pos   = $sel.index(), show;
-
-                ret = toggleSelect(items, pos);
-                if (vmod) vmod.val = ret;
-                if (index) index.val = pos;
-
-                show = SelectArray[key];
-                if (show && show.modal) {
-                    show.modal.hide();
+                opt.call = function(val, pos) {
+                    if ($val) $val.val = val;
+                    if ($pos) $pos.val = pos;
+                    if ($call && typeof $call.val == "function") {
+                        $call.val();    // 运行对象回调方法
+                    }
                 }
-            })
 
-            // 初始化默认选择项，可以用下标或者 val 值
-            ret = toggleSelect($el.query("item"), vmod && vmod.val);
-            if (vmod && parseInt(vmod.val) !== NaN) {
-                vmod.val = ret; // 数字初始化时，修正为具体值
+                handle = $el.select(opt);
+                if (val || bind) SelectMain.add(val||bind, handle);
             }
         }
     });
 
     Vue.directive("select", {
         bind: function() {
-            var key = makeBind(this.raw),
-                $el = $(this.el), once = false;
+            var $el = $(this.el), once = false, key = this.raw;
 
             $el.on("tap", function() {
-                var handle = SelectArray[key], modal, scroll;
+                var select = SelectMain.get(key), srcoll;
 
-                if (handle /* 不为空说明有数据 */) {
-                    modal  = handle.modal;
-                    scroll = handle.scroll;
-
-                    modal.toggle(); // 切换select显示状态
+                if (select /* 不为空说明有数据 */) {
+                    // 切换select显示状态
+                    select.toggle();
+                    scroll = select.scroll;
 
                     if (!once /* 没初始化过则初始化 */) {
                         $(scroll.wrapper).render(function() {

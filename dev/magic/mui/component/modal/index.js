@@ -18,16 +18,17 @@ module.exports = (function() {
 
         if (opt.hasInsert /* 已插入页面直接处理 */) {
             this.el.attr("id", mid);
-            this.el.addClass("hideOut");
+            this.el.addClass("hideOut")
+                   .removeClass("hide");
         } else {
-            html  = "<div class='modal hideOut' id='"+mid+"'>";
-            this.el.addClass("modal_body");
-            html += this.el[0].outerHTML+"</div>";
-            $("body").append(html);     // 添加到页面中
-            this.el.remove();           // 旧元素从页面删除 
+            html = "<div class='modal hideOut' id='"+mid+"'></div>";
+            this.el.addClass("modal_body")
+                   .removeClass("hide")
+                   .wrap(html);
+            this.el = this.el.parent();
+            $("body").append(this.el);     // 添加到页面中
         }
         
-        this.el = $("#"+mid);      //  获得对象的句柄
         this.el.addClass("align"+opt.align.toUpFirst());
 
         if (opt.autoHide /* 绑定默认关闭方法 */) {
@@ -81,7 +82,9 @@ module.exports = (function() {
     if ($ && $.fn && !$.fn.modal) {
         $.fn.extend({modal: function(option) {
             var opt = $.extend({}, option);
-            opt.hasInsert = true;
+            if (opt.hasInsert === undefined) {
+                opt.hasInsert = true;
+            }
             return new Modal(this[0], opt).init();
         }});
     };

@@ -5,3 +5,4 @@ require("./component/modal");               // 加载Modal模态弹框组件
 require("./component/tip");                 // 加载Tip提示组件
 require("./component/confirm");             // 加载confirm组件
 require("./component/spinner.js");          // 加载Loading组件
+require("./component/select");              // 加载select组件

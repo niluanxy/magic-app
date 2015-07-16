@@ -1,8 +1,6 @@
 module.exports = (function() {
-    Vue.component("mg-tabs", {
+    $$.component("mg-tabs", {
         template: "<content></content>",
-        replace: false,
-        inherit: true,
         ready: function() {
             var $el = $(this.$el), tabs, $item, hash, 
                 match, $child;
@@ -21,18 +19,12 @@ module.exports = (function() {
 
                 $child = $item.find(".icon");
 
-                if ($child.length && $child.attr("toggle") !== null) {
+                if ($child.length && $child.attr("toggle")) {
                     var toggle = $child.attr("toggle"),
-                        cls    = $$.parseJSON(toggle);
+                        cls    = $.parseJSON(toggle),
+                        active = $item.hasClass("actived");
 
-                    if ($item.hasClass("actived")) {
-                        $child.addClass(cls.on);
-                        $child.removeClass(cls.off);
-                    } else {
-                        $child.removeClass(cls.on);
-                        $child.addClass(cls.off);
-                    }
-
+                    $child.switchClass(cls, active);
                     $child.removeAttr("toggle");
                 }
 

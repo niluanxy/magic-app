@@ -48,22 +48,4 @@ module.exports = (function() {
             });
         }
     }
-
-    /*=================================================
-     *  简易的 JSON 字符串转换函数
-     *=================================================*/
-    $$.parseJSON = function(str) {
-        var arr = str.split(","), item, key, ret = {};
-
-        for(var i=0; i<arr.length; i++) {
-            item = arr[i];
-            item = item.replace(/\s+/g, ' ');
-            item = item.replace(/[\'*|\"*]/g, '');
-            key  = item.match(/.*(?=\:)/)[0];
-            key  = key.replace(/\s+/g, '');
-            ret[key] = item.replace(/^.*\:\s*/g, "");
-        }
-
-        return ret;
-    }
 })();

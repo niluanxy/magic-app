@@ -9,10 +9,8 @@ module.exports = (function() {
         return parent != thisid;    // 不同则是 iFrame
     }
 
-    Vue.component("mg-iframe", {
+    $$.component("mg-iframe", {
         template: "<content></content>",
-        replace: false,
-        inherit: true,
         ready: function() {
             var $el    = $(this.$el),
                 src    = $el.attr("src"),

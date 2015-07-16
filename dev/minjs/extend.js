@@ -29,6 +29,16 @@ String.prototype.toUpFirst = function() {
 
 /**
  * Array findBy 工具函数，通过给定的key和值反向查找数据
+ * eg: var test = [
+ *     {name: "jack", age: 23, work: true},
+ *     {name: "tom",  age: 24, work: false},
+ *     {name: "tony", age: 22, work: false},
+ *     {name: "kidy", age: 26, work: true},
+ * ]
+ *     test.findBy("name", "tony")
+ * ret:  {name: "tony", age: 22, work: false}
+ *     test.findBy("name", "tom", true)
+ * ret:  1
  */
 
 Array.prototype.findBy = function(key, val, index) {
@@ -39,4 +49,27 @@ Array.prototype.findBy = function(key, val, index) {
     }
 
     return undefined;
+}
+
+/* 检测当前数组是否包含某元素 */
+Array.prototype.findIn = function(val) {
+    for(var i=0; i<this.length; i++) {
+        if (this[i] == val) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/* 删除数组中指定值 */
+Array.prototype.delBy = function(val, all) {
+    for(var i=0; i<this.length; i++) {
+        if (this[i] == val) {
+            this.splice(i, 1);
+            if (!all) break;
+        }
+    }
+
+    return this;
 }

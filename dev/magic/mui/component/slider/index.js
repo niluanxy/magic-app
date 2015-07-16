@@ -23,17 +23,16 @@ module.exports = (function() {
 
     Slider.prototype.init = function() {
         var that = this, opt = that.options,
-                   html, childs, scroll;
+                   childs, $first, scroll, items;
 
-        html = "<div class='slider_scroll'>"
-               + that.el.html() + "</div>";
-        that.el.html(html); // 重新设置内容
-
-        scroll = that.el.find(".slider_scroll");
+        items = that.el[0].childNodes;
+        that.el.wrapAll("<div class='slider_scroll'></div>");
+        scroll = that.el.children();
         childs = scroll.query(".slider-item");
+        $first = $(childs[0]);
 
-        this.__render = $(childs[0]).render(function() {
-            that.pageWidth  = $(childs[0]).width();
+        this.__render = $first.render(function() {
+            that.pageWidth = $first.width();
             if (opt.scale) {
                 scroll.height(that.pageWidth*opt.scale);
             }

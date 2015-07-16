@@ -1,8 +1,6 @@
 module.exports = (function() {
-    Vue.component("mg-confirm", {
+    $$.component("mg-confirm", {
         template: "<div class='confirm modal_body'><content></content></div>",
-        replace: false,
-        inherit: true,
         ready: function() {
             var $el = $(this.$el), handle, show, $confirm; 
 

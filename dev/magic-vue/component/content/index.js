@@ -1,10 +1,8 @@
 require("./style.scss");
 
 module.exports = (function() {
-    Vue.component("mg-content", {
+    $$.component("mg-content", {
         template: "<div class='scroll_body'><content></content></div>",
-        replace: false,
-        inherit: true,
         ready: function() {
             var $el = $(this.$el), $scroll, $parent, handle;   // 定义操作对象
 
@@ -15,7 +13,7 @@ module.exports = (function() {
                 $el.addClass("has-header");
             }
             if ($parent.find("mg-footer").length || 
-                $parent.find("tabs-footer").length) {
+                $parent.find(".tabs-footer").length) {
                 $el.addClass("has-footer");
             }
 
@@ -40,10 +38,8 @@ module.exports = (function() {
         }
     });
 
-    Vue.component("mg-scroll", {
+    $$.component("mg-scroll", {
         template: "<div><content></content></div>",
-        replace: false,
-        inherit: true,
         ready: function() {
             var $el = $(this.$el), $scroll, handle;   // 定义操作对象
 

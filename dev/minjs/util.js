@@ -316,45 +316,6 @@ module.exports = (function() {
     };
 
     /**
-     * 尝试将 text 转为 dom 对象
-     *
-     * @param       {String}    text - 要转换的DOM字符串
-     * @return      {Element}   包含转换好的DOM的一个Body对象
-     * @author      mufeng  <smufeng@gmail.com>
-     * @version     0.1     <2015-05-30>
-     */
-    util.makeDom = function(text) {
-        var content = document.implementation.createHTMLDocument("");
-        content.body.innerHTML = text;    // 将输入字符串转为DOM对象
-        return content.body;    // 返回包含DOM的Body对象
-    };
-
-    /**
-     * 将字符串或者DOM添加到给定的对象中
-     * @param       {String||Element}   text - 要添加的字符串或者DOM
-     * @param       {Element}           el - 要操作的DOM对象
-     * @return      {Element}           操作后的DOM对象
-     * @author      mufeng  <smufeng@gmail.com>
-     * @version     0.1     <2015-05-30>
-     */
-    util.append = function(text, el) {
-        if (typeof text === "string" &&
-             text[0] === "<" && 
-             text[ text.length - 1 ] === ">" &&
-             text.length >= 3) {
-            var doms = util.makeDom(text).childNodes;
-
-            for (var i=0; i<doms.length; i++) {
-                el.appendChild(doms.item(i));
-            }
-        } else if (text instanceof Element) {
-            el.appendChild(text);
-        }
-
-        return el;  // 反正处理后的对象
-    }
-
-    /**
      * 继承给定父类的所有属性
      *
      * @param       {Object}   p - 要继承的父类对象

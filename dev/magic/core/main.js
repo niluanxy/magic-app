@@ -6,7 +6,8 @@ require("extend");      // 原生对象扩展
         var magic = function(select) {
                 return new magic.fn._init(select);
             },
-            _UTIL = require("util");
+            _UTIL = require("util"),
+            _DOM  = require("dom");
 
         magic.fn = magic.prototype = {
             constructor: Magic,
@@ -19,11 +20,8 @@ require("extend");      // 原生对象扩展
                     this.length = 0;    // 默认无元素
 
                     // 判断是否为创建DOM的字符串
-                    if (select[0] === "<" &&
-                        select[ select.length - 1 ] === ">" &&
-                        select.length >= 3) {
-                        
-                        var make = _UTIL.makeDom(select);
+                    if (_DOM.check(select)) {
+                        var make = _DOM.make(select);
                         if (make.childNodes.length == 1) {
                             this[0] = make.childNodes[0];
                         } else {
@@ -85,6 +83,19 @@ require("extend");      // 原生对象扩展
             toggleClass: function(className, set) {
                 _UTIL.toggleClass(this[0], className, set);
                 
+                return this;
+            },
+
+            /* 只有两种状态的元素切换样式 */
+            switchClass: function(cls, active) {
+                if (active /* 激活状态 */) {
+                    this.addClass(cls.on||'');
+                    this.removeClass(cls.off||'')
+                } else {
+                    this.removeClass(cls.on||'');
+                    this.addClass(cls.off||'')
+                }
+
                 return this;
             },
 
@@ -155,19 +166,9 @@ require("extend");      // 原生对象扩展
                 }
             },
 
-            /* 为对象添加HTML对象或者字符串 */
-            append: function(text) {
-                this[0] = _UTIL.append(text, this[0]);
-                return this;
-            },
-
-
             /* 将自身从父元素中删除，如果可以的话 */
             remove : function() {
-                var parent = this.parent()[0];
-                if (parent) {
-                    parent.removeChild(this[0]);
-                }
+                return _DOM.remove(this[0]);
             },
 
             /* 获取当前元素在父类中的位置 */
@@ -199,6 +200,45 @@ require("extend");      // 原生对象扩展
                 }
             },
 
+            /* 为对象添加HTML对象或者字符串 */
+            append: function(text) {
+                this[0] = _DOM.append(this[0], text);
+                return this;
+            },
+
+            insertBefore: function(text) {
+                this[0] = _DOM.prepend(this[0], text);
+                return this;
+            },
+
+            /* 元素前插入对象操作的方法 */
+            before: function(html) {
+                _DOM.before(this[0], html);
+
+                return this;
+            },
+
+            /* 元素后插入对象操作的方法 */
+            after: function(html) {
+                _DOM.after(this[0], html);
+
+                return this;
+            },
+
+            /* 元素外包裹元素 */
+            wrap: function(html) {
+                _DOM.wrap(this[0], html);
+
+                return this;
+            },
+
+            /* 选择元素的所有子元素外包裹dom */
+            wrapAll: function(html) {
+                _DOM.wrapAll(this[0], html);
+
+                return this;
+            },
+
             /* 简单判断元素渲染完成后执行某操作 */
             render: function(call) {
                 var handle, that = this, argv = [];
@@ -218,10 +258,7 @@ require("extend");      // 原生对象扩展
 
             /* 对象的父元素和子元素操作方法 */
             parent: function() {
-                var parent = null;  // 存放父类元素
-                if (this[0] /* 有对象时执行 */) {
-                    parent = this[0].parentNode;
-                }
+                var parent = _DOM.parent(this[0]);
 
                 if (parent) return magic(parent);
             },
@@ -267,6 +304,22 @@ require("extend");      // 原生对象扩展
                 var defer = require("promise");
 
                 return new defer.Promise();
+            },
+
+            /* 一个简易的转换json的方法 */
+            parseJSON: function(str) {
+                var arr = str.split(","), item, key, ret = {};
+
+                for(var i=0; i<arr.length; i++) {
+                    item = arr[i];
+                    item = item.replace(/\s+/g, ' ');
+                    item = item.replace(/[\'*|\"*]/g, '');
+                    key  = item.match(/.*(?=\:)/)[0];
+                    key  = key.replace(/\s+/g, '');
+                    ret[key] = item.replace(/^.*\:\s*/g, "");
+                }
+
+                return ret;
             },
 
             jsonp: function(url, data) {
