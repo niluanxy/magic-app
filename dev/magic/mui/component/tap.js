@@ -33,17 +33,22 @@ $.ready(function() {
         } while($target[0] && $target[0] != this);
     });
 
+    // 清除激活类
+    function clearActive($target) {
+        if ($target.hasClass("button")   ||
+            $target.hasClass("tab-item") ||
+            $target.hasClass("item")) {
+
+            clearTimeout($target.data("_active_handle"));
+            $target.removeClass("active");
+        }
+    }
+
     $document.on("touchmove", $.delayCall(function(e) {
         var $target = $(e.target);
 
         do {
-            if ($target.hasClass("button")   ||
-                $target.hasClass("tab-item") ||
-                $target.hasClass("item")) {
-
-                clearTimeout($target.data("_active_handle"));
-                $target.removeClass("active");
-            }
+            clearActive($target);
 
             $target = $target.parent();     // 向上递归检测
         } while($target[0] && $target[0] != this);
@@ -58,24 +63,23 @@ $.ready(function() {
         ct = $.getTime() - tap.startT;
 
         if (cx<5 && cy < 5 && ct < 200) {
-            e.stopPropagation();    // 终止冒泡
-
             var ev = new Event('tap');
             
             ev.pageX  = touch.pageX;
             ev.pageY  = touch.pageY;
             ev._target = e.target;
+            ev.preventDefault = function() {
+                e.preventDefault();
+            }
+            ev.stopPropagation = function() {
+                e.stopPropagation();    // 终止冒泡
+            }
 
             do {
                 tagname = $target[0].tagName;
                 $target[0].dispatchEvent(ev);   // 触发 Tap 事件
 
-                if ($target.hasClass("button")   ||
-                    $target.hasClass("tab-item") ||
-                    $target.hasClass("item")) {
-
-                    $target.removeClass("active");
-                }
+                clearActive($target);   // 清除激活类
 
                 if (tagname === "A") {
                     e.preventDefault();
@@ -91,12 +95,7 @@ $.ready(function() {
             } while($target[0] && $target[0] != this);
         } else {
             do {
-                if ($target.hasClass("button")   ||
-                    $target.hasClass("tab-item") ||
-                    $target.hasClass("item")) {
-
-                    $target.removeClass("active");
-                }
+                clearActive($target);   // 清除激活类
 
                 $target = $target.parent();     // 向上递归检测
             } while($target[0] && $target[0] != this);

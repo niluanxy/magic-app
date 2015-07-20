@@ -1,5 +1,22 @@
 module.exports = (function() {
-    var util = {}; // 定义返回的对象
+    var util     = {}, // 定义返回的对象
+        isArray  = Array.isArray;
+
+    /* 判断是否为一个纯净的对象 */
+    var isObject = util.isPlainObject= function(obj) {
+        if (typeof obj !== "object" ||
+             obj.nodeType || obj === window) {
+            return false;
+        }
+
+        if ( obj.constructor &&
+                !({}).hasOwnProperty.call( obj.constructor.prototype, "isPrototypeOf" ) ) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     /**
      * 按照输入参数返回一个节流函数
@@ -78,46 +95,76 @@ module.exports = (function() {
         el.removeEventListener(type, fn, !!capture);
     };
 
-
     /**
      * 合并一个或多个对象到目标对象
      *
+     * @param       {Object}    deep     - 是否深度复制
      * @param       {Object}    target   - 目标对象
      * @param       {Object}    obj...   - 要合并一个或多个对象
-     * @param       {Boolean}   ...last  - 是否忽略空值(null,undefined)
+     * @param       {Boolean}   ...last  - 是否忽略无效值(null,undefined)
      * @author      mufeng  <smufeng@gmail.com>
      * @version     0.1     <2015-04-10>
      */
-    util.extend = function(target, obj) {
-        var i = 1, src = target, name, argv, len, pass;
-        argv = arguments;       // 参数数组
+    util.extend = function(/* deep, target, obj..., last */) {
+        var i = 1, argv = arguments, len = argv.length,
+            target = argv[0], name, copy, clone,
+            pass = false, deep = false, isarr = false;
 
         // 如果最后一个变量是 true ，表示忽略无效字段
-        if (argv[argv.length-1] === true) {
-            len = argv.length-1;
-            pass = true;
-        } else {
-            len = argv.length;
-            pass = false;
+        if (typeof argv[len-1] === "boolean") {
+            pass = argv[len-1];
+            len--;
+        }
+
+        // 如果第一个变量是 布尔值，设置是否深度复制
+        if (typeof argv[0] === "boolean") {
+            deep = argv[0];
+            target = argv[1];
+            i++;
         }
 
         // 如果只有一个参数时，合并到自身
-        if (argv.length == 1) {
-            src = this;     // 重置复制对象句柄
-            i = 0;          // 重置开始复制的对象下标
+        if (i == len) {
+            target = this;      // 重置复制对象句柄
+            i = 0;              // 重置开始复制的对象下标
         }
 
         for(; i < len; i++) {
-            for(name in argv[i]) {
-                if (pass && argv[i][name] == undefined) {
-                    continue;   // 跳过 null 与 undefined    
-                }
+            if (argv[i] != null) {
+                for(name in argv[i]) {
+                    src  = target[name];
+                    copy = argv[i][name];
 
-                src[name] = argv[i][name];
+                    // 跳过指向自身，防止死循环
+                    if (target === copy) {
+                        continue;
+                    }
+
+                    // 若设置忽略无效值，则忽略
+                    if (pass && copy == undefined) {
+                        continue;   
+                    }
+
+                    if (deep && copy && 
+                            ( isarr = isArray(copy) || isObject(copy) ) 
+                        ) {
+
+                        // 深度复制时，判断是否需要创建新空间
+                        if (isarr) {
+                            clone = src && isArray(src) ? src : [];
+                        } else {
+                            clone = src && isObject(src) ? src : {};
+                        }
+
+                        target[name] = util.extend(deep, clone, copy);
+                    } else if (copy !== undefined) {
+                        target[name] = copy;
+                    }
+                }
             }
         }
 
-        return src;     // 返回合并后的对象
+        return target;     // 返回合并后的对象
     };
 
     /**

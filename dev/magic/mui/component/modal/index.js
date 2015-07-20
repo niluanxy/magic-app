@@ -33,11 +33,9 @@ module.exports = (function() {
 
         if (opt.autoHide /* 绑定默认关闭方法 */) {
             var that = this, ele = this.el[0];
-            that.el.on("touchend", function(event) {
-                if (event.target == ele) {
-                    that.hide();    // 隐藏自己
-                    event.stopPropagation();
-                }
+            that.el.on("tap", function(e) {
+                e.preventDefault();     // 阻止默认动作
+                if (e.target == ele) that.hide();
             })
         }
 

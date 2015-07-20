@@ -40,38 +40,38 @@ function task_dev_mixin() {
     .pipe(concat("mixin.scss"))
     .pipe(gulp.dest(DIR_MAGIC+"lib/"))
     .pipe(gulp.dest(DIR_APP+"pub/lib/"))
-    .on("finish", function() { defer.resolve(); })
+    .on("finish", function() { defer.resolve(); });
 
-    return defer.promise
+    return defer.promise;
 }
 gulp.task("dev-mixin", task_dev_mixin);
 
 
 /* minjs 相关任务方法 */
 function task_dev_minjs() {
-    var defer = Q.defer()
+    var defer = Q.defer();
 
     gulp.src(DIR_MINJS+"*.js")
     .pipe(gulp.dest(DIR_MAGIC+"lib/minjs/"))
-    .on("finish", function() { defer.resolve() })
+    .on("finish", function() { defer.resolve() });
 
-    return defer.promise
+    return defer.promise;
 }
 gulp.task("dev-minjs", task_dev_minjs)
 
 
 /* magic 相关任务方法 */
 function task_dev_magic_css() {
-    var defer = Q.defer()
+    var defer = Q.defer();
 
     gulp.src(DIR_MAGIC+"core/main.scss")
     .pipe(sass())
     .pipe(autoprefixer())
     .pipe(rename("magic.css"))
     .pipe(gulp.dest(DIR_APP+"pub/lib/"))
-    .on("finish", function() { defer.resolve(); })
+    .on("finish", function() { defer.resolve(); });
 
-    return defer.promise
+    return defer.promise;
 }
 gulp.task("dev-magic-css", task_dev_magic_css);
 
@@ -79,7 +79,7 @@ function task_dev_magic_js() {
     var LIB_MINJS = DIR_MAGIC + "lib/minjs/",
         DIR_CORE  = DIR_MAGIC + "core/";
 
-    var defer = Q.defer()
+    var defer = Q.defer();
 
     webpack({
             entry: DIR_CORE + "main.js",
@@ -106,7 +106,7 @@ function task_dev_magic_js() {
             }
         })
     .pipe(gulp.dest(DIR_MAGIC_VUE+"lib/"))
-    .on("finish", function() { defer.resolve(); })
+    .on("finish", function() { defer.resolve(); });
 
     return defer.promise;
 }
@@ -117,7 +117,7 @@ gulp.task("dev-magic-js", task_dev_magic_js);
 function task_dev_magic_vue() {
     var DIR_SRC = DIR_MAGIC_VUE;
 
-    var defer = Q.defer()
+    var defer = Q.defer();
 
     webpack({
             entry: DIR_SRC+"main.js",
@@ -132,9 +132,9 @@ function task_dev_magic_vue() {
             }
         })
     .pipe(gulp.dest(DIR_APP+"pub/lib/"))
-    .on("finish", function() { defer.resolve() })
+    .on("finish", function() { defer.resolve() });
 
-    return defer.promise 
+    return defer.promise;
 }
 gulp.task("dev-magic-vue", task_dev_magic_vue);
 
@@ -149,9 +149,9 @@ function task_dev_app_pub() {
               "!"+DIR_APP+"pub/lib/magic*",
               "!"+DIR_APP+"pub/lib/mixin.scss"])
     .pipe(gulp.dest(fpath+"pub/"))
-    .on("finish", function() { defer.resolve() })
+    .on("finish", function() { defer.resolve() });
 
-    return defer.promise
+    return defer.promise;
 }
 gulp.task("dev-app-pub", task_dev_app_pub);
 
@@ -165,23 +165,23 @@ function task_dev_app_html() {
 
     var defer = Q.defer(),
         fpath = cordova?DIR_CORDOVA+"www/":
-                        DIR_APP+"dist/";;
+                        DIR_APP+"dist/";
 
     gulp.src(DIR_APP+"index.html")
     .pipe(gulpif(release, mininline(inline)))
     .pipe(gulp.dest(fpath))
-    .on("finish", function() { defer.resolve() })
+    .on("finish", function() { defer.resolve() });
 
-    return defer.promise
+    return defer.promise;
 }
 gulp.task("dev-app-html", task_dev_app_html);
 
 function task_dev_app_css() {
     var defer = Q.defer(),
         fpath = cordova?DIR_CORDOVA+"www/":
-                        DIR_APP+"dist/";;
+                        DIR_APP+"dist/";
 
-    del(DIR_APP+"dist/page/main*.css", function() {
+    del(fpath+"page/main*.css", function() {
         gulp.src(DIR_APP+"pub/main.scss")
         .pipe(sass())
         .pipe(autoprefixer())
@@ -204,10 +204,10 @@ function task_dev_app_css() {
 
                 defer.resolve();
             })
-        })
-    })
+        });
+    });
 
-    return defer.promise
+    return defer.promise;
 }
 gulp.task("dev-app-css", task_dev_app_css);
 
@@ -272,10 +272,10 @@ function task_dev_app_js() {
             } else {
                 defer.resolve();
             }
-        })
-    })
+        });
+    });
 
-    return defer.promise
+    return defer.promise;
 }
 gulp.task("dev-app-js", task_dev_app_js);
 
@@ -287,7 +287,7 @@ gulp.task("dev-app", function(rel) {
         task_dev_app_html(),
         task_dev_app_css(),
         task_dev_app_js()
-    ])
+    ]);
 })
 
 gulp.task("cordova", function(rel) {
@@ -306,7 +306,7 @@ gulp.task("cordova", function(rel) {
         del("www");
         del("plugins");
         del("config.xml");
-    })
+    });
 })
 
 
@@ -324,7 +324,7 @@ gulp.task("serve", function() {
 
     /* magic 动态刷新任务 */
     gulp.watch(["dev/magic/**/*.scss", "!dev/magic/mui"], ["dev-magic-css"])
-    gulp.watch(["dev/magic/**/*.js", "dev/magic/mui/**/*"], ["dev-magic-js"])
+    gulp.watch(["dev/magic/**/*.js", "dev/magic/mui/**/*.scss"], ["dev-magic-js"])
 
     /* magic-vue 动态刷新任务 */
     gulp.watch(["dev/magic-vue/**/*"], ["dev-magic-vue"])
@@ -344,7 +344,7 @@ gulp.task("build.base", function() {
     return Q.all([
         task_dev_mixin(),
         task_dev_minjs()
-    ])
+    ]);
 })
 
 gulp.task("build.magic", ["build.base"], function(rel) {
@@ -353,13 +353,13 @@ gulp.task("build.magic", ["build.base"], function(rel) {
     return Q.all([
         task_dev_magic_css(),
         task_dev_magic_js()
-    ])
+    ]);
 })
 
 gulp.task("build.vue", ["build.magic"], function(rel) {
     release = rel ? true : false;
 
-    return Q.all([task_dev_magic_vue()])
+    return Q.all([task_dev_magic_vue()]);
 })
 
 gulp.task("build.app", ["build.vue"], function(rel) {

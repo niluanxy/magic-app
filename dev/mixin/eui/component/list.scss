@@ -28,10 +28,6 @@
         font-size: $item-font-size;
         padding: $item-padding;
         @include retina-border(bottom, $item-default-border);
-    
-        >* {
-            z-index: 2;
-        }
 
         &[href].active {
             @include retina-border-width(bottom, 0);
@@ -39,7 +35,7 @@
             &:after {
                 content: " ";
                 position: absolute;
-                z-index: 0;
+                z-index: -1;
                 top: 0;
                 height: 100%;
                 left: -50%;
@@ -107,6 +103,7 @@
         &.item-avator,
         &.item-avator-large {
             .avator {
+                border-radius: $list-border-radius;
                 position: absolute;
                 top: $item-padding;
                 left: $item-padding;
@@ -117,7 +114,7 @@
                 }
             }
 
-            >* {
+            .line {
                 @include text-ellipsis();
                 position: relative;
 
@@ -139,7 +136,7 @@
                 width: $item-avator;
             }
 
-            >* {
+            .line {
                 line-height: $item-avator/2;
             }
         }
@@ -152,7 +149,7 @@
                 width: $item-avator-large;
             }
 
-            >* {
+            .line {
                 line-height: $item-avator-large/3;
             }
         }
@@ -164,6 +161,14 @@
             .avator {
                 left: 0;
             }
+        }
+
+        &.item-avator {
+            padding-left: $item-padding + $item-avator;
+        }
+
+        &.item-avator-large {
+            padding-left: $item-padding + $item-avator-large;
         }
     }
 

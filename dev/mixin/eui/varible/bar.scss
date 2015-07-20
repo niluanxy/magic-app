@@ -7,6 +7,7 @@ $bar-height:                      44px !default;
 $bar-title-font-size:             16px !default;
 $bar-padding-portrait:            5px !default;
 $bar-padding-landscape:           5px !default;
+$bar-inline-height:               $bar-height - $bar-padding-portrait*2 !default;   
 $bar-transparency:                1 !default;
 
 $bar-default-bg:                  rgba($color-light, $bar-transparency) !default;

@@ -28,6 +28,10 @@
         .button {
             color: $color;
         }
+
+        .input {
+            border-color: $border-color;
+        }
     }
 }
 
@@ -131,6 +135,14 @@
             width: 40%;
             font-size: $font-size-base;
         }
+    }
+
+    .input {
+        padding: 0 $bar-title-font-size/2;
+        height: $bar-inline-height;
+        line-height: $bar-inline-height;
+        border-radius: $border-radius-base;
+        border: 1px solid $bar-default-border;
     }
 
     .button {

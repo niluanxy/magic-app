@@ -19,7 +19,7 @@ module.exports = (function() {
                 parent = this.$parent, ihandle,
                 pid, iframe, $iframe, name, pcall, load;
 
-            if (src == undefined) return;
+            if (src === undefined) return;
             $el.removeAttr("src");      // 移除无用src
 
             pid   = $.getRandom();      // 生成独立的ID
@@ -35,7 +35,7 @@ module.exports = (function() {
             ihandle = $el.attr('iframe');
 
             // 给子类添加一个全局方法，用于子类通过这个触发父类回调
-            if (src.match(/^http:\/\//) === null) {
+            if (!(parent[src] !== undefined) && src.match(/^http:\/\//) === null) {
                 // 给父类添加一个回调的方法
                 window[pcall] = function(data) {
                     var runcall = parent[rcall];

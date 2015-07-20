@@ -1,6 +1,10 @@
 .select {
     overflow: hidden;
 
+    .item_body {
+        margin-bottom: 0;
+    }
+
     &.modal_body {
         max-height: 45%;
     }

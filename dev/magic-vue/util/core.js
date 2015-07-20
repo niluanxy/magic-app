@@ -2,12 +2,17 @@ module.exports = (function() {
     /*=================================================
      *  key 数据持久化相关方法
      *=================================================*/
+    $$.__key_null = "__KEY__NULL_v0.3.0";
+
     $$.key = function(key, val) {
+        var fix; // 修复读取值为null自动转为字符串
         if (val !== undefined) {
-            localStorage.setItem(key, val);
+            fix = val==null?$$.__key_null:val;
+            localStorage.setItem(key, fix);
             return val; // 返回设置的值
         } else {
-            return localStorage.getItem(key);
+            fix = localStorage.getItem(key);
+            return fix==$$.__key_null?null:fix;
         }
     };
 
@@ -35,7 +40,7 @@ module.exports = (function() {
         }
 
         key = arr[len];     // 校验对象是否合法
-        if (vobj[key] === undefined) {
+        if (!vobj || vobj[key] === undefined) {
             return undefined
         } else {
             return Object.defineProperty(new Object, "val", {

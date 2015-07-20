@@ -49,7 +49,10 @@ $(function() {
     spinner = $.tip("", {type: "loading", delay: "short"});
 
     // 加载页面方法
-    loadView = function(pageData) {
+    loadView = function(page) {
+        var pageData  = $.extend({}, page);
+        pageData.data = $.extend(true, {}, page.data);
+
         var tmp = pageData.template, old, fix, defer, mixins;
         fix = old = tmp.match(/\<mg\-page.*\>/i)[0];
 

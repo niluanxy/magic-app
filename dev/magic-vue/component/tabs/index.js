@@ -1,23 +1,38 @@
 module.exports = (function() {
+    function fixMatch(str) {
+        return str?str.replace(/^\#*[\\|\/]*/, ""):'';
+    }
+
+    function checkMatch($item, check) {
+        if ($item && check) {
+            var match = $item.attr("match"), href;
+            if ( check.match($item.attr("match")) ) {
+                return true;
+            } else if ( check.match(fixMatch(
+                            $item.attr("href"))) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     $$.component("mg-tabs", {
         template: "<content></content>",
         ready: function() {
-            var $el = $(this.$el), tabs, $item, hash, 
-                match, $child;
+            var $el = $(this.$el), tabs, 
+                $item, hash, $child;
 
             tabs = $el.query(".tab-item");
-            hash = location.hash.replace(/^\#[\\|\/]/, "#");
+            hash = fixMatch(location.hash);
 
             for(var i=0; i<tabs.length; i++) {
-                $item = $(tabs[i]);
-                match = $item.attr("match");
+                $item  = $(tabs[i]);
+                $child = $item.find(".icon");
 
-                if ((match && hash.match(match)) ||
-                    ($item.attr("href") == hash)) {
+                if (checkMatch($item, hash)) {
                     $item.addClass("actived");
                 }
-
-                $child = $item.find(".icon");
 
                 if ($child.length && $child.attr("toggle")) {
                     var toggle = $child.attr("toggle"),

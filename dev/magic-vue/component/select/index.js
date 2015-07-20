@@ -2,20 +2,38 @@ module.exports = (function() {
     var SelectMain = {
         data: {},
 
+        key: function(str) {
+            if (typeof str == "string") {
+                return "_select_"+str.hashCode();
+            }
+
+            return null;
+        },
+
         add : function(str, handle) {
-            var key = "_select_"+str.hashCode();
-            this.data[key] = handle;
+            var key;
+            if ((key = this.key(str)) && handle) {
+                this.data[key] = handle;
+            }
+
+            return handle;
         },
 
         get : function(str) {
-            var key = "_select_"+str.hashCode();
-            return this.data[key];
+            var key;
+            if (key = this.key(str)) {
+                return this.data[key];
+            }
+            return null;
         },
 
         del : function(str) {
-            var key = "_select_"+str.hashCode();
-            this.data[key].destroy();
-            delete this.data[key];
+            var key, handle;
+            if (key = this.key(str)) {
+                handle = this.data[key];
+                if (handle) handle.destroy();
+                delete this.data[key];
+            }
         }
     };
 
@@ -48,9 +66,18 @@ module.exports = (function() {
                     }
                 }
 
-                handle = $el.select(opt);
-                if (val || bind) SelectMain.add(val||bind, handle);
+                handle = $el.select(opt);   // 创建对象
+                this.$watch(val||bind, function(newVal) {
+                    handle.set(newVal); // 同步更新组件值
+                })
+                if ($val) $val.val = handle.val();
+                if ($pos) $pos.val = handle.pos();
+                if ((val || bind)) SelectMain.add(val||bind, handle);
             }
+
+            this.$on("pageDestroy", function() {
+                SelectMain.del((val || bind));
+            })
         }
     });
 
