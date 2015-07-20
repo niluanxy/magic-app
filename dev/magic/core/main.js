@@ -308,6 +308,10 @@ require("extend");      // 原生对象扩展
 
             /* 一个简易的转换json的方法 */
             parseJSON: function(str) {
+                // 去掉首尾括号,方便后续处理
+                str = str.replace(/^\{+/, '');    
+                str = str.replace(/\}+$/, '');
+
                 var arr = str.split(","), item, key, ret = {};
 
                 for(var i=0; i<arr.length; i++) {

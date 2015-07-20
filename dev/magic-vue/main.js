@@ -148,7 +148,12 @@ $(function() {
     window.loadView = loadView;
     window.$$       = mvue;
 
-    require("./util/main.js");      // 加载常用工具方法
+    /* 加载常用工具方法 */
+    require("./util/main.js");
+
     /* 加载默认的核心样式文件和组件 */
     require("./component/main.js");
+
+    /* 加载硬件操作相关文件 */
+    require("./plug/main.js");
 });

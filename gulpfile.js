@@ -294,19 +294,20 @@ gulp.task("cordova", function(rel) {
     cordova = true; // 设置cordova打包模式
     release = rel ? true : false;
 
-    del(DIR_CORDOVA+"www");
-
-    Q.all([
-        task_dev_app_pub(),
-        task_dev_app_html(),
-        task_dev_app_css(),
-        task_dev_app_js()
-    ]).then(function() {
-        // 删除自动生成的多余文件
-        del("www");
-        del("plugins");
-        del("config.xml");
+    del(DIR_CORDOVA+"www", function() {
+        Q.all([
+            task_dev_app_pub(),
+            task_dev_app_html(),
+            task_dev_app_css(),
+            task_dev_app_js()
+        ]).then(function() {
+            // 删除自动生成的多余文件
+            del("www");
+            del("plugins");
+            del("config.xml");
+        });
     });
+        
 })
 
 
