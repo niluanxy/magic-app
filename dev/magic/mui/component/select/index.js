@@ -24,7 +24,7 @@ module.exports = (function() {
         item = that.el[0].childNodes;
         that.el.addClass("list select");   // 设置样式
         for(var i=0; i<item.length; i++) {
-            if (item.nodeType !== 1) continue;
+            if (item[i].nodeType !== 1) continue;
 
             $(item[i]).addClass("item");
         }
@@ -38,7 +38,7 @@ module.exports = (function() {
         }
 
         if (opt.mult) rets = {val:[], pos:[]};
-        that.set(opt.init || null); // 初始化
+        that.set(opt.init !== undefined ? opt.init : null); // 初始化
 
         that.el.on("tap", function(e) {
             var pos = $(e._target).index();
@@ -79,7 +79,9 @@ module.exports = (function() {
         rets = mult ? {val:[], pos: []} : {};
         sets = mult && !Array.isArray(sets) ? [] : sets;
         cval = cval !== undefined ? cval :
-                    (mult?isNaN(sets[0]):isNaN(sets));
+                    (sets == null ? true :
+                        (mult?isNaN(sets[0]):isNaN(sets))
+                    );
 
         for(var i=0; i<item.length; i++) {
             if (item[i].nodeType !== 1) continue;
@@ -113,7 +115,9 @@ module.exports = (function() {
                 }
             }
 
-            $icon.switchClass(cls, select);
+            if ($icon.length > 0) {
+                $icon.switchClass(cls, select);
+            }
         }
 
         this.rets = rets;   // 更新存储的值

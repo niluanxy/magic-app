@@ -55,20 +55,26 @@ module.exports = (function() {
             if ($bind || $val) {
                 opt.modal = $bind?true:false;
                 opt.mult  = mult;
-                opt.init  = $val ? $val.val : 
-                           ($pos ? $pos.val : null);
+                opt.init  = $val && $val.val != undefined 
+                                ? $val.val : 
+                           ($pos && $pos.val != undefined 
+                                ? $pos.val : null);
 
                 opt.call = function(val, pos) {
                     if ($val) $val.val = val;
                     if ($pos) $pos.val = pos;
                     if ($call && typeof $call.val == "function") {
-                        $call.val();    // 运行对象回调方法
+                        val = val || null;      // 默认重置为null
+                        $call.val(val, pos);    // 运行对象回调方法
                     }
                 }
 
                 handle = $el.select(opt);   // 创建对象
                 this.$watch(val||bind, function(newVal) {
-                    handle.set(newVal); // 同步更新组件值
+                    if (handle.val() != newVal) {
+                        // 同步更新组件
+                        handle.set(newVal, true);
+                    }
                 })
                 if ($val) $val.val = handle.val();
                 if ($pos) $pos.val = handle.pos();
@@ -76,7 +82,7 @@ module.exports = (function() {
             }
 
             this.$on("pageDestroy", function() {
-                SelectMain.del((val || bind));
+                SelectMain.del(val || bind);
             })
         }
     });

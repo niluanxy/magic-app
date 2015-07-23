@@ -45,7 +45,16 @@ String.prototype.toUpFirst = function() {
 Array.prototype.findBy = function(key, val, index) {
     for(var i in this) {
         if (this[i][key] == val) {
-            return index?i:this[i];
+            if (index != undefined) {
+                if (index === true) {
+                    return i;   // true 返回下标
+                } else if (typeof index == "string") {
+                    // 尝试返回指定的值
+                    return this[i][index];
+                }
+            }
+
+            return this[i]; // 默认返回对象
         }
     }
 
