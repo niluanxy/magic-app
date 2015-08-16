@@ -11,7 +11,8 @@ module.exports = function(select, el) {
 
     if (typeof select == "string") {
         var elname = select.toLowerCase(); // 转为字符串
-        content = el instanceof Element ? el : document;
+        content = el instanceof Element ||
+                  el instanceof DocumentFragment ? el : document;
 
         if (elname == "body") {
             result = document.body;

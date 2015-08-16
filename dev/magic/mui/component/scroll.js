@@ -1959,7 +1959,8 @@ if ($ && $.fn && !$.fn.scroll) {
         option = $.extend({
             bindToWrapper: true,
             scrollbars: true,
-            fadeScrollbars: true
+            fadeScrollbars: true,
+            preventDefault: false
         }, option);
 
         this.data("ui_scroll", new scroll(this[0], option));

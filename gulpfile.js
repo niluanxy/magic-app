@@ -51,6 +51,9 @@ gulp.task("dev-mixin", task_dev_mixin);
 function task_dev_minjs() {
     var defer = Q.defer();
 
+    gulp.src(DIR_MINJS+"director.js")
+    .pipe(gulp.dest(DIR_MAGIC_VUE+"lib/"));
+
     gulp.src(DIR_MINJS+"*.js")
     .pipe(gulp.dest(DIR_MAGIC+"lib/minjs/"))
     .on("finish", function() { defer.resolve() });
@@ -88,14 +91,15 @@ function task_dev_magic_js() {
             },
             resolve: {
                 alias: {
-                    util    :  LIB_MINJS + "util.js",
+                    util    : LIB_MINJS + "util.js",
                     query   : LIB_MINJS + "selector.js",
+                    event   : LIB_MINJS + "event.js",
                     director: LIB_MINJS + "director.js",
                     domready: LIB_MINJS + "ondomready.js",
                     dom     : LIB_MINJS + "dom.js",
-                    extend  :   LIB_MINJS + "extend.js",
-                    promise :  LIB_MINJS + "promise.js",
-                    jsonp   :  LIB_MINJS + "jsonp.js",
+                    extend  : LIB_MINJS + "extend.js",
+                    promise : LIB_MINJS + "promise.js",
+                    jsonp   : LIB_MINJS + "jsonp.js",
                 }
             },
             module: {
@@ -324,8 +328,10 @@ gulp.task("serve", function() {
     gulp.watch(["dev/minjs/*"], ["dev-minjs"])
 
     /* magic 动态刷新任务 */
-    gulp.watch(["dev/magic/**/*.scss", "!dev/magic/mui"], ["dev-magic-css"])
-    gulp.watch(["dev/magic/**/*.js", "dev/magic/mui/**/*.scss"], ["dev-magic-js"])
+    gulp.watch(["dev/magic/core/*.scss"], ["dev-magic-css"])
+    gulp.watch(["dev/magic/**/*.js", "dev/magic/**/*.scss",
+                "dev/magic/**/*.html", "!dev/magic/core/*.scss"],
+                ["dev-magic-js"])
 
     /* magic-vue 动态刷新任务 */
     gulp.watch(["dev/magic-vue/**/*"], ["dev-magic-vue"])

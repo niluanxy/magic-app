@@ -3,18 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>magic app</title>
+
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <meta name="apple-mobile-web-app-title" content="weishop">
     <meta name="apple-mobile-web-app-capable" content="yes" /> 
     <meta name="apple-touch-fullscreen" content="yes" />
     <meta name="format-detection" content="telephone=no" />
-
     <link rel="stylesheet" href="page/main.css">
+    <script type="text/javascript" src="cordova.js"></script>
 </head>
 <body>
     <mg-view></mg-view>
 
+    <div class="test">
+        <a id="testPIC" class="button button-block">图片测试</a>
+
+        <a id="testVIC" class="button button-block">图片预览</a>
+    </div>
+
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script type="text/javascript" src="pub/lib/vue.min.js"></script>
     <script type="text/javascript" src="page/main.js"></script>
+
+    <script>
+        $plug.init("http://wei.3laoshi.com/isign");
+        $("#testPIC").on("tap", function () {
+            $plug.camera.upload();
+        })
+    </script>
 </body>
 </html>

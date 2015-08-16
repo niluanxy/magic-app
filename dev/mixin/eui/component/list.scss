@@ -118,11 +118,11 @@
                 @include text-ellipsis();
                 position: relative;
 
-                &:nth-child(2) {
+                &:first-of-type {
                     top: -$item-avator-fix;
                 }
 
-                &:last-child {
+                &:last-of-type {
                     bottom: -$item-avator-fix;
                 }
             }
@@ -134,6 +134,7 @@
 
             .avator {
                 width: $item-avator;
+                height: $item-avator;
             }
 
             .line {
@@ -147,6 +148,7 @@
 
             .avator {
                 width: $item-avator-large;
+                height: $item-avator-large;
             }
 
             .line {

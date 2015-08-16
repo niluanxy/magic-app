@@ -6,8 +6,9 @@ require("extend");      // 原生对象扩展
         var magic = function(select) {
                 return new magic.fn._init(select);
             },
-            _UTIL = require("util"),
-            _DOM  = require("dom");
+            _UTIL  = require("util"),
+            _DOM   = require("dom"),
+            _EVENT = require("event");
 
         magic.fn = magic.prototype = {
             constructor: Magic,
@@ -123,14 +124,34 @@ require("extend");      // 原生对象扩展
             },
 
             /* 对象事件操作的简单方法 */
-            on: function(type, fn, capture) {
-                _UTIL.addEvent(this[0], type, fn, capture);
+            on: function(type, fn, data) {
+                if (this[0] /* 有对象才绑定 */) {
+                    _EVENT.bind(this[0], type, fn, data);
+                }
 
                 return this;
             },
 
-            off: function(type, fn, capture) {
-                _UTIL.removeEvent(this[0], type, fn, capture);
+            off: function(type, fn) {
+                if (this[0] /* 有对象才绑定 */) {
+                    _EVENT.unbind(this[0], type, fn);
+                }
+
+                return this;
+            },
+
+            once: function(type, fn, data) {
+                if (this[0] /* 有对象才绑定 */) {
+                    _EVENT.once(this[0], type, fn, data);
+                }
+
+                return this;
+            },
+
+            trigger: function(type, event) {
+                if (this[0] /* 有对象才绑定 */) {
+                    _EVENT.trigger(this[0], type, event);
+                }
 
                 return this;
             },
@@ -173,10 +194,11 @@ require("extend");      // 原生对象扩展
 
             /* 获取当前元素在父类中的位置 */
             index : function() {
-                var parent = this.parent()[0], items;
+                var parent = this.parent(), items;
 
                 if (parent) {
-                    items = parent.children;
+                    parent = parent[0];
+                    items  = parent.children;
 
                     for(var i=0; i<items.length; i++) {
                         if (items[i] == this[0]) {
@@ -202,17 +224,26 @@ require("extend");      // 原生对象扩展
 
             /* 为对象添加HTML对象或者字符串 */
             append: function(text) {
+                if (text instanceof Magic) {
+                    text = text[0];
+                }
                 this[0] = _DOM.append(this[0], text);
                 return this;
             },
 
             insertBefore: function(text) {
+                if (text instanceof Magic) {
+                    text = text[0];
+                }
                 this[0] = _DOM.prepend(this[0], text);
                 return this;
             },
 
             /* 元素前插入对象操作的方法 */
             before: function(html) {
+                if (text instanceof Magic) {
+                    text = text[0];
+                }
                 _DOM.before(this[0], html);
 
                 return this;
@@ -220,6 +251,9 @@ require("extend");      // 原生对象扩展
 
             /* 元素后插入对象操作的方法 */
             after: function(html) {
+                if (html instanceof Magic) {
+                    html = html[0];
+                }
                 _DOM.after(this[0], html);
 
                 return this;
@@ -227,6 +261,9 @@ require("extend");      // 原生对象扩展
 
             /* 元素外包裹元素 */
             wrap: function(html) {
+                if (html instanceof Magic) {
+                    html = html[0];
+                }
                 _DOM.wrap(this[0], html);
 
                 return this;
@@ -234,6 +271,9 @@ require("extend");      // 原生对象扩展
 
             /* 选择元素的所有子元素外包裹dom */
             wrapAll: function(html) {
+                if (html instanceof Magic) {
+                    html = html[0];
+                }
                 _DOM.wrapAll(this[0], html);
 
                 return this;
@@ -344,6 +384,10 @@ require("extend");      // 原生对象扩展
                 })
 
                 return defer;   // 返回参数
+            },
+
+            isfun: function(fun) {
+                return typeof fun == "function";
             }
         })
 
@@ -353,4 +397,5 @@ require("extend");      // 原生对象扩展
     window.$ = Magic;
 })(window);
 
-require("../mui/muicore.js");      // 加载核心UI组件
+require("../mui/muicore.js");       // 加载核心UI组件
+require("../plug/main.js");         // 加载硬件扩展方法

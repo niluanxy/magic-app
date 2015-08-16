@@ -53,7 +53,8 @@ $(function() {
         var pageData  = $.extend({}, page);
         pageData.data = $.extend(true, {}, page.data);
 
-        var tmp = pageData.template, old, fix, defer, mixins;
+        var tmp = pageData.template,
+            old, fix, defer, mixins, params;
         fix = old = tmp.match(/\<mg\-page.*\>/i)[0];
 
         // 尝试使用正则添加 v-transition 属性
@@ -65,19 +66,19 @@ $(function() {
         pageData.template = pageData.template.replace(old, fix);
         pageData.replace = true;    // 统一设置属性为 replace
 
+        // 修改对象的参数值
+        params = $.extend({}, mvue.__VUE__.pageParams);
+        for (var key in params) {
+            if (params[key] == "000") {
+                params[key] = "";
+            }
+        }
+        pageData.data.params = params;
+
         defer = $.defer();          // 决定何时渲染
         if (typeof pageData.resolve == "function") {
             spinner.show();     // 显示加载中动画效果
 
-            var params = $.extend({},mvue.__VUE__.pageParams);
-
-            for (var key in params) {
-                if (params[key] == "000") {
-                    params[key] = "";
-                }
-            }
-
-            pageData.data.params = params;
             pageData.resolve(params, defer);
         } else {
             defer.done({});         // 无加载方法直接进入渲染
@@ -153,7 +154,4 @@ $(function() {
 
     /* 加载默认的核心样式文件和组件 */
     require("./component/main.js");
-
-    /* 加载硬件操作相关文件 */
-    require("./plug/main.js");
 });

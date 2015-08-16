@@ -45,6 +45,7 @@ $.ready(function() {
     }
 
     $document.on("touchmove", $.delayCall(function(e) {
+        e.preventDefault(); // 修复微信下拉显示网页地址
         var $target = $(e.target);
 
         do {
@@ -63,11 +64,13 @@ $.ready(function() {
         ct = $.getTime() - tap.startT;
 
         if (cx<5 && cy < 5 && ct < 200) {
-            var ev = new Event('tap');
-            
+            var ev = document.createEvent('Event');
+            ev.initEvent("tap", true, true);
             ev.pageX  = touch.pageX;
             ev.pageY  = touch.pageY;
+
             ev._target = e.target;
+
             ev.preventDefault = function() {
                 e.preventDefault();
             }
@@ -75,30 +78,13 @@ $.ready(function() {
                 e.stopPropagation();    // 终止冒泡
             }
 
-            do {
-                tagname = $target[0].tagName;
-                $target[0].dispatchEvent(ev);   // 触发 Tap 事件
-
-                clearActive($target);   // 清除激活类
-
-                if (tagname === "A") {
-                    e.preventDefault();
-                    var tohref = $target.attr("href");
-                    // 手动跳转到指定页面
-                    if (tohref) {
-                        location.href = tohref;
-                        return false;   // 中止后续检测
-                    }
-                }
-
-                $target = $target.parent();     // 向上递归检测
-            } while($target[0] && $target[0] != this);
-        } else {
-            do {
-                clearActive($target);   // 清除激活类
-
-                $target = $target.parent();     // 向上递归检测
-            } while($target[0] && $target[0] != this);
+            e.target.dispatchEvent(ev);
         }
+
+        do {
+            clearActive($target);   // 清除激活类
+
+            $target = $target.parent();     // 向上递归检测
+        } while($target[0] && $target[0] != this);
     });
 });

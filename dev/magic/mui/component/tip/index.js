@@ -56,6 +56,10 @@ module.exports = (function() {
         if (opt.type == "loading") {
             opt.live = true; // loading 类型一直显示
         }
+        $("#"+cls).on("tap", function(e) {
+            e.preventDefault();     // 终止默认动作
+        })
+
 
         // 将默认背景色存储下来，用于后续显示默认背景色
         this.backStyle = this.backHandle.css("background-color");
@@ -134,5 +138,15 @@ module.exports = (function() {
         $.extend({tip: function(text, option) {
             return new Tip(text, option).init();
         }})
+
+        /* 绑定快捷UI操作方法 */
+        var $tip = new Tip("").init();
+        $u.tip = function (text, option) {
+            $tip.show(text, option);
+        }
+
+        $u.tipHide = function () {
+            $tip.hide();
+        }
     };
 })();

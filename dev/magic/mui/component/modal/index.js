@@ -34,7 +34,7 @@ module.exports = (function() {
         if (opt.autoHide /* 绑定默认关闭方法 */) {
             var that = this, ele = this.el[0];
             that.el.on("tap", function(e) {
-                e.preventDefault();     // 阻止默认动作
+                e.preventDefault(); // 阻止默认动作
                 if (e.target == ele) that.hide();
             })
         }
