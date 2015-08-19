@@ -35,7 +35,7 @@ module.exports = (function() {
             ihandle = $el.attr('iframe');
 
             // 给子类添加一个全局方法，用于子类通过这个触发父类回调
-            if (!(parent[src] !== undefined) && src.match(/^http:\/\//) === null) {
+            if (parent[src] && src.match(/^http:\/\//) === null) {
                 // 给父类添加一个回调的方法
                 window[pcall] = function(data) {
                     var runcall = parent[rcall];
@@ -66,7 +66,7 @@ module.exports = (function() {
                 })
             } else {
                 // 如果父类无此值，直接尝试赋值
-                $iframe.attr("src", src);
+                $iframe.attr("src", src || "");
             }
 
             if (parent[handle] !== undefined) {

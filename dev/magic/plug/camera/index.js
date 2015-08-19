@@ -42,7 +42,7 @@ module.exports = (function() {
                         // 显示loading动画
                         $load.show();
                     })
-                $view.attr("src", res.localIds[0]);
+                $view.attr("src", resfix);
 
                 /* 尝试隐藏选择框 */
                 if (modal && modal.hide) modal.hide();

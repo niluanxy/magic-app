@@ -140,13 +140,14 @@ module.exports = (function() {
         }})
 
         /* 绑定快捷UI操作方法 */
-        var $tip = new Tip("").init();
-        $u.tip = function (text, option) {
-            $tip.show(text, option);
-        }
+        var $tip  = new Tip("").init(),
+            $load = new Tip("", {type: "loading"});
 
-        $u.tipHide = function () {
-            $tip.hide();
-        }
+
+        $u.tip = function (text, option) { $tip.show(text, option); }
+        $u.tipHide = function () { $tip.hide(); }
+
+        $u.loading = function () {$load.show();}
+        $u.loadingHide = function() {$load.hide();}
     };
 })();

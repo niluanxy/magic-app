@@ -5,6 +5,8 @@
     function loadRequire(call) {
         return function () {
             require("./camera");        // 图像操作
+            require("./pay");           // 支付操作
+            require("./file");          // 文件操作
 
             if (typeof call == "function") call();
         }
@@ -51,11 +53,41 @@
                     nonceStr: rdata.nonceStr,
                     signature: rdata.signature,
                     jsApiList:  [
-                        "scanQRcode",
+                        "onMenuShareTimeline",
+                        "onMenuShareAppMessage",
+                        "onMenuShareQQ",
+                        "onMenuShareWeibo",
+                        "onMenuShareQZone",
+                        "startRecord",
+                        "stopRecord",
+                        "onVoiceRecordEnd",
+                        "playVoice",
+                        "pauseVoice",
+                        "stopVoice",
+                        "onVoicePlayEnd",
+                        "uploadVoice",
+                        "downloadVoice",
                         "chooseImage",
                         "previewImage",
                         "uploadImage",
-                        "downloadImage"
+                        "downloadImage",
+                        "translateVoice",
+                        "getNetworkType",
+                        "openLocation",
+                        "getLocation",
+                        "hideOptionMenu",
+                        "showOptionMenu",
+                        "hideMenuItems",
+                        "showMenuItems",
+                        "hideAllNonBaseMenuItem",
+                        "showAllNonBaseMenuItem",
+                        "closeWindow",
+                        "scanQRCode",
+                        "chooseWXPay",
+                        "openProductSpecificView",
+                        "addCard",
+                        "chooseCard",
+                        "openCard"
                     ]
                 });
 
