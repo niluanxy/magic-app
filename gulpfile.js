@@ -1,4 +1,5 @@
 var gulp         = require('gulp-param')(require('gulp'), process.argv),
+    shell        = require('gulp-shell'),
     del          = require("del"),
     Q            = require("q"),
     fs           = require("fs"),
@@ -23,6 +24,7 @@ var DIR_APP       = __dirname + "/app/",
     DIR_MAGIC     = __dirname + "/dev/magic/",
     DIR_MAGIC_VUE = __dirname + "/dev/magic-vue/",
     DIR_CORDOVA   = __dirname + "/cordova/";
+    DIR_RESOURCE  = __dirname + "/resource/";
 
 var release = false;    // 是否为发布输出，发布输出会压缩优化
 var cordova = false;    // APP打包是否为cordova输出
@@ -218,17 +220,20 @@ gulp.task("dev-app-css", task_dev_app_css);
 function task_dev_app_js() {
     var UglifyJsPlugin = require("webpack/lib/optimize/UglifyJsPlugin.js");
     var CordovaPlugin  = require('webpack-cordova-plugin');
+    var commonsPlugin  = require("webpack/lib/optimize/CommonsChunkPlugin");
+    var ignorePlugin   = require("webpack/lib/IgnorePlugin");
+
     var pugls = release ? [new UglifyJsPlugin({
-                             sourceMap: false,
-                             mangle: false 
-                            })] : [];
+                sourceMap: false,
+                mangle: false 
+            })] : [];
 
     if (cordova) pugls.push(new CordovaPlugin({
-                                config: 'config.xml',
-                                src: 'index.html',
-                                platform: 'android',
-                                version: true,
-                            }));  
+                config: 'config.xml',
+                src: 'index.html',
+                platform: 'android',
+                version: true,
+            }));
 
     var defer = Q.defer(),
         fpath = cordova?DIR_CORDOVA+"www/":
@@ -246,7 +251,7 @@ function task_dev_app_js() {
                     loaders: [
                         { test: /\.html$/, loader: "html" },
                         { test: /\.scss$/, loader: "style!css!sass!autoprefixer" },
-                        { test: /\.(png|jpg|gif)$/, loader: 'url-loader?limit=8192&name=../pub/img/[name].[ext]?[hash]'},
+                        { test: /\.(jpg|png|gif)$/, loader: "url-loader?limit=8192&name=../pub/img/[name].[ext]" },
                     ]
                 },
                 plugins: pugls,
@@ -311,9 +316,45 @@ gulp.task("cordova", function(rel) {
             del("config.xml");
         });
     });
-        
 })
 
+var errmsg = "\b\b\b\b<%= error.message %>";
+
+/* 创建 cordova 项目 */
+gulp.task("create_base", shell.task([
+    "cordova create cordova com.magic.app main"
+], {errorMessage: errmsg}))
+
+gulp.task("cordova-create", ["create_base"], function() {
+    gulp.src(DIR_RESOURCE + "config.xml")
+        .pipe(gulp.dest(DIR_CORDOVA))
+})
+
+/* 添加android平台 */
+gulp.task("android_base", shell.task([
+    "cordova platform add android"
+], {errorMessage: errmsg, cwd: "cordova"}))
+
+gulp.task("cordova-android", ["android_base"], function() {
+    var path = DIR_CORDOVA + "platforms/android/res";
+
+    del(path, function() {
+        gulp.src(DIR_RESOURCE + "android/res/**/*")
+            .pipe(gulp.dest(path))
+    });
+})
+
+/* 直接安装apk到手机上 */
+gulp.task("cordova-run", shell.task([
+    "gulp cordova",
+    "cordova run android"
+], {errorMessage: errmsg, cwd: "cordova"}))
+
+/* 只生成 apk 安装文件 */
+gulp.task("cordova-build", shell.task([
+    "gulp cordova",
+    "cordova build android"
+], {errorMessage: errmsg, cwd: "cordova"}))
 
 /* 监控刷新调试 */
 gulp.task("serve", function() {
