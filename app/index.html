@@ -123,34 +123,44 @@
     </style>
 </head>
 <body>
-    <header class="header">
-        <h3>教师列表</h3>
-    </header>
 
-    <div class="body">
-        <div class="teacher">
-            <div class="avatar">
-                <img src="http://www.qqzhi.com/uploadpic/2015-01-30/233713182.jpg" alt="">
-            </div>
-                
-            <div class="info">
-                <p class="name">柳梦璃</p>
-                <p class="desc">仙剑-女主-完美女神</p>
-                <p class="level">99级</p>
-            </div>
-
-            <div class="bottom">
-                <span>综合评分</span>
-                <span>10课时</span>
-                <span>120名学生</span>
-            </div>
-        </div>
-
-        <div class="two" style="width: 100%; margin-top: 20px; background-color: #fff; height: 100px; border: 2px solid #ddd; line-height: 60px; padding: 20px;">
-            这个是正常的 1px 线的效果
+    <div id="test1">
+        <div id="test2">
+            <p id="test3">最里面的测试</p>
         </div>
     </div>
 
+    <script>
+        var test1 = document.querySelectorAll("#test1")[0],
+            test2 = document.querySelectorAll("#test2")[0],
+            test3 = document.querySelectorAll("#test3")[0];
+
+
+        test1.addEventListener("up", function () {
+            console.log("event up test1");
+        }, false);
+
+        test2.addEventListener("up", function () {
+            console.log("event up test2");
+        }, false);
+
+        test3.addEventListener("up", function (e) {
+            console.log(e.target)
+            console.log(e.pageX)
+            e.stopImmediatePropagation();
+            console.log("event up test3");
+        }, false);
+
+        test1.addEventListener("click", function (e) {
+            var ev = document.createEvent('Event');
+            ev.initEvent("up", true, true);
+            ev.pageX = 123
+
+            e.target.dispatchEvent(ev);
+            console.log("has run in click")
+        }, false);
+
+    </script>
 
     <script>
         (function (doc, win) {
