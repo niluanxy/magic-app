@@ -5,31 +5,33 @@
     <title>magic app</title>
 
     <script>
-    (function() {
-        var ratio = window.devicePixelRatio,
-        scale, html, meta, head = document.head;
+        (function() {
+            var ratio = window.devicePixelRatio,
+                    scale, html, meta, head = document.head;
 
-        if (ratio !== undefined) {
-            // scale =   ratio >= 3   ? 0.39 : 
-            //         ( ratio >= 1.5 ? 0.5 : 1)
-            scale = 0.5;
-        } 
+            if (ratio !== undefined) {
+                // scale =   ratio >= 3   ? 0.39 :
+                //         ( ratio >= 1.5 ? 0.5 : 1)
+                scale = 0.5;
+            }
 
-        meta = document.createElement("meta");
-        meta.setAttribute("name", "viewport");
-        content  = 'initial-scale=' + scale;
-        content += ', maximum-scale='+scale;
-        content += ', user-scalable=no, width=device-width';
-        meta.setAttribute("content", content);
+            meta = document.createElement("meta");
+            meta.setAttribute("name", "viewport");
+            content  = 'initial-scale=' + scale;
+            content += ', maximum-scale='+scale;
+            content += ', user-scalable=no, width=device-width';
+            meta.setAttribute("content", content);
 
-        head.appendChild(meta); // 插入到页面中
-    })();
+            head.appendChild(meta); // 插入到页面中
+        })();
     </script>
     <meta name="apple-mobile-web-app-title" content="weishop">
-    <meta name="apple-mobile-web-app-capable" content="yes" /> 
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-touch-fullscreen" content="yes" />
     <meta name="format-detection" content="telephone=no" />
     <link rel="stylesheet" href="page/main.css">
+
+    <script src="page/main.js"></script>
 
     <style>
         body {
@@ -124,58 +126,43 @@
 </head>
 <body>
 
-    <div id="test1">
-        <div id="test2">
-            <p id="test3">最里面的测试</p>
-        </div>
+<div id="test1">
+    <div id="test2">
+        <p id="test3">最里面的测试</p>
     </div>
+</div>
 
-    <script>
-        var test1 = document.querySelectorAll("#test1")[0],
+<script>
+    var test1 = document.querySelectorAll("#test1")[0],
             test2 = document.querySelectorAll("#test2")[0],
             test3 = document.querySelectorAll("#test3")[0];
 
 
-        test1.addEventListener("up", function () {
-            console.log("event up test1");
-        }, false);
+    EVENT.bind(test1, "click.upload", function (e) {
+        console.log("click uoload")
+        e.stopImmediatePropagation()
+    })
 
-        test2.addEventListener("up", function () {
-            console.log("event up test2");
-        }, false);
+    EVENT.bind(test1, "click.two", function (e) {
+        console.log("click two")
+    })
 
-        test3.addEventListener("up", function (e) {
-            console.log(e.target)
-            console.log(e.pageX)
-            e.stopImmediatePropagation();
-            console.log("event up test3");
-        }, false);
+</script>
 
-        test1.addEventListener("click", function (e) {
-            var ev = document.createEvent('Event');
-            ev.initEvent("up", true, true);
-            ev.pageX = 123
+<script>
+    (function (doc, win) {
+        var docEl = doc.documentElement,
+                resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+                recalc = function () {
+                    var clientWidth = docEl.clientWidth;
+                    if (!clientWidth) return;
+                    docEl.style.fontSize = 20 * (clientWidth / 640) + 'px';
+                };
 
-            e.target.dispatchEvent(ev);
-            console.log("has run in click")
-        }, false);
-
-    </script>
-
-    <script>
-        (function (doc, win) {
-          var docEl = doc.documentElement,
-            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
-            recalc = function () {
-              var clientWidth = docEl.clientWidth;
-              if (!clientWidth) return;
-              docEl.style.fontSize = 20 * (clientWidth / 640) + 'px';
-            };
-
-          if (!doc.addEventListener) return;
-          win.addEventListener(resizeEvt, recalc, false);
-          doc.addEventListener('DOMContentLoaded', recalc, false);
-        })(document, window);
-    </script>
+        if (!doc.addEventListener) return;
+        win.addEventListener(resizeEvt, recalc, false);
+        doc.addEventListener('DOMContentLoaded', recalc, false);
+    })(document, window);
+</script>
 </body>
 </html>
