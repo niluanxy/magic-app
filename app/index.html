@@ -31,98 +31,8 @@
     <meta name="format-detection" content="telephone=no" />
     <link rel="stylesheet" href="page/main.css">
 
+    <script src="pub/lib/vue.min.js"></script>
     <script src="page/main.js"></script>
-
-    <style>
-        body {
-            font-size: 24px;
-            background-color: #EDEEEF;
-        }
-
-        .header {
-            position: fixed;
-            top: 0; left: 0;
-            background-color: #fff;
-            right: 0;
-            height: 4.4rem;
-            padding: 0 1rem;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .body {
-            padding-top: 1rem;
-            position: fixed;
-            top: 4.4rem; right: 0;
-            left: 0; bottom: 0;
-        }
-
-        .header h3 {
-            height: 100%;
-            line-height: 4.3rem;
-            font-size: 1.7rem;
-        }
-
-        .teacher {
-            position: relative;
-            background-color: #fff;
-            height: 10.1rem;
-            border: 1px solid #ddd;
-            border-width: 1px 0;
-            padding-left: 10rem;
-            padding-right: 1rem;
-        }
-
-        .teacher:before {
-            position: absolute;
-            content: " ";
-            border-bottom: 1px solid #ddd;
-            bottom: 2.8rem;
-            left: 0; right: 0;
-        }
-
-        .teacher .avatar {
-            z-index: 3;
-            position: absolute;
-            background-color: #fff;
-            left: 1rem;
-            top: 1rem;
-            width: 8rem;
-            height: 8rem;
-        }
-        .teacher .avatar img {
-            padding: 0.2rem;
-            overflow: hidden;
-            border: 1px solid #ddd;
-            border-radius: 50%;
-            width: 100%;
-        }
-
-        .teacher .info {
-            height: 7.3rem;
-            padding: 1rem 0;
-        }
-
-        .teacher .info p {
-            font-size: 1.4rem;
-            line-height: 1.8rem;
-        }
-
-        .teacher .info .desc {
-            color: #828282;
-        }
-
-        .teacher .bottom {
-            height: 2.8rem;
-            line-height: 2.6rem;
-            display: flex;
-        }
-
-        .teacher .bottom>* {
-            flex: 1;
-            text-align: center;
-        }
-    </style>
 </head>
 <body>
 
@@ -133,17 +43,22 @@
 </div>
 
 <script>
-    var test1 = document.querySelectorAll("#test1")[0],
-            test2 = document.querySelectorAll("#test2")[0],
-            test3 = document.querySelectorAll("#test3")[0];
-
-
-    EVENT.bind(test1, "click.upload", function (e, name) {
+    $("#test1").on("click.upload", function (e, name) {
         console.log("test1 click uoload")
         console.log(name)
     }, "#test3")
 
-    EVENT.bind(test3, "click.two", function (e, name) {
+    $("#test2").once("click.upload", function (e, name) {
+        console.log("test2 click upload")
+        console.log(name)
+    }, "#test3")
+
+    $("#test2").on("click.upload", function (e, name) {
+        console.log("test2 click upload two test")
+        console.log(name)
+    }, "#test3")
+
+    $("#test3").on("click.two", function (e, name) {
         console.log("test3 click two")
         console.log(name)
     })
