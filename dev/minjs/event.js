@@ -258,7 +258,10 @@ module.exports = (function() {
      * @param types     事件名，可为多个，支持自定义
      * @param call      绑定的要执行的回调函数
      * @param select    过滤器参数
+     *
+     * TODO: 性能调优，执行后直接从回调数组中删除
      */
+
     Event.once = function (ele, types, call, select) {
         var hasRun = false, fixCall = function() {
             if (!hasRun /* 未运行时运行方法 */) {
