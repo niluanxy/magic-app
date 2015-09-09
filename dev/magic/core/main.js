@@ -33,7 +33,7 @@ require("extend");      // 原生对象扩展
                     } else {
                         // 否则直接尝试查找对象
                         var qur = magic.query(select, content);
-                        if (qur instanceof Array) {
+                        if (qur && qur.length /* 是否返回数组 */) {
                             if (qur.length > 0) {
                                 this[0] = qur[0];
                                 this.length = 1;

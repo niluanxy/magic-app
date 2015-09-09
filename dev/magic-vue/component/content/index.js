@@ -12,6 +12,7 @@ module.exports = (function() {
             if ($parent.find("mg-header").length) {
                 $el.addClass("has-header");
             }
+
             if ($parent.find("mg-footer").length || 
                 $parent.find(".tabs-footer").length) {
                 $el.addClass("has-footer");
@@ -50,9 +51,17 @@ module.exports = (function() {
     $$.component("mg-scroll", {
         template: "<div><content></content></div>",
         ready: function() {
-            var $el = $(this.$el), $scroll, handle, refresh, opt;   // 定义操作对象
+            var $el = $(this.$el), $scroll, handle,
+                refresh, opt = {};   // 定义操作对象
 
-            opt = $el.attr("scroll-x") ? {scrollX: true, scrollY: false} : {};
+            opt.scrollbars = $el.attr("scrollbars");
+
+            if ($el.attr("scroll-x")) {
+                opt.scrollX = true;
+                opt.scrollY = false;
+                $el.children().addClass("scroll-x");
+            }
+
             $scroll = $el.addClass("mg-scroll").scroll(opt);
 
             handle = $el.attr("handle");
