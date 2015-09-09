@@ -69,15 +69,6 @@ $.ready(function() {
             ev.pageX  = touch.pageX;
             ev.pageY  = touch.pageY;
 
-            ev._target = e.target;
-
-            ev.preventDefault = function() {
-                e.preventDefault();
-            }
-            ev.stopPropagation = function() {
-                e.stopPropagation();    // 终止冒泡
-            }
-
             e.target.dispatchEvent(ev);
         }
 

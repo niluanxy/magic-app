@@ -4,27 +4,28 @@
     <meta charset="UTF-8">
     <title>magic app</title>
 
-    <script>
-        (function() {
-            var ratio = window.devicePixelRatio,
-                    scale, html, meta, head = document.head;
+    <!--<script>-->
+        <!--(function() {-->
+            <!--var ratio = window.devicePixelRatio,-->
+                    <!--scale, html, meta, head = document.head;-->
 
-            if (ratio !== undefined) {
-                // scale =   ratio >= 3   ? 0.39 :
-                //         ( ratio >= 1.5 ? 0.5 : 1)
-                scale = 0.5;
-            }
+            <!--if (ratio !== undefined) {-->
+                <!--// scale =   ratio >= 3   ? 0.39 :-->
+                <!--//         ( ratio >= 1.5 ? 0.5 : 1)-->
+                <!--scale = 0.5;-->
+            <!--}-->
 
-            meta = document.createElement("meta");
-            meta.setAttribute("name", "viewport");
-            content  = 'initial-scale=' + scale;
-            content += ', maximum-scale='+scale;
-            content += ', user-scalable=no, width=device-width';
-            meta.setAttribute("content", content);
+            <!--meta = document.createElement("meta");-->
+            <!--meta.setAttribute("name", "viewport");-->
+            <!--content  = 'initial-scale=' + scale;-->
+            <!--content += ', maximum-scale='+scale;-->
+            <!--content += ', user-scalable=no, width=device-width';-->
+            <!--meta.setAttribute("content", content);-->
 
-            head.appendChild(meta); // 插入到页面中
-        })();
-    </script>
+            <!--head.appendChild(meta); // 插入到页面中-->
+        <!--})();-->
+    <!--</script>-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <meta name="apple-mobile-web-app-title" content="weishop">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-touch-fullscreen" content="yes" />
@@ -33,51 +34,121 @@
 
     <script src="pub/lib/vue.min.js"></script>
     <script src="page/main.js"></script>
+
 </head>
 <body>
-
-<div id="test1">
-    <div id="test2">
-        <p id="test3">最里面的测试</p>
+    <div class="content">
+        <ul class="test scroll-x">
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+            <li class="item">
+                这是一个测试的scroll项目
+            </li>
+        </ul>
     </div>
-</div>
-
 <script>
-    $("#test1").on("click.upload", function (e, name) {
-        console.log("test1 click uoload")
-        console.log(name)
-    }, "#test3")
-
-    $("#test2").once("click.upload", function (e, name) {
-        console.log("test2 click upload")
-        console.log(name)
-    }, "#test3")
-
-    $("#test2").on("click.upload", function (e, name) {
-        console.log("test2 click upload two test")
-        console.log(name)
-    }, "#test3")
-
-    $("#test3").on("click.two", function (e, name) {
-        console.log("test3 click two")
-        console.log(name)
-    })
-</script>
-
-<script>
-    (function (doc, win) {
-        var docEl = doc.documentElement,
-                resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
-                recalc = function () {
-                    var clientWidth = docEl.clientWidth;
-                    if (!clientWidth) return;
-                    docEl.style.fontSize = 20 * (clientWidth / 640) + 'px';
-                };
-
-        if (!doc.addEventListener) return;
-        win.addEventListener(resizeEvt, recalc, false);
-        doc.addEventListener('DOMContentLoaded', recalc, false);
-    })(document, window);
+    $(".content").scroll({
+        scrollX: true,
+        scrollY: false
+    });
+//    (function (doc, win) {
+//        var docEl = doc.documentElement,
+//                resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+//                recalc = function () {
+//                    var clientWidth = docEl.clientWidth;
+//                    if (!clientWidth) return;
+//                    docEl.style.fontSize = 20 * (clientWidth / 640) + 'px';
+//                };
+//
+//        if (!doc.addEventListener) return;
+//        win.addEventListener(resizeEvt, recalc, false);
+//        doc.addEventListener('DOMContentLoaded', recalc, false);
+//    })(document, window);
 </script>
 </body>
 </html>
