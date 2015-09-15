@@ -2002,20 +2002,23 @@ if ($ && $.fn && !$.fn.scroll) {
         handle = new scroll(this[0], option);
 
         if (probe === 3 /* 设置下拉刷新 */) {
-            var $el = $(this[0]), pos, ispull, maxy, starty, html,
+            var $el = $(this[0]), ispull, maxy, starty,
+                html, sph = 54, $pup, $pdown,
                 callup   = option.pullRefreshUp,
                 calldown = option.pullRefreshDown;
 
-            html = "<i class='icon'></i><i class='result'></i><span class='text'></span></div>";
+            html = "<i class='icon'></i><i class='result'></i><span class='text'>123123</span></div>";
 
             console.log(this[0])
 
             if (calldown /* 添加下拉刷新提示框 */) {
-                $el.insertBefore("<div class='scroll_pullDown'>"+html);  // 开头插入元素
+                $pdown = $("<div class='scroll_pullDown'>"+html);
+                $el.insertBefore($pdown);           // 开头插入元素
             }
 
             if (callup /* 添加上拉刷新提示框 */) {
-                $el.append("<div class='scroll_pullUp'>"+html);  // 末尾插入元素
+                $pup = $("<div class='scroll_pullUp'>"+html);
+                $el.append($pup);                   // 末尾插入元素
             }
 
             $el.on("touchstart", function() {
@@ -2030,25 +2033,29 @@ if ($ && $.fn && !$.fn.scroll) {
             }).on("touchend", function() {
                 if (!ispull) return false;   // 不满足下拉动作中止程序
 
-                if (handle.directionY == -1 && starty == 0 && handle.y >= 54){
-                    callup   && callup();       // 尝试执行上拉回调
-
-                    console.log("pull refresh up called!")
-                }
-
-                if (handle.directionY ==  1 && starty == maxy && handle.y <= (maxy-54)) {
+                if (handle.directionY ==  1 && starty == maxy && handle.y <= (maxy-sph)) {
                     calldown && calldown();     // 尝试执行下拉回调
 
                     console.log("pull refresh down called!")
+                }
+
+                if (handle.directionY == -1 && starty == 0 && handle.y >= sph){
+                    callup   && callup();       // 尝试执行上拉回调
+
+                    console.log("pull refresh up called!")
                 }
 
                 ispull = false;         // 重置下拉状态
             })
 
             handle.on("scroll", function(e) {
-                pos = handle.y;    // 记录下当前位置
+                if (!ispull) return false;  // 非下拉状态直接退出
 
-                if (pos > 54 ) {
+                var pos = handle.y, dir = handle.directionY;
+
+                if (dir == 1 && pos >= sph) {   // 下拉动画
+                    $pdown.css("top", -(sph-pos) + "px");
+                } else if (dir == -1 && pos <= (maxy-sph)) {
 
                 }
             })
