@@ -217,7 +217,7 @@ module.exports = (function() {
             dkey = attrs[map];      // 获得对象上的数据索引ID
 
             if (val != undefined) {
-                dataCache[dkey][key] = val;
+                return dataCache[dkey][key] = val;
             } else {
                 return dataCache[dkey][key];
             }

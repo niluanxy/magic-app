@@ -86,7 +86,7 @@ module.exports = (function() {
         return;
     }
 
-    /* 制定元素的前方插入对象 */
+    /* 选择元素的前方插入对象 */
     _dom.before = function(el, html) {
         return _dom._addIn(el, html, true)
     }

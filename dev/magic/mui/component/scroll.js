@@ -1,9 +1,10 @@
+/*! iScroll v5.1.3 ~ (c) 2008-2014 Matteo Spinelli ~ http://cubiq.org/license */
 var scroll = module.exports = (function (window, document, Math) {
-    var rAF = window.requestAnimationFrame  ||
-        window.webkitRequestAnimationFrame  ||
-        window.mozRequestAnimationFrame     ||
-        window.oRequestAnimationFrame       ||
-        window.msRequestAnimationFrame      ||
+    var rAF = window.requestAnimationFrame	||
+        window.webkitRequestAnimationFrame	||
+        window.mozRequestAnimationFrame		||
+        window.oRequestAnimationFrame		||
+        window.msRequestAnimationFrame		||
         function (callback) { window.setTimeout(callback, 1000 / 60); };
 
     var utils = (function () {
@@ -33,8 +34,8 @@ var scroll = module.exports = (function (window, document, Math) {
         }
 
         me.prefixPointerEvent = function (pointerEvent) {
-            return window.MSPointerEvent ? 
-                'MSPointer' + pointerEvent.charAt(9).toUpperCase() + pointerEvent.substr(10):
+            return window.MSPointerEvent ?
+            'MSPointer' + pointerEvent.charAt(9).toUpperCase() + pointerEvent.substr(10):
                 pointerEvent;
         };
 
@@ -86,7 +87,6 @@ var scroll = module.exports = (function (window, document, Math) {
             transformOrigin: _prefixStyle('transformOrigin')
         });
 
-
         me.preventDefaultException = function (el, exceptions) {
             for ( var i in exceptions ) {
                 if ( exceptions[i].test(el[i]) ) {
@@ -123,7 +123,7 @@ var scroll = module.exports = (function (window, document, Math) {
                 }
             },
             circular: {
-                style: 'cubic-bezier(0.1, 0.57, 0.1, 1)',   // Not properly "circular" but this looks better, it should be (0.075, 0.82, 0.165, 1)
+                style: 'cubic-bezier(0.1, 0.57, 0.1, 1)',	// Not properly "circular" but this looks better, it should be (0.075, 0.82, 0.165, 1)
                 fn: function (k) {
                     return Math.sqrt( 1 - ( --k * k ) );
                 }
@@ -193,7 +193,7 @@ var scroll = module.exports = (function (window, document, Math) {
     function IScroll (el, options) {
         this.wrapper = typeof el == 'string' ? document.querySelector(el) : el;
         this.scroller = this.wrapper.children[0];
-        this.scrollerStyle = this.scroller.style;       // cache style for better performance
+        this.scrollerStyle = this.scroller.style;		// cache style for better performance
 
         this.options = {
 
@@ -203,7 +203,7 @@ var scroll = module.exports = (function (window, document, Math) {
 
             snapThreshold: 0.334,
 
-    // INSERT POINT: OPTIONS 
+// INSERT POINT: OPTIONS 
 
             startX: 0,
             startY: 0,
@@ -258,16 +258,19 @@ var scroll = module.exports = (function (window, document, Math) {
 
         this.options.invertWheelDirection = this.options.invertWheelDirection ? -1 : 1;
 
-    // INSERT POINT: NORMALIZATION
+        if ( this.options.probeType == 3 ) {
+            this.options.useTransition = false;	}
 
-        // Some defaults    
+// INSERT POINT: NORMALIZATION
+
+        // Some defaults
         this.x = 0;
         this.y = 0;
         this.directionX = 0;
         this.directionY = 0;
         this._events = {};
 
-    // INSERT POINT: DEFAULTS
+// INSERT POINT: DEFAULTS
 
         this._init();
         this.refresh();
@@ -298,7 +301,7 @@ var scroll = module.exports = (function (window, document, Math) {
                 this._initKeys();
             }
 
-    // INSERT POINT: _init
+// INSERT POINT: _init
 
         },
 
@@ -339,10 +342,10 @@ var scroll = module.exports = (function (window, document, Math) {
             var point = e.touches ? e.touches[0] : e,
                 pos;
 
-            this.initiated  = utils.eventType[e.type];
-            this.moved      = false;
-            this.distX      = 0;
-            this.distY      = 0;
+            this.initiated	= utils.eventType[e.type];
+            this.moved		= false;
+            this.distX		= 0;
+            this.distY		= 0;
             this.directionX = 0;
             this.directionY = 0;
             this.directionLocked = 0;
@@ -371,29 +374,29 @@ var scroll = module.exports = (function (window, document, Math) {
             this._execEvent('beforeScrollStart');
         },
 
-        _move: utils.delayCall(function (e) {
+        _move: function (e) {
             if ( !this.enabled || utils.eventType[e.type] !== this.initiated ) {
                 return;
             }
 
-            if ( this.options.preventDefault ) {    // increases performance on Android? TODO: check!
+            if ( this.options.preventDefault ) {	// increases performance on Android? TODO: check!
                 e.preventDefault();
             }
 
-            var point       = e.touches ? e.touches[0] : e,
-                deltaX      = point.pageX - this.pointX,
-                deltaY      = point.pageY - this.pointY,
-                timestamp   = utils.getTime(),
+            var point		= e.touches ? e.touches[0] : e,
+                deltaX		= point.pageX - this.pointX,
+                deltaY		= point.pageY - this.pointY,
+                timestamp	= utils.getTime(),
                 newX, newY,
                 absDistX, absDistY;
 
-            this.pointX     = point.pageX;
-            this.pointY     = point.pageY;
+            this.pointX		= point.pageX;
+            this.pointY		= point.pageY;
 
-            this.distX      += deltaX;
-            this.distY      += deltaY;
-            absDistX        = Math.abs(this.distX);
-            absDistY        = Math.abs(this.distY);
+            this.distX		+= deltaX;
+            this.distY		+= deltaY;
+            absDistX		= Math.abs(this.distX);
+            absDistY		= Math.abs(this.distY);
 
             // We need to move at least 10 pixels for the scrolling to initiate
             if ( timestamp - this.endTime > 300 && (absDistX < 10 && absDistY < 10) ) {
@@ -403,11 +406,11 @@ var scroll = module.exports = (function (window, document, Math) {
             // If you are scrolling in one direction lock the other
             if ( !this.directionLocked && !this.options.freeScroll ) {
                 if ( absDistX > absDistY + this.options.directionLockThreshold ) {
-                    this.directionLocked = 'h';     // lock horizontally
+                    this.directionLocked = 'h';		// lock horizontally
                 } else if ( absDistY >= absDistX + this.options.directionLockThreshold ) {
-                    this.directionLocked = 'v';     // lock vertically
+                    this.directionLocked = 'v';		// lock vertically
                 } else {
-                    this.directionLocked = 'n';     // no lock
+                    this.directionLocked = 'n';		// no lock
                 }
             }
 
@@ -456,17 +459,23 @@ var scroll = module.exports = (function (window, document, Math) {
 
             this._translate(newX, newY);
 
-    /* REPLACE START: _move */
-
+            /* REPLACE START: _move */
             if ( timestamp - this.startTime > 300 ) {
                 this.startTime = timestamp;
                 this.startX = this.x;
                 this.startY = this.y;
+
+                if ( this.options.probeType == 1 ) {
+                    this._execEvent('scroll');
+                }
             }
 
-    /* REPLACE END: _move */
+            if ( this.options.probeType > 1 ) {
+                this._execEvent('scroll');
+            }
+            /* REPLACE END: _move */
 
-        }, 16),
+        },
 
         _end: function (e) {
             if ( !this.enabled || utils.eventType[e.type] !== this.initiated ) {
@@ -497,7 +506,7 @@ var scroll = module.exports = (function (window, document, Math) {
                 return;
             }
 
-            this.scrollTo(newX, newY);  // ensures that the last position is rounded
+            this.scrollTo(newX, newY);	// ensures that the last position is rounded
 
             // we scrolled less than 10 pixels
             if ( !this.moved ) {
@@ -545,7 +554,7 @@ var scroll = module.exports = (function (window, document, Math) {
                 easing = this.options.bounceEasing;
             }
 
-    // INSERT POINT: _end
+// INSERT POINT: _end
 
             if ( newX != this.x || newY != this.y ) {
                 // change easing function when scroller goes out of the boundaries
@@ -606,23 +615,23 @@ var scroll = module.exports = (function (window, document, Math) {
         },
 
         refresh: function () {
-            var rf = this.wrapper.offsetHeight;     // Force reflow
+            var rf = this.wrapper.offsetHeight;		// Force reflow
 
-            this.wrapperWidth   = this.wrapper.clientWidth;
-            this.wrapperHeight  = this.wrapper.clientHeight;
+            this.wrapperWidth	= this.wrapper.clientWidth;
+            this.wrapperHeight	= this.wrapper.clientHeight;
 
-    /* REPLACE START: refresh */
+            /* REPLACE START: refresh */
 
-            this.scrollerWidth  = this.scroller.offsetWidth;
-            this.scrollerHeight = this.scroller.offsetHeight;
+            this.scrollerWidth	= this.scroller.offsetWidth;
+            this.scrollerHeight	= this.scroller.offsetHeight;
 
-            this.maxScrollX     = this.wrapperWidth - this.scrollerWidth;
-            this.maxScrollY     = this.wrapperHeight - this.scrollerHeight;
+            this.maxScrollX		= this.wrapperWidth - this.scrollerWidth;
+            this.maxScrollY		= this.wrapperHeight - this.scrollerHeight;
 
-    /* REPLACE END: refresh */
+            /* REPLACE END: refresh */
 
-            this.hasHorizontalScroll    = this.options.scrollX && this.maxScrollX < 0;
-            this.hasVerticalScroll      = this.options.scrollY && this.maxScrollY < 0;
+            this.hasHorizontalScroll	= this.options.scrollX && this.maxScrollX < 0;
+            this.hasVerticalScroll		= this.options.scrollY && this.maxScrollY < 0;
 
             if ( !this.hasHorizontalScroll ) {
                 this.maxScrollX = 0;
@@ -644,7 +653,7 @@ var scroll = module.exports = (function (window, document, Math) {
 
             this.resetPosition();
 
-    // INSERT POINT: _refresh
+// INSERT POINT: _refresh
 
         },
 
@@ -755,7 +764,7 @@ var scroll = module.exports = (function (window, document, Math) {
             }
 
 
-    // INSERT POINT: _transitionTime
+// INSERT POINT: _transitionTime
 
         },
 
@@ -770,18 +779,18 @@ var scroll = module.exports = (function (window, document, Math) {
             }
 
 
-    // INSERT POINT: _transitionTimingFunction
+// INSERT POINT: _transitionTimingFunction
 
         },
 
         _translate: function (x, y) {
             if ( this.options.useTransform ) {
 
-    /* REPLACE START: _translate */
+                /* REPLACE START: _translate */
 
                 this.scrollerStyle[utils.style.transform] = 'translate(' + x + 'px,' + y + 'px)' + this.translateZ;
 
-    /* REPLACE END: _translate */
+                /* REPLACE END: _translate */
 
             } else {
                 x = Math.round(x);
@@ -794,14 +803,14 @@ var scroll = module.exports = (function (window, document, Math) {
             this.y = y;
 
 
-        if ( this.indicators ) {
-            for ( var i = this.indicators.length; i--; ) {
-                this.indicators[i].updatePosition();
+            if ( this.indicators ) {
+                for ( var i = this.indicators.length; i--; ) {
+                    this.indicators[i].updatePosition();
+                }
             }
-        }
 
 
-    // INSERT POINT: _translate
+// INSERT POINT: _translate
 
         },
 
@@ -1063,7 +1072,11 @@ var scroll = module.exports = (function (window, document, Math) {
 
             this.scrollTo(newX, newY, 0);
 
-    // INSERT POINT: _wheel
+            if ( this.options.probeType > 1 ) {
+                this._execEvent('scroll');
+            }
+
+// INSERT POINT: _wheel
         },
 
         _initSnap: function () {
@@ -1354,7 +1367,7 @@ var scroll = module.exports = (function (window, document, Math) {
                 return;
             }
 
-            var snap = this.options.snap,   // we are using this alot, better to cache it
+            var snap = this.options.snap,	// we are using this alot, better to cache it
                 newX = snap ? this.currentPage.pageX : this.x,
                 newY = snap ? this.currentPage.pageY : this.y,
                 now = utils.getTime(),
@@ -1468,11 +1481,16 @@ var scroll = module.exports = (function (window, document, Math) {
                 if ( that.isAnimating ) {
                     rAF(step);
                 }
+
+                if ( that.options.probeType == 3 ) {
+                    that._execEvent('scroll');
+                }
             }
 
             this.isAnimating = true;
             step();
         },
+
         handleEvent: function (e) {
             switch ( e.type ) {
                 case 'touchstart':
@@ -1524,6 +1542,8 @@ var scroll = module.exports = (function (window, document, Math) {
             }
         }
     };
+
+    /* 原文件修改处 */
     function createDefaultScrollbar (direction, interactive, type) {
         var scrollbar = document.createElement('div'),
             indicator = document.createElement('div');
@@ -1668,10 +1688,10 @@ var scroll = module.exports = (function (window, document, Math) {
 
             this.initiated = true;
             this.moved = false;
-            this.lastPointX = point.pageX;
-            this.lastPointY = point.pageY;
+            this.lastPointX	= point.pageX;
+            this.lastPointY	= point.pageY;
 
-            this.startTime  = utils.getTime();
+            this.startTime	= utils.getTime();
 
             if ( !this.options.disableTouch ) {
                 utils.addEvent(window, 'touchmove', this);
@@ -1686,7 +1706,7 @@ var scroll = module.exports = (function (window, document, Math) {
             this.scroller._execEvent('beforeScrollStart');
         },
 
-        _move: utils.delayCall(function (e) {
+        _move: function (e) {
             var point = e.touches ? e.touches[0] : e,
                 deltaX, deltaY,
                 newX, newY,
@@ -1709,11 +1729,20 @@ var scroll = module.exports = (function (window, document, Math) {
 
             this._pos(newX, newY);
 
-    // INSERT POINT: indicator._move
+
+            if ( this.scroller.options.probeType == 1 && timestamp - this.startTime > 300 ) {
+                this.startTime = timestamp;
+                this.scroller._execEvent('scroll');
+            } else if ( this.scroller.options.probeType > 1 ) {
+                this.scroller._execEvent('scroll');
+            }
+
+
+// INSERT POINT: indicator._move
 
             e.preventDefault();
             e.stopPropagation();
-        }, 16),
+        },
 
         _end: function (e) {
             if ( !this.initiated ) {
@@ -1799,7 +1828,7 @@ var scroll = module.exports = (function (window, document, Math) {
                 }
             }
 
-            var r = this.wrapper.offsetHeight;  // force refresh
+            var r = this.wrapper.offsetHeight;	// force refresh
 
             if ( this.options.listenX ) {
                 this.wrapperWidth = this.wrapper.clientWidth;
@@ -1820,7 +1849,7 @@ var scroll = module.exports = (function (window, document, Math) {
                     this.maxBoundaryX = this.maxPosX;
                 }
 
-                this.sizeRatioX = this.options.speedRatioX || (this.scroller.maxScrollX && (this.maxPosX / this.scroller.maxScrollX));  
+                this.sizeRatioX = this.options.speedRatioX || (this.scroller.maxScrollX && (this.maxPosX / this.scroller.maxScrollX));
             }
 
             if ( this.options.listenY ) {
@@ -1950,20 +1979,81 @@ var scroll = module.exports = (function (window, document, Math) {
     /* !!! 原文件修改处 */
     return function(el, option) {
         return new IScroll(el, option);
-    }    
+    }
 })(window, document, Math);
+
 
 /* 尝试绑定方法到 magic 框架的全局对象上 */
 if ($ && $.fn && !$.fn.scroll) {
     $.fn.extend({scroll: function(option) {
+        var handle, probe;     // 存储scroll对象
+
+        probe = (option && (typeof option.pullRefreshUp == "function" ||
+                            typeof option.pullRefreshDown == "function")) ? 3 : null;
+
         option = $.extend({
             bindToWrapper: true,
             scrollbars: true,
             fadeScrollbars: true,
-            preventDefault: true
+            preventDefault: true,
+            probeType     : probe
         }, option);
 
-        this.data("ui_scroll", new scroll(this[0], option));
-        return this.data("ui_scroll");
+        handle = new scroll(this[0], option);
+
+        if (probe === 3 /* 设置下拉刷新 */) {
+            var $el = $(this[0]), pos, ispull, maxy, starty, html,
+                callup   = option.pullRefreshUp,
+                calldown = option.pullRefreshDown;
+
+            html = "<i class='icon'></i><i class='result'></i><span class='text'></span></div>";
+
+            console.log(this[0])
+
+            if (calldown /* 添加下拉刷新提示框 */) {
+                $el.insertBefore("<div class='scroll_pullDown'>"+html);  // 开头插入元素
+            }
+
+            if (callup /* 添加上拉刷新提示框 */) {
+                $el.append("<div class='scroll_pullUp'>"+html);  // 末尾插入元素
+            }
+
+            $el.on("touchstart", function() {
+                maxy   = handle.maxScrollY;     // 保存最大滚动边距
+                starty = handle.y;              // 起始位置
+
+                if (starty == 0 || starty == maxy) {
+                    ispull = true;      // 当前为下拉刷新状态
+                } else {
+                    ispull = false;
+                }
+            }).on("touchend", function() {
+                if (!ispull) return false;   // 不满足下拉动作中止程序
+
+                if (handle.directionY == -1 && starty == 0 && handle.y >= 54){
+                    callup   && callup();       // 尝试执行上拉回调
+
+                    console.log("pull refresh up called!")
+                }
+
+                if (handle.directionY ==  1 && starty == maxy && handle.y <= (maxy-54)) {
+                    calldown && calldown();     // 尝试执行下拉回调
+
+                    console.log("pull refresh down called!")
+                }
+
+                ispull = false;         // 重置下拉状态
+            })
+
+            handle.on("scroll", function(e) {
+                pos = handle.y;    // 记录下当前位置
+
+                if (pos > 54 ) {
+
+                }
+            })
+        }
+
+        return this.data("ui_scroll", handle);
     }})
 };

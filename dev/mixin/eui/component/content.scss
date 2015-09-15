@@ -25,5 +25,28 @@
     >*:first-child {
         padding-bottom: 1px;
     }
+
+    .scroll_pullDown, .scroll_pullUp {
+        position: absolute;
+        z-index: 99;
+        left: 15%;
+        right: 15%;
+        text-align: center;
+        overflow: hidden;
+        height: 60px;
+        line-height: 60px;
+
+        .icon {
+            float: left;
+        }
+    }
+
+    .scroll_pullDown {
+        top: 0;
+    }
+
+    .scroll_pullUp {
+        bottom: 0;
+    }
 }
 

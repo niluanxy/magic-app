@@ -4,11 +4,15 @@ module.exports = (function() {
     $$.component("mg-content", {
         template: "<div class='scroll_body'><content></content></div>",
         ready: function() {
-            var $el = $(this.$el), $scroll, $parent, handle, refresh;   // 定义操作对象
+            var $el = $(this.$el), $scroll, $parent, handle, refresh, opt = {};   // 定义操作对象
 
-            $scroll = $el.addClass("content").scroll(); // 初始化
 
-            $parent = $el.parent();
+            opt.pullRefreshDown = this[$el.attr("pullRefreshDown")] || null;
+            opt.pullRefreshUp   = this[$el.attr("pullRefreshUp")]   || null;
+
+            $scroll = $el.addClass("content").scroll(opt); // 初始化
+
+            $parent = $el.parent();     // 查找元素父类，修正样式
             if ($parent.find("mg-header").length) {
                 $el.addClass("has-header");
             }
