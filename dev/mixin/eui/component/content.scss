@@ -26,17 +26,21 @@
         padding-bottom: 1px;
     }
 
+    &.refreshUp {
+        padding-top: $content-pull-height;
+    }
+
     .scroll_pullDown, .scroll_pullUp {
         position: absolute;
-        z-index: 99;
+        z-index: 1;
         width: 100%;
         color: #fff;
         padding: 0 15%;
-        background-color: #423f47;
         text-align: center;
         overflow: hidden;
-        height: 54px;
-        line-height: 54px;
+        height: $content-pull-height;
+        line-height: $content-pull-height;
+        background-color: $content-pull-back;
 
         .icon {
             float: left;
@@ -44,11 +48,11 @@
     }
 
     .scroll_pullDown {
-        top: 0;
+        top: -$content-pull-height;
     }
 
     .scroll_pullUp {
-        bottom: 0;
+        bottom: -$content-pull-height;
     }
 }
 

@@ -7,8 +7,12 @@ module.exports = {
     },
 
     methods: {
-        pullRefresh: function(event) {
-            console.log("pullRefresh has run!")
-        }
+        pullDown: function(event) {
+            console.log("pullDown has run!")
+        },
+
+        pullUp: function(event) {
+            console.log("pullUp has run!")
+        },
     }
 }

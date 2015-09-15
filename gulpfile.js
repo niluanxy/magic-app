@@ -363,15 +363,15 @@ gulp.task("serve", function() {
     });
 
     /* mixin 动态刷新任务 */
-    gulp.watch(["dev/mixin/**/*"], ["dev-mixin"])
+    gulp.watch(["dev/mixin/**/*.scss"], ["dev-mixin"])
 
     /* minjs 动态刷新任务 */
     gulp.watch(["dev/minjs/*"], ["dev-minjs"])
 
     /* magic 动态刷新任务 */
-    gulp.watch(["dev/magic/core/*.scss"], ["dev-magic-css"])
+    gulp.watch(["dev/magic/core/*.scss", "dev/magic/lib/mixin.scss"], ["dev-magic-css"])
     gulp.watch(["dev/magic/**/*.js", "dev/magic/**/*.scss",
-                "dev/magic/**/*.html", "!dev/magic/core/*.scss"],
+                "dev/magic/**/*.html", "!dev/magic/core/*.scss", "!dev/magic/lib/mixin.scss"],
                 ["dev-magic-js"])
 
     /* magic-vue 动态刷新任务 */

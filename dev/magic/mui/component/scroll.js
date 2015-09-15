@@ -220,7 +220,7 @@ var scroll = module.exports = (function (window, document, Math) {
 
             HWCompositing: true,
             useTransition: true,
-            useTransform: true
+            useTransform: true,
         };
 
         for ( var i in options ) {
@@ -2002,64 +2002,89 @@ if ($ && $.fn && !$.fn.scroll) {
         handle = new scroll(this[0], option);
 
         if (probe === 3 /* 设置下拉刷新 */) {
+            window.refresh = handle;
+
             var $el = $(this[0]), ispull, maxy, starty,
-                html, sph = 54, $pup, $pdown,
+                posy, dir, html, sph = 54, $pup, $pdown,
                 callup   = option.pullRefreshUp,
                 calldown = option.pullRefreshDown;
 
-            html = "<i class='icon'></i><i class='result'></i><span class='text'>123123</span></div>";
-
-            console.log(this[0])
+            html = "<i class='icon'></i><i class='result'></i><span class='text'>123</span></div>";
 
             if (calldown /* 添加下拉刷新提示框 */) {
-                $pdown = $("<div class='scroll_pullDown'>"+html);
-                $el.insertBefore($pdown);           // 开头插入元素
+                $el.insertBefore("<div class='scroll_pullDown'>"+html);     // 开头插入元素
+                $pdown = $el.find(".scroll_pullDown");
             }
 
             if (callup /* 添加上拉刷新提示框 */) {
-                $pup = $("<div class='scroll_pullUp'>"+html);
-                $el.append($pup);                   // 末尾插入元素
+                $el.append("<div class='scroll_pullUp'>"+html);             // 末尾插入元素
+                $pup = $el.find(".scroll_pullUp");
             }
 
             $el.on("touchstart", function() {
-                maxy   = handle.maxScrollY;     // 保存最大滚动边距
-                starty = handle.y;              // 起始位置
+                maxy   = handle.maxScrollY;
+                dir    = handle.directionY;
+                starty = handle.y;
 
                 if (starty == 0 || starty == maxy) {
+                    handle.cancelScroll = true;
                     ispull = true;      // 当前为下拉刷新状态
+                    $pdown.removeClass("hide");
+                    $pup.removeClass("hide");
                 } else {
                     ispull = false;
                 }
-            }).on("touchend", function() {
+            }).on("touchend", function(e) {
                 if (!ispull) return false;   // 不满足下拉动作中止程序
 
-                if (handle.directionY ==  1 && starty == maxy && handle.y <= (maxy-sph)) {
-                    calldown && calldown();     // 尝试执行下拉回调
+                posy = handle.y; dir = handle.directionY;    // 当前位置和方向
 
+                if (dir == -1 && starty == 0 && posy >= sph) {
+                    calldown && calldown();            // 尝试执行下拉回调
                     console.log("pull refresh down called!")
                 }
 
-                if (handle.directionY == -1 && starty == 0 && handle.y >= sph){
-                    callup   && callup();       // 尝试执行上拉回调
-
+                if (dir == 1 && starty == maxy && posy <= (maxy-sph)){
+                    callup   && callup();              // 尝试执行上拉回调
                     console.log("pull refresh up called!")
                 }
 
                 ispull = false;         // 重置下拉状态
+                $pdown.addClass("hide").css("top",  -sph + "px");
+                $pup.addClass("hide").css("bottom", -sph + "px");
             })
 
-            handle.on("scroll", function(e) {
+            handle.on("scroll", function() {
                 if (!ispull) return false;  // 非下拉状态直接退出
 
-                var pos = handle.y, dir = handle.directionY;
+                posy = handle.y; dir = handle.directionY;
+                if (dir == 1 && starty == 0) {
+                    return ispull = false;  // 修复首次下滚判断错误问题
+                }
 
-                if (dir == 1 && pos >= sph) {   // 下拉动画
-                    $pdown.css("top", -(sph-pos) + "px");
-                } else if (dir == -1 && pos <= (maxy-sph)) {
-
+                if (dir == -1 && posy <= sph) {   // 下拉动画
+                    $pdown.css("top", -(sph-posy) + "px");
+                } else if (dir == 1 && posy >= (maxy-sph)) {
+                    $pup.css("bottom", (maxy-posy-sph) + "px");
                 }
             })
         }
+
+        $el.on("touchstart", function(e) {
+            var tagName = e.target.tagName, inputs;
+
+            if ("INPUT TEXTAREA".search(tagName) == -1) {
+                inputs = $el.query("input");
+                for(var i=0; i<inputs.length; i++) {
+                    inputs[i].blur();
+                }
+
+                inputs = $el.query("textarea");
+                for(var i=0; i<inputs.length; i++) {
+                    inputs[i].blur();
+                }
+            }
+        })
 
         return this.data("ui_scroll", handle);
     }})
