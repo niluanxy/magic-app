@@ -371,7 +371,7 @@ var scroll = module.exports = (function (window, document, Math) {
             this._execEvent('beforeScrollStart');
         },
 
-        _move: function (e) {
+        _move: utils.delayCall(function (e) {
             if ( !this.enabled || utils.eventType[e.type] !== this.initiated ) {
                 return;
             }
@@ -466,7 +466,7 @@ var scroll = module.exports = (function (window, document, Math) {
 
     /* REPLACE END: _move */
 
-        },
+        }, 16),
 
         _end: function (e) {
             if ( !this.enabled || utils.eventType[e.type] !== this.initiated ) {
@@ -1686,7 +1686,7 @@ var scroll = module.exports = (function (window, document, Math) {
             this.scroller._execEvent('beforeScrollStart');
         },
 
-        _move: function (e) {
+        _move: utils.delayCall(function (e) {
             var point = e.touches ? e.touches[0] : e,
                 deltaX, deltaY,
                 newX, newY,
@@ -1713,7 +1713,7 @@ var scroll = module.exports = (function (window, document, Math) {
 
             e.preventDefault();
             e.stopPropagation();
-        },
+        }, 16),
 
         _end: function (e) {
             if ( !this.initiated ) {
@@ -1959,12 +1959,9 @@ if ($ && $.fn && !$.fn.scroll) {
         option = $.extend({
             bindToWrapper: true,
             scrollbars: true,
-            bounceEasing: "quadratic",
             fadeScrollbars: true,
             preventDefault: true
         }, option);
-
-
 
         this.data("ui_scroll", new scroll(this[0], option));
         return this.data("ui_scroll");
