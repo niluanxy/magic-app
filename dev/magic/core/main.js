@@ -222,6 +222,17 @@ require("extend");      // 原生对象扩展
                 }
             },
 
+            text : function(text) {
+                if (!this[0]) return this;
+
+                if (text /* 有值时设置值并返回自身 */) {
+                    this[0].innerText = text;
+                    return this;
+                } else {
+                    return this[0].innerText;
+                }
+            },
+
             /* 为对象添加HTML对象或者字符串 */
             append: function(text) {
                 if (text instanceof Magic) {

@@ -7,12 +7,18 @@ module.exports = {
     },
 
     methods: {
-        pullDown: function(event) {
+        pullDown: function(finish) {
             console.log("pullDown has run!")
+            setTimeout(function() {
+                finish.done();
+            }, 600)
         },
 
-        pullUp: function(event) {
+        pullUp: function(finish) {
             console.log("pullUp has run!")
+            setTimeout(function() {
+                finish.done();
+            }, 600)
         },
     }
 }
