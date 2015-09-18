@@ -1,5 +1,5 @@
 module.exports = (function() {
-    var $el = $($$.__VIEW__), $tip = $.tip();
+    var $tip = $.tip(), $loading = $.tip('', {type: "loading"});
 
     $$.tip = function(text, option) {
         if (!text) return;
@@ -11,7 +11,13 @@ module.exports = (function() {
         $tip.show("操作失败，"+text, option);
     }
     
-    $$.tipHide = function() {
-        $tip.hide();
+    $$.tipHide = function() { $tip.hide(); };
+
+    $$.loading = function() {
+        $loading.show();
+    }
+
+    $$.loadingHide = function() {
+        $loading.hide();
     }
 })();

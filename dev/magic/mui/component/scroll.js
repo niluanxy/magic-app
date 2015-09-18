@@ -586,13 +586,13 @@ var scroll = module.exports = (function (window, document, Math) {
             time = time || 0;
 
             if ( !this.hasHorizontalScroll || this.x > 0 ) {
-                x = this.minScrollX ? this.minScrollX : 0;
+                x = 0;
             } else if ( this.x < this.maxScrollX ) {
                 x = this.maxScrollX;
             }
 
             if ( !this.hasVerticalScroll || this.y > 0 ) {
-                y = this.minScrollY ? this.minScrollY : 0;
+                y = 0;
             } else if ( this.y < this.maxScrollY ) {
                 y = this.maxScrollY;
             }
@@ -1986,7 +1986,7 @@ var scroll = module.exports = (function (window, document, Math) {
 /* 尝试绑定方法到 magic 框架的全局对象上 */
 if ($ && $.fn && !$.fn.scroll) {
     $.fn.extend({scroll: function(option) {
-        var handle, probe;     // 存储scroll对象
+        var handle, probe, $el = this;     // 存储scroll对象
 
         probe = (option && (typeof option.pullRefreshUp == "function" ||
                             typeof option.pullRefreshDown == "function")) ? 3 : null;
@@ -1995,8 +1995,8 @@ if ($ && $.fn && !$.fn.scroll) {
             bindToWrapper: true,
             scrollbars: true,
             fadeScrollbars: true,
-            preventDefault: true,
-            probeType     : probe,
+            preventDefault: false,
+            probeType     : probe
         }, option);
 
         handle = new scroll(this[0], option);
@@ -2004,88 +2004,68 @@ if ($ && $.fn && !$.fn.scroll) {
         if (probe === 3 /* 设置下拉刷新 */) {
             window.refresh = handle;
 
-            var $el = this.children(), ispull, defer, sph = 54,
-                $pup, $pdown, $text, finish, starty;
+            var ispull, maxy, starty, posy, dir,
+                html, sph = 54, $pup, $pdown,
                 callup   = option.pullRefreshUp,
                 calldown = option.pullRefreshDown;
 
+            html = "<i class='icon'></i><i class='result'></i><span class='text'>123</span></div>";
+
             if (calldown /* 添加下拉刷新提示框 */) {
-                $el.insertBefore("<div class='scroll_pullDown'><i class='icon'></i>"+
-                    "<i class='result'></i><span class='text'>释放刷新内容</span></div>");     // 开头插入元素
+                $el.insertBefore("<div class='scroll_pullDown'>"+html);     // 开头插入元素
                 $pdown = $el.find(".scroll_pullDown");
             }
 
             if (callup /* 添加上拉刷新提示框 */) {
-                $el.append("<div class='scroll_pullUp'><i class='icon'></i>"+
-                    "<i class='result'></i><span class='text'>释放刷新内容</span></div>");             // 末尾插入元素
+                $el.append("<div class='scroll_pullUp'>"+html);             // 末尾插入元素
                 $pup = $el.find(".scroll_pullUp");
             }
 
-            finish = function(istrue, refresh, reset) {
-                if (!reset /* 非重置模式再修改 */) {
-                    if (istrue === false) {
-                        $text.text("刷新失败");
-                    } else {
-                        $text.text("刷新成功");
-                    }
-                }
-
-                setTimeout(function() {
-                    handle.minScrollY = 0;
-                    handle.maxScrollY = handle.wrapperHeight - handle.scrollerHeight;
-
-                    $text   && $text.text("释放刷新内容");
-                    refresh && handle.refresh();
-                    handle.resetPosition(handle.options.bounceTime);     // 重置位置
-                    defer = null;               // 释放内存
-                }, reset ? 0 : 600);
-            }
-
             $el.on("touchstart", function() {
-                starty = handle.y;      // 记录起始位置
+                maxy   = handle.maxScrollY;
+                dir    = handle.directionY;
+                starty = handle.y;
 
-                if (!defer && (Math.abs(starty-10) <= 10 ||
-                    Math.abs(starty-handle.maxScrollY) <= 10)) {
+                if (starty == 0 || starty == maxy) {
+                    handle.cancelScroll = true;
                     ispull = true;      // 当前为下拉刷新状态
-                    defer = $.defer(); defer.then(finish);
+                    $pdown.removeClass("hide");
+                    $pup.removeClass("hide");
                 } else {
                     ispull = false;
                 }
-
-                console.log(ispull)
             }).on("touchend", function(e) {
-                console.log(defer)
                 if (!ispull) return false;   // 不满足下拉动作中止程序
 
-                var posy = handle.y, dir = handle.directionY,
-                    maxy = handle.wrapperHeight - handle.scrollerHeight;
+                posy = handle.y; dir = handle.directionY;    // 当前位置和方向
 
-                if (dir == -1 && posy >= sph) {
-                    handle.minScrollY = sph;    // 刷新提示定位修复
-
-                    $text = $pdown.find(".text").text("内容刷新中...");
-                    calldown && calldown(defer);    // 尝试执行下拉回调
-                } else if (posy <= (maxy-sph)) {
-                    handle.maxScrollY = maxy-sph;       // 刷新提示定位修复
-
-                    $text = $pup.find(".text").text("内容刷新中...");
-                    callup   && callup(defer);      // 尝试执行上拉回调
-                } else {
-                    console.log("clear has run")
-                    finish(null, null, true);       // 触发失败则重置
+                if (dir == -1 && starty == 0 && posy >= sph) {
+                    calldown && calldown();            // 尝试执行下拉回调
+                    console.log("pull refresh down called!")
                 }
 
-                ispull = false;             // 重置下拉状态
+                if (dir == 1 && starty == maxy && posy <= (maxy-sph)){
+                    callup   && callup();              // 尝试执行上拉回调
+                    console.log("pull refresh up called!")
+                }
+
+                ispull = false;         // 重置下拉状态
+                $pdown.addClass("hide").css("top",  -sph + "px");
+                $pup.addClass("hide").css("bottom", -sph + "px");
             })
 
             handle.on("scroll", function() {
                 if (!ispull) return false;  // 非下拉状态直接退出
 
-                var posy = handle.y, dir = handle.directionY;
+                posy = handle.y; dir = handle.directionY;
+                if (dir == 1 && starty == 0) {
+                    return ispull = false;  // 修复首次下滚判断错误问题
+                }
 
-                if (dir == 1 && Math.abs(starty) <= 10) {
-                    ispull = false;     // 修复首次下滚判断错误问题
-                    defer  = null;      // 清除defer句柄
+                if (dir == -1 && posy <= sph) {   // 下拉动画
+                    $pdown.css("top", -(sph-posy) + "px");
+                } else if (dir == 1 && posy >= (maxy-sph)) {
+                    $pup.css("bottom", (maxy-posy-sph) + "px");
                 }
             })
         }

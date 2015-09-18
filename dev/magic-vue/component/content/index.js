@@ -4,7 +4,8 @@ module.exports = (function() {
     $$.component("mg-content", {
         template: "<div class='scroll_body'><content></content></div>",
         ready: function() {
-            var $el = $(this.$el), $scroll, $parent, handle, refresh, opt = {};   // 定义操作对象
+            var $el = $(this.$el), $scroll, $parent,
+                handle, refresh, opt = {}, repos;   // 定义操作对象
 
 
             opt.pullRefreshDown = this[$el.attr("pullRefreshDown")] || null;
@@ -27,27 +28,28 @@ module.exports = (function() {
                 this[handle] = $scroll;
             }
 
-            // 是否开启触屏后刷新，默认 开启 触屏刷新
-            if ((refresh = $el.attr("refresh")) !== false) {
+            // 触屏后刷新，默认 只执行一次 触屏刷新
+            refresh = $el.attr("refresh")
+            repos   = $el.attr("repos");
+            if (this[refresh] === undefined) {
                 var $body = $el.children(), last = 0;
+                bind = refresh === "true" ? "on" : "once";
 
-                if (refresh === true) {
-                    $el.on("touchstart", function() {
-                        var height = $body.height();
-
-                        if (height != last) {
-                            $scroll.refresh();      // 强制刷新高度
-                            last = height;          // 更新内容高度
-                        }
+                $el[bind]("touchstart", function() {
+                    var height = $body.height();
+                    if (height != last) {
+                        $scroll.refresh();      // 强制刷新高度
+                        last = height;          // 更新内容高度
+                        if (repos) $scroll.scrollTo(0, 0);
+                    }
+                })
+            } else {
+                this.$watch(refresh, function(newVal) {
+                    Vue.nextTick(function() {
+                        $scroll.refresh();
+                        if (repos) $scroll.scrollTo(0, 0);
                     })
-                } else if (this[refresh] !== undefined) {
-                    this.$watch(refresh, function(newVal) {
-                        Vue.nextTick(function() {
-                            $scroll.refresh();
-                            $scroll.scrollTo(0, 0);
-                        })
-                    })
-                }
+                })
             }
         }
     });

@@ -22,14 +22,12 @@ module.exports = (function() {
     }
 
     Slider.prototype.init = function() {
-        var that = this, opt = that.options,
-                   childs, $first, scroll, items;
+        var that = this, opt = that.options, childs, $first, scroll;
 
-        items = that.el[0].childNodes;
         that.el.wrapAll("<div class='slider_scroll'></div>");
         scroll = that.el.children();
         childs = scroll.query(".slider-item");
-        $first = $(childs[0]);
+        $first = $(childs[0] || childs);
 
         this.__render = $first.render(function() {
             that.pageWidth = $first.width();

@@ -366,7 +366,7 @@ gulp.task("serve", function() {
     gulp.watch(["dev/mixin/**/*.scss"], ["dev-mixin"])
 
     /* minjs 动态刷新任务 */
-    gulp.watch(["dev/minjs/*"], ["dev-minjs"])
+    gulp.watch(["dev/minjs/*.js"], ["dev-minjs"])
 
     /* magic 动态刷新任务 */
     gulp.watch(["dev/magic/core/*.scss", "dev/magic/lib/mixin.scss"], ["dev-magic-css"])

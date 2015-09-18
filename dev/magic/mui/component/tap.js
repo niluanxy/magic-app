@@ -30,7 +30,7 @@ $.ready(function() {
             }
 
             $target = $target.parent();     // 向上递归检测
-        } while($target[0] && $target[0] != this);
+        } while($target && $target[0] != this);
     });
 
     // 清除激活类
@@ -52,7 +52,7 @@ $.ready(function() {
             clearActive($target);
 
             $target = $target.parent();     // 向上递归检测
-        } while($target[0] && $target[0] != this);
+        } while($target && $target[0] != this);
     }, 50));
 
     $document.on("touchend", function(e) {
@@ -76,6 +76,6 @@ $.ready(function() {
             clearActive($target);   // 清除激活类
 
             $target = $target.parent();     // 向上递归检测
-        } while($target[0] && $target[0] != this);
+        } while($target && $target[0] != this);
     });
 });

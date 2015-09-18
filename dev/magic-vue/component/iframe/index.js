@@ -3,13 +3,10 @@ require("./style.scss");
 module.exports = (function() {
     // 检测是否是 iFrame ，依赖于全局 runid
     window.isFrame = function(dom) {
-        var parent = dom.parent.$$.key("_magic_runid"),
-            thisid = window.$$.key("_magic_runid");
-
-        return parent != thisid;    // 不同则是 iFrame
+        return dom.parent.document != dom.document;    // 不同则是 iFrame
     }
 
-    $$.component("mg-iframe", {
+    Vue.component("mg-iframe", {
         template: "<content></content>",
         ready: function() {
             var $el    = $(this.$el),
@@ -35,7 +32,7 @@ module.exports = (function() {
             ihandle = $el.attr('iframe');
 
             // 给子类添加一个全局方法，用于子类通过这个触发父类回调
-            if (parent[src] && src.match(/^http:\/\//) === null) {
+            if ((parent[src] || src) && src.match(/^http[s]?:\/\//) === null) {
                 // 给父类添加一个回调的方法
                 window[pcall] = function(data) {
                     var runcall = parent[rcall];

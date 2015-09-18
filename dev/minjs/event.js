@@ -182,7 +182,7 @@ module.exports = (function() {
             eveName = events[i]; evePre = getfix(eveName);
 
             /* 如果事件不存在，直接跳过 */
-            if (!handle[evePre]) continue;
+            if (!handle || !handle[evePre]) continue;
 
             typeRun = handle[evePre].runs;
 
@@ -225,7 +225,8 @@ module.exports = (function() {
         for (var i = 0; i < events.length; i++) {
             eveName = events[i];  evePre = getfix(eveName);
 
-            if (!handle[evePre]) continue;   // 事件不存在则跳过
+            // 事件不存在则跳过
+            if (!handle || !handle[evePre]) continue;
 
             creEvent = document.createEvent('Event');
             creEvent.initEvent(evePre, true, true);
