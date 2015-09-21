@@ -57,7 +57,13 @@ module.exports = (function() {
                     snum += str[i]; pos = i;
                 }
 
-                vals[dir] = parseInt(snum);
+                snum = parseInt(snum);      // 存放获得的 数字 值
+
+                if (ope[ope.length] == "+") {
+                    vals[dir] += snum;
+                } else if (ope[ope.length] == "-") {
+                    vals[dir] -= snum;
+                }
             } else {
                 switch(chk) {
                     case "+" :
