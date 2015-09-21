@@ -13,47 +13,123 @@ module.exports = (function() {
         format: "Y-M-D h:m",            // 最终输出的内容的模板
         filter: "",                     // 数据项过滤器，负数反选，正数正选，~区间
 
+        /* values: { Y: [], M: []...}   // 自动追加的参数，存放每个字段的具体可选值 */
+
         min   : '',                     // 最小选择时间，默认为现在前五年
         max   : '',                     // 最大选择时间，默认为现在后五年
     }
 
+    /* 判断是否为闰年 */
+    Timer.isLeap = function(year) {
+        if (isNaN(year)) return false;
+
+        year = parseInt(year);  // 转为数字，方便处理
+
+        return (year%4==0 && year%100!=0)||(year%100==0 && year%400==0);
+    }
+
+    /* 通过传入年份和月份，返回该月的天数 */
+    Timer.getDays = function(year, month) {
+        if (isNaN(year) || isNaN(month)) return false;
+
+        var days = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+        month = month > 12 ? 11 : (month < 0 ? 0 : month-1);  // 修正月份
+        days[1] += Timer.isLeap(year) ? 1 : 0;                // 修正二月的天数
+
+        return days[month];     // 返回对应的月的天数
+    }
+
+    /* 运算表达式 */
+    Timer.operat = function(num, str, save) {
+        if (!str || !num || !save) return 0;
+
+        var ope = [], vals = [num, null], snum, pos = 0, chk, dir = 0;
+
+        do {
+            chk = str[pos]; snum = "";
+
+            if (!isNaN(chk) /* 当前为数字 */) {
+                snum += chk;        // 尝试循环查找数字
+
+                for(var i=pos; i<str.length; i++) {
+                    if (isNaN(str[i])) break;
+                    snum += str[i]; pos = i;
+                }
+
+                vals[dir] = parseInt(snum);
+            } else {
+                switch(chk) {
+                    case "+" :
+                        vals[dir] += num;
+                        break;
+                    case "-" :
+                        vals[dir] -= num;
+                        break;
+                    case "~" :
+                        dir = 1;
+                    default :
+                        ope.push(chk);
+                }
+            }
+        } while (pos < str.length);
+
+        dir = [];   // 变量复用，存放运算出的可选值
+        do {
+            chk = ope.pop();
+
+            if (chk == '~') {
+                for(var i=vals[0]; i<vals[1]; i++) {
+                    dir.push(i);   // 压入数据
+                }
+
+                vals[0] = vals[1] = null;
+            } else if (chk == '!') {
+                for (var i=0; i<dir.length; i++) {
+                    pos = save.indexOf(dir[i]);
+
+                    if (pos != -1 /* 原数组有值 */) {
+                        save.splice(pos, 1);
+                    }
+                }
+            }
+        } while (chk != undefined);
+
+        vals[0] && save.push(vals[0]);
+        vals[1] && save.push(vals[1]);
+
+        console.log(save)
+
+        return save[save.lengh];    // 返回最后的值
+    }
+
+    /* 通过过滤器生成具体的选择值 */
+    Timer.initVals = function(type, filter, min, max, step) {
+        /* Y 年    M 月    D 日    h 时    m 分    s 秒 */
+
+        var vals = [], now = new Date(), operat = Timer.operat, fil, num;
+
+        if (type === 'Y') {
+            vals.push(now.getFullYear());
+
+            if (filter /* 不为空时才处理 */) {
+                num = vals[0];  // 当前操作对象
+                fil = filter.replace(/[\[|\]|\s]/g, '');
+                fil = fil ? fil.splice(',') : [];
+
+
+            }
+        }
+    }
+
     Timer.prototype.init = function() {
-        var mid  = "modal_"+$.getRandom(), html,
-            that = this, opt = that.option;
 
-        if (opt.hasInsert /* 已插入页面直接处理 */) {
-            that.el.attr("id", mid);
-            that.el.addClass("hideOut")
-                .removeClass("hide");
-        } else {
-            html = "<div class='modal hideOut' id='"+mid+"'></div>";
-            that.el.addClass("modal_body")
-                .removeClass("hide")
-                .wrap(html);
-            that.el = that.el.parent();
-            $("body").append(that.el);     // 添加到页面中
-        }
-
-        that.el.addClass("align"+opt.align.toUpFirst());
-
-        if (opt.autoHide /* 绑定默认关闭方法 */) {
-            var that = this, ele = this.el[0];
-            that.el.on("tap", function(e) {
-                e.stopPropagation(); // 阻止冒泡
-                if (e.target == ele) that.hide();
-            })
-        } else {
-            that.el.on("tap", function(e) {
-                e.stopPropagation(); // 阻止冒泡
-            })
-        }
-
-        if (that.el.hasClass("hideOut")) {
-            that.isHide = true; // 设置隐藏状态
-        }
-
-        return this;
     };
+
+    /* 非公开方法，通过过滤器返回值列表 */
+    Timer.prototype._vals = function(type) {
+
+    }
 
     Timer.prototype.show = function(anim) {
         var scroll = this.el.data("ui_scroll");
@@ -68,15 +144,16 @@ module.exports = (function() {
     Timer.prototype.hide = function(anim) {
         this.isHide = true;
         this.el.removeClass("showIn").addClass("hideOut");
+
         return this;
     };
 
     Timer.prototype.set = function() {
-        return this.isHide ? this.show(): this.hide();
+
     };
 
     Timer.prototype.get = function() {
-        return this.isHide ? this.show(): this.hide();
+
     };
 
     Timer.prototype.destroy = function() {
@@ -84,19 +161,21 @@ module.exports = (function() {
     };
 
     /* 尝试绑定方法到 magic 框架的全局对象上 */
-    if ($ && !$.modal) {
-        $.extend({date: function(element, option) {
-            return new Modal(element, option).init();
-        }});
-    };
+    $.extend({timer: Timer});
 
-    if ($ && $.fn && !$.fn.modal) {
-        $.fn.extend({modal: function(option) {
-            var opt = $.extend({}, option);
-            if (opt.hasInsert === undefined) {
-                opt.hasInsert = true;
-            }
-            return new Modal(this[0], opt).init();
-        }});
-    };
+    //if ($ && !$.timer) {
+    //    $.extend({timer: function(element, option) {
+    //        return new Timer(element, option).init();
+    //    }});
+    //};
+    //
+    //if ($ && $.fn && !$.fn.modal) {
+    //    $.fn.extend({timer: function(option) {
+    //        var opt = $.extend({}, option);
+    //        if (opt.hasInsert === undefined) {
+    //            opt.hasInsert = true;
+    //        }
+    //        return new Timer(this[0], opt).init();
+    //    }});
+    //};
 })();
