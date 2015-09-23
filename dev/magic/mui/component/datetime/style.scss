@@ -1,0 +1,43 @@
+.timer {
+    height: 45%;
+    overflow: hidden;
+    background-color: #fff;
+
+    .screen {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+
+        .time-item {
+            float: left;
+            height: 100%;
+            width: 33.3%;
+            padding: 21px 0;
+            text-align: center;
+            position: relative;
+
+            &:before {
+                z-index: 99;
+                content: " ";
+                display: block;
+                position: absolute;
+                height: 20%;
+                width: 100%;
+                top: 40%; left: 0;
+                border: 1px solid #007aff;
+                border-width: 1px 0;
+            }
+
+            .list {
+                margin: 0;
+                &:before {
+                    display: none;
+                }
+
+                .item:before {
+                    display: none;
+                }
+            }
+        }
+    }
+}

@@ -242,6 +242,13 @@ require("extend");      // 原生对象扩展
                 return this;
             },
 
+            appendTo: function(select) {
+                var $to = new magic.fn._init(select);
+                $to && $to.append(this);
+
+                return this;
+            },
+
             insertBefore: function(text) {
                 if (text instanceof Magic) {
                     text = text[0];

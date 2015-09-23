@@ -7,7 +7,8 @@ module.exports = (function() {
             var $el = $(this.$el), $scroll, $parent,
                 handle, refresh, opt = {}, repos;   // 定义操作对象
 
-
+            refresh = $el.attr("refresh")   // 默认开启自动刷新
+            opt.refresh = refresh=="true"?"true":"once";
             opt.pullRefreshDown = this[$el.attr("pullRefreshDown")] || null;
             opt.pullRefreshUp   = this[$el.attr("pullRefreshUp")]   || null;
 
@@ -28,22 +29,9 @@ module.exports = (function() {
                 this[handle] = $scroll;
             }
 
-            // 触屏后刷新，默认 只执行一次 触屏刷新
-            refresh = $el.attr("refresh")
+            // 是否监控数据自动刷新内容
             repos   = $el.attr("repos");
-            if (this[refresh] === undefined) {
-                var $body = $el.children(), last = 0;
-                bind = refresh === "true" ? "on" : "once";
-
-                $el[bind]("touchstart", function() {
-                    var height = $body.height();
-                    if (height != last) {
-                        $scroll.refresh();      // 强制刷新高度
-                        last = height;          // 更新内容高度
-                        if (repos) $scroll.scrollTo(0, 0);
-                    }
-                })
-            } else {
+            if (this[refresh] != undefined) {
                 this.$watch(refresh, function(newVal) {
                     Vue.nextTick(function() {
                         $scroll.refresh();
@@ -58,8 +46,10 @@ module.exports = (function() {
         template: "<div><content></content></div>",
         ready: function() {
             var $el = $(this.$el), $scroll, handle,
-                refresh, opt = {};   // 定义操作对象
+                refresh, repos, opt = {};   // 定义操作对象
 
+            refresh = $el.attr("refresh")   // 默认开启自动刷新
+            opt.refresh = refresh=="true"?"true":"once";
             opt.scrollbars = $el.attr("scrollbars");
 
             if ($el.attr("scroll-x")) {
@@ -75,27 +65,15 @@ module.exports = (function() {
                 this[handle] = $scroll;
             }
 
-            // 是否开启触屏后刷新，默认 开启 触屏刷新
-            if ((refresh = $el.attr("refresh")) !== false) {
-                var $body = $el.children(), last = 0;
-
-                if (refresh === true) {
-                    $el.on("touchstart", function() {
-                        var height = $body.height();
-
-                        if (height != last) {
-                            $scroll.refresh();      // 强制刷新高度
-                            last = height;          // 更新内容高度
-                        }
+            // 是否监控数据自动刷新内容
+            repos   = $el.attr("repos");
+            if (this[refresh] !== undefined) {
+                this.$watch(refresh, function() {
+                    Vue.nextTick(function() {
+                        $scroll.refresh();
+                        if (repos) $scroll.scrollTo(0, 0);
                     })
-                } else if (this[refresh] !== undefined) {
-                    this.$watch(refresh, function() {
-                        Vue.nextTick(function() {
-                            $scroll.refresh();
-                            $scroll.scrollTo(0, 0);
-                        })
-                    })
-                }
+                })
             }
         }
     })
