@@ -8,4 +8,4 @@ require("./component/tip");                 // 加载Tip提示组件
 require("./component/confirm");             // 加载confirm组件
 require("./component/spinner.js");          // 加载Loading组件
 require("./component/select");              // 加载select组件
-require("./component/datetime");            // 加载timer时间组件
+require("./component/timer");               // 加载timer时间组件

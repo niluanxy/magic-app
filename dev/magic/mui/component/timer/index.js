@@ -1,7 +1,7 @@
 require("./style.scss");
 
 module.exports = (function() {
-    var Timer = function(time, option) {
+    var Timer = function(option, time) {
         this.value = "";                // 存放当前时间的date对象
         this.el    = null;              // 当前DOM控制句柄
         this.modal = null;              // 控制整体弹框
@@ -13,9 +13,9 @@ module.exports = (function() {
 
     Timer.DEFAULT = {
         type  : "mobile",               // 现实模式，移动/桌面
-        show  : "YMD-hm",                // 需要显示的UI模块
-        text  : "Y-M-D h:m",            // 选择框中提示文字的模板
-        format: "Y-M-D h:m",            // 最终输出的内容的模板
+        show  : "YMD-hm",               // 需要显示的UI模块
+        text  : "YYYY-MM-DD hh:mm",     // 选择框中提示文字的模板
+        format: "YYYY-MM-DD hh:mm",     // 最终输出的内容的模板
         filter: "",                     // 数据项过滤器，负数反选，正数正选，~区间
 
         /* values: { Y: [], M: []...}   // 自动追加的参数，存放每个字段的具体可选值 */
@@ -24,6 +24,23 @@ module.exports = (function() {
         max   : '',                     // 最大选择时间，默认为现在后五年
 
         call  : null,                   // 选择后回调，传递三个参数 (type, val, handle)
+    }
+
+    /* 时间类型的简写和全写互转 */
+    Timer.type = function(find) {
+        var type = {
+            Y: "year", M: "month", D: "day", h: "hour", m: "minute"
+        }
+
+        for (var key in type) {
+            if (key === find) {
+                return type[key];
+            } else if (type[key] === find) {
+                return key;
+            }
+        }
+
+        return "";
     }
 
     /* 判断是否为闰年 */
@@ -40,7 +57,7 @@ module.exports = (function() {
     Timer.getDays = function(year, month) {
         if (isNaN(year) || isNaN(month)) return false;
 
-        var days = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        var days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
         month = month > 12 ? 11 : (month < 0 ? 0 : month);  // 修正月份
         days[1] += Timer.isLeap(year) ? 1 : 0;                // 修正二月的天数
@@ -285,6 +302,11 @@ module.exports = (function() {
         return html;    // 返回最终构建的HTML
     }
 
+
+    /* TODO: min,max功能测试
+     * TODO: 过滤器功能测试
+     * TODO: 时间和日期同时出现时显示切换，以及提示时间显示
+     * TODO: input绑定功能设置，vue组件编写 */
     Timer.prototype.init = function() {
         var that = this, opt = that.options, tmp,
             dir = 0, show, scroll = that.scroll;
@@ -324,11 +346,11 @@ module.exports = (function() {
             vals = Timer.initVals(tmp, opt.filter[tmp], ext);
             vals = Timer.fixVals(tmp, vals, that.value, opt.min, opt.max);
 
-            html = "<div class='time-item' type='"+tmp+ "'><div class='list'>";
+            html = "<div class='time-item' type='"+Timer.type(tmp)+ "'><div class='list'>";
 
             scroll[tmp] = $(html+Timer.makeHtml(tmp, vals)+"</div></div>").scroll({
                                 scrollbars: false,
-                                snap      : ".item"
+                                snap      : true
                             });
             that.page[dir].append(scroll[tmp].wrapper);
         }
@@ -338,17 +360,16 @@ module.exports = (function() {
             var handle = this, val, $now, $el, type;
 
             $el  = $(handle.wrapper);
-            $now = $el.find(".item:nth-child("+(handle.currentPage.pageY+1)+")");
+            type = $el.attr("type");
+            $now = that.nowItem(Timer.type(type));
 
-            /* 获取当前类型和选中的值 */
-            type = $el.attr("type");  val  = $now.attr("val");
-
-            console.log(type);
-            console.log(val)
+            val = $now.attr("val");
+            that.update(Timer.type(type), val);     // 更新改变项值
+            that.refresh(Timer.type(type));         // 刷新时间数据
 
             if (typeof opt.call == "function") {
                 /* 执行时间选择完毕的回调 */
-                opt.call(type, val, $now, handle);
+                opt.call(that.val(), that.value, that);
             }
         };
 
@@ -369,17 +390,26 @@ module.exports = (function() {
 
     /* 返回给定类型的当前选中的值 */
     Timer.prototype.itemVal = function(type) {
-        var handle = this.scroll[type], val = 0, $now, find;
+        var handle = this.scroll[type], val = 0, $now;
 
         if (handle /* 有值时才操作 */) {
-            find = ".item:nth-child("+(handle.currentPage.pageY+1)+")"
-            $now = handle.scroller.find(find);
+            $now = this.nowItem(type);
             val  = $now.attr("val") || 0;
         }
 
         return val;         // 返回选定的值
     }
 
+    /* 返回某个值的当前选中DOM对象 */
+    Timer.prototype.nowItem = function(type) {
+        var handle = this.scroll[type], pos;
+
+        pos = handle.currentPage.pageY+1 || 1;
+
+        return $(handle.scroller).find(".item:nth-child("+pos+")");
+    }
+
+    /* 手动更新某个时间值 */
     Timer.prototype.update = function(type, val) {
         var fun = {
             Y: "setFullYear",
@@ -390,7 +420,15 @@ module.exports = (function() {
         }
 
         if (fun[type] && val) {
-            this.value[fun[type]](val);
+            /* 修复当前日期大于该月最大日期时，月份更改失败问题 */
+            if (type == "M") {
+                var now = this.value,
+                    max = Timer.getDays(now.getFullYear(), val);
+
+                if (max < now.getDate()) now.setDate(max);
+            }
+
+            this.value[fun[type]](parseInt(val));
         }
 
         return this.value;  // 返回修改后的值
@@ -400,14 +438,14 @@ module.exports = (function() {
     Timer.prototype.refresh = function(type, date) {
         var filter, pos, now, $el, vals, tmp, opt = this.options;
 
-        filter = opt.filter;    // 获取过滤器数据
-        pos = "YMDhm".split("").indexOf(type);
+        filter = "YMDhm".split("");    // 获取过滤器数据
+        pos = filter.indexOf(type);
         pos = pos == -1 ? 0: pos;
         now = date instanceof Date ? date : this.value;
 
-        for (var i=start+1; i<filter.lenght; i++) {
+        for (var i=pos+1; i<filter.length; i++) {
             tmp = filter[i];    // 获取当前时间对象类型
-            $el = this.el.find(".time-item[type='"+tmp+"']");
+            $el = this.el.find(".time-item[type='"+Timer.type(tmp)+"']>.list");
 
             if ($el[0] /* 当前是否有此对象 */) {
                 vals = Timer.initVals(tmp, filter[tmp], now.getMonth());
@@ -416,8 +454,8 @@ module.exports = (function() {
                 html = Timer.makeHtml(tmp, vals);
 
                 /* 更新事件数据，同时刷新滚动条 */
-                $el.html(html);  this.scroll[tmp].refresh();
-                this.update(type, this.itemVal(type));
+                $el.html(html); this.scroll[tmp].refresh();
+                this.update(tmp, this.itemVal(tmp));
             }
         }
 
@@ -441,13 +479,11 @@ module.exports = (function() {
         return this;
     };
 
-    Timer.prototype.set = function() {
+    Timer.prototype.val = function(format) {
+        var fmt = format || this.options.format;
 
-    };
-
-    Timer.prototype.get = function() {
-
-    };
+        return Timer.format(this.value, fmt);
+    }
 
     Timer.prototype.destroy = function() {
         this.el.remove();   // 删除自身
