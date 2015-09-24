@@ -306,6 +306,7 @@ module.exports = (function() {
     /* TODO: min,max功能测试
      * TODO: 过滤器功能测试
      * TODO: 时间和日期同时出现时显示切换，以及提示时间显示
+     * TODO: step分钟过滤器功能添加
      * TODO: input绑定功能设置，vue组件编写 */
     Timer.prototype.init = function() {
         var that = this, opt = that.options, tmp,
@@ -436,7 +437,8 @@ module.exports = (function() {
 
     /* 刷新时间对象的可选值列表 */
     Timer.prototype.refresh = function(type, date) {
-        var filter, pos, now, $el, vals, tmp, opt = this.options;
+        var filter, pos, now, $el, vals,
+            ext, tmp, opt = this.options;
 
         filter = "YMDhm".split("");    // 获取过滤器数据
         pos = filter.indexOf(type);
@@ -445,10 +447,11 @@ module.exports = (function() {
 
         for (var i=pos+1; i<filter.length; i++) {
             tmp = filter[i];    // 获取当前时间对象类型
+            ext = tmp=="D"?now.getMonth():null;
             $el = this.el.find(".time-item[type='"+Timer.type(tmp)+"']>.list");
 
             if ($el[0] /* 当前是否有此对象 */) {
-                vals = Timer.initVals(tmp, filter[tmp], now.getMonth());
+                vals = Timer.initVals(tmp, filter[tmp], ext);
                 vals = Timer.fixVals(tmp, vals, now, opt.min, opt.max);
 
                 html = Timer.makeHtml(tmp, vals);

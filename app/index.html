@@ -55,9 +55,13 @@
 //    })(document, window);
 
     $(function() {
-        $.timer({call: function(time, date, handle) {
-            console.log(time)
-        }}).show();
+        $.timer({
+            show: "hm",
+
+            call: function(time, date, handle) {
+                console.log(time)
+            }
+        }).show();
     })
 </script>
 </body>
