@@ -63,7 +63,7 @@ module.exports = (function() {
 
             // 更新当前 slide 停止的页面索引
             var pageX = that.handle.x * -1;
-            that.pageIndex = pageX/that.pageWidth;
+            that.pageIndex = that.handle.currentPage.pageX;
         })
 
         return this;

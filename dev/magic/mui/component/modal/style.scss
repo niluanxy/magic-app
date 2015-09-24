@@ -1,4 +1,4 @@
-$animationTime:         .3s;
+$animationTime:         .6s;
 $opacity:                .6;
 
 .modal {
@@ -56,12 +56,23 @@ $opacity:                .6;
 
 @keyframes slideInUp {
     0% {
-        transform: translate3d(0, 100%, 0);
-        visibility: visible;
+        opacity: 0;
+    }
+
+    25% {
+        opacity: 0.2;
+    }
+
+    50% {
+        opacity: 0.35;
+    }
+
+    75% {
+        opacity: 0.5;
     }
 
     100% {
-        transform: translate3d(0, 0, 0);
+        opacity: 1;
     }
 }
 
