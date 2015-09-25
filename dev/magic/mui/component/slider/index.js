@@ -87,13 +87,6 @@ module.exports = (function() {
             if (opt.autoPlay && opt.time) {
                 that.timeHandle = setInterval(function() {
                     that.next();    // 自动播放下一个
-                    if (typeof call == "function") {
-                        var index = (that.pageIndex+1);
-                        index = index > that.pageLength ? 1 : index;
-                        call.call(that, that.el.find(
-                            ".slider-item:nth-child("+index+")"
-                        ), index);
-                    }
                 }, opt.time)
             }
 
@@ -135,7 +128,8 @@ module.exports = (function() {
     Slider.prototype.go = function(index) {
         // 只有内容真正载入的时候，才自动播放，以避免报错
         if (this.pageWidth > 0) {
-            var len = this.pageLength-1, now;
+            var len  = this.pageLength- 1,
+                call = this.options.call;
 
             if (index == undefined) {
                 index = this.pageIndex + 1;
@@ -144,6 +138,13 @@ module.exports = (function() {
             index = index < 0 ? len : (index > len ? 0 : index);
             this.handle.goToPage(index, 0);     // 滚动到对应页面
             this.pageIndex = index;             // 更新当前索引
+
+            if (typeof call == "function") {
+                index = index+1;    // 更新下标
+                call(this.el.find(
+                    ".slider-item:nth-child("+index+")"
+                ), index);
+            }
         }
 
         return this;

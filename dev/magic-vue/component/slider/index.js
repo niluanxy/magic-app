@@ -9,11 +9,12 @@ module.exports = (function() {
                 autoPlay : $el.attr("autoPlay"),
                 describe : $el.attr("describe"),
                 indicator: $el.attr("indicator"),
-                scale    : $el.attr("scale")
+                scale    : $el.attr("scale"),
+                call     : this[$el.attr("call")]
             });
 
             handle = $el.attr("handle");
-            if (handle && this[handle]) {
+            if (handle && this[handle] !== undefined) {
                 this[handle] = $slider;
             }
         }
