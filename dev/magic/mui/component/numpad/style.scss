@@ -1,0 +1,40 @@
+.numpad {
+    display: flex !important;
+    overflow: hidden;
+    text-align: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    .numbers, .actions {
+        display: flex;
+        flex-wrap: wrap;
+
+        .item {
+            flex: 1;
+            line-height: 44px;
+            min-height: 44px;
+            display: inline-block;
+
+            &[val="ok"] {
+                min-height: 88px;
+                line-height: 88px;
+            }
+        }
+    }
+
+    .numbers {
+        flex: 3;
+        flex-direction: row;
+
+        .item {
+            min-width: 33%;
+        }
+    }
+
+    .actions {
+        flex: 1;
+        flex-direction: column;
+    }
+
+
+}
