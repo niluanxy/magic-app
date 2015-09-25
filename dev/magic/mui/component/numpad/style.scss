@@ -11,6 +11,7 @@
 
         .item {
             flex: 1;
+            user-select: none;
             line-height: 44px;
             min-height: 44px;
             display: inline-block;
@@ -35,6 +36,4 @@
         flex: 1;
         flex-direction: column;
     }
-
-
 }
