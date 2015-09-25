@@ -26,16 +26,19 @@ $(function() {
     })
 
     // APP初始化方法
-    mvue.init = function() {
+    mvue.init = function(url, tourl) {
         $$.key("_magic_runid", $.getRandom());
-        mroute.notfound = function() {
-            location.hash = "#index";
+        mroute.notFound = function() {
+            location.hash = url || "#index";
         }
         this.__ROUTER__ = Router(mroute).init();
         if (!location.href.match(/#/)) {
-            location.hash = "#index";
+            location.hash = url || "#index";
         }
+
+        if (url && tourl) location.hash = url;
     }
+
 
     // APP添加路由方法
     mvue.when = function(url, call) {
