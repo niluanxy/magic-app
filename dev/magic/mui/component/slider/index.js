@@ -51,7 +51,7 @@ module.exports = (function() {
                 snapSpeed: 600,
                 scrollbars: false
             });
-            that.play();
+            that.play(0);   // 初始化播放第一个视频
         })
 
         that.el.on("touchstart", function() {
@@ -90,8 +90,7 @@ module.exports = (function() {
                 }, opt.time)
             }
 
-            /* 直接跳转到制定的地方 */
-            if (go && !isNaN(go)) that.go(go);
+            that.go(go);        /* 直接跳转到制定的地方 */
         }
 
         return this;
