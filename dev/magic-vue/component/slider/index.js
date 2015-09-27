@@ -10,7 +10,8 @@ module.exports = (function() {
                 describe : $el.attr("describe"),
                 indicator: $el.attr("indicator"),
                 scale    : $el.attr("scale"),
-                call     : this[$el.attr("call")]
+                enter    : this[$el.attr("enter")],
+                leave    : this[$el.attr("leave")]
             });
 
             handle = $el.attr("handle");
