@@ -2,7 +2,7 @@ module.exports = (function() {
     var eveData = [], eveUUID = 1, EventObj, Event = {}, fixpara;
 
     fixpara = ("target type pageX pageY clientX clientY keyCode keyChar "+
-    "offsetX offsetY path timeStamp screenX screenY changedTouches").split(" ");
+    "offsetX offsetY path timeStamp screenX screenY changedTouches targetTouches").split(" ");
 
     EventObj = function (src, porp) {
         this.originalEvent = src;
@@ -119,14 +119,22 @@ module.exports = (function() {
      * 对指定对象绑定事件
      * @param ele       要绑定的对象
      * @param types     事件名，可为多个，支持自定义
-     * @param call      绑定的要执行的回调函数
      * @param select    过滤器参数
+     * @param call      绑定的要执行的回调函数
+     * @param capture   是否绑定到传播阶段
      */
-    Event.bind = function (ele, types, call, select) {
+    Event.bind = function (ele, types, select, call, capture) {
         var handle, events, eveName, evePre;
 
-        if (ele.nodeType === 3 || ele.nodeType === 8 || !types || !call) {
+        if (ele.nodeType === 3 || ele.nodeType === 8 || arguments.length < 3) {
             return false;   // 参数不齐全直接退出后续执行
+        }
+
+        /* 省略过滤器的时候，自动修复参数 call */
+        if (typeof select == "function") {
+            capture = call;
+            call    = select;
+            select  = "";
         }
 
         if (!ele.$_uuid /* 第一次绑定时初始化对象 */) {
@@ -153,7 +161,7 @@ module.exports = (function() {
                     triggerCall(ele, handleNow.calls, e);
                 };
 
-                ele.addEventListener(evePre, handleNow.handle, false);
+                ele.addEventListener(evePre, handleNow.handle, !!capture);
             }
 
             handleNow.calls.push({
@@ -170,7 +178,7 @@ module.exports = (function() {
      * @param ele       要操作的对象
      * @param types     要移除的事件名
      */
-    Event.unbind = function (ele, types) {
+    Event.unbind = function (ele, types, capture) {
         var handle, events, eveName, evePre, typeRun;
 
         if (!ele || !ele.$_uuid || !types ||
@@ -193,7 +201,7 @@ module.exports = (function() {
             }
 
             if (typeRun.length === 0) {
-                ele.removeEventListener(evePre, handle[evePre].handle, false);
+                ele.removeEventListener(evePre, handle[evePre].handle, !!capture);
                 delete handle[evePre];      // 删除对应的事件
             }
         }
@@ -225,14 +233,12 @@ module.exports = (function() {
         for (var i = 0; i < events.length; i++) {
             eveName = events[i];  evePre = getfix(eveName);
 
-            // 事件不存在则跳过
-            if (!handle || !handle[evePre]) continue;
-
             creEvent = document.createEvent('Event');
             creEvent.initEvent(evePre, true, true);
             creEvent.originalData = data;
 
-            if (eveName.indexOf(".") > 0) {
+            /* 如果当前元素绑定了句柄，且有事件空间，则手动冒泡 */
+            if (handle && handle[evePre] && eveName.indexOf(".") > 0) {
                 var runEle   = ele, handleNow,
                     newEvent = new EventObj(creEvent, {type: eveName});
 

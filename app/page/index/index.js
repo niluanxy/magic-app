@@ -3,7 +3,7 @@ require("./style.scss");
 module.exports = {
     template: require("./template.html"),
     data: {
-
+        modal: null
     },
 
     methods: {

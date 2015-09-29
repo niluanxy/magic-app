@@ -1,6 +1,17 @@
 <mg-page id="index">
 
+    <mg-header>
+        <a href="#fail" class="button button-clear ion-ios-arrow-left">《--</a>
+        <h3 class="title">这里是标题</h3>
+        <a class="button button-clear" v-on="tap: modal.show();">弹框</a>
+    </mg-header>
+
     <mg-content pullRefreshDown="pullDown" pullRefreshUp="pullUp">
+
+        <a class="button button-stable">第一个</a>
+
+        <a class="button button-block button-stable">第二个</a>
+
         <div class="list">
             <div class="item">这里是占位置的地方，就是随便写的</div>
             <div class="item">这里是占位置的地方，就是随便写的</div>
@@ -31,4 +42,24 @@
             <div class="item">这里是占位置的地方，就是随便写的</div>
         </div>
     </mg-content>
+
+    <mg-tabs class="tabs-footer tabs-stable">
+        <a class="tab-item">
+            找老师
+        </a>
+        <a class="tab-item">
+            课程
+        </a>
+    </mg-tabs>
+
+    <mg-modal handle="modal">
+        <mg-header>
+            <a class="button button-clear ion-ios-arrow-left">《--</a>
+            <h3 class="title">这是弹出的页面</h3>
+        </mg-header>
+
+        <mg-content>
+            弹出的内容测试一下
+        </mg-content>
+    </mg-modal>
 </mg-page>

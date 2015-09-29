@@ -2098,22 +2098,6 @@ if ($ && $.fn && !$.fn.scroll) {
             })
         }
 
-        $el.on("touchstart", function(e) {
-            var tagName = e.target.tagName, inputs;
-
-            if ("INPUT TEXTAREA".search(tagName) == -1) {
-                inputs = $el.query("input");
-                for(var i=0; i<inputs.length; i++) {
-                    inputs[i].blur();
-                }
-
-                inputs = $el.query("textarea");
-                for(var i=0; i<inputs.length; i++) {
-                    inputs[i].blur();
-                }
-            }
-        })
-
         return this.data("ui_scroll", handle);
     }})
 };

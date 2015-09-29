@@ -6,31 +6,57 @@
  */
 
 $.ready(function() {
-    var $body = $("body"), $document = $(document), tap = {};
+    var $body = $("body"), $document = $(document), tap = {},
+        inputs, event = { start: "", move: "", end: ""}, delay = 300;
 
-    $document.on("touchstart", function(e) {
-        var touch   = e.changedTouches[0],
-            $target = $(e.target), handle;
+    if (window.ontouchstart !== undefined) {
+        event.start = "touchstart";
+        event.move  = "touchmove";
+        event.end   = "touchend";
+    } else {
+        event.start = "mousedown";
+        event.move  = "mousemove";
+        event.end   = "mouseup";
+    }
 
-        tap.startX = touch.pageX;
-        tap.startY = touch.pageY;
+    $document.on(event.start, function(e) {
+        /* 忽略多指手势操作 */
+        var touchs = e.targetTouches;
+
+        if (touchs && touchs.length > 1) return true;
+
+        var $target = $(e.target), handle, tagName;
+
+        /* 记录此次点击事件的相关信息，用于方法判断 */
+        if (touchs && touchs[0]) {
+            tap.startX = touchs[0].pageX;
+            tap.startY = touchs[0].pageY;
+        } else {
+            tap.startX = e.pageX;
+            tap.startY = e.pageY;
+        }
         tap.startT = $.getTime();
 
-        do {
-            if ($target.hasClass("button")   ||
-                $target.hasClass("tab-item") ||
-                $target.hasClass("item")) {
+        /* 修复移动端input点击焦点不更新的问题 */
+        tagName = e.target.tagName;
+        if ("INPUT TEXTAREA".search(tagName) >= 0) {
+            inputs = e.target;
+        } else {
+            inputs && inputs.blur();    // 刷新焦点
+        }
 
-                handle = setTimeout((function($actobj) {
-                    return function() {
-                        $actobj.addClass("active");
-                    }
-                })($target), 60);
-                $target.data("_active_handle", handle);
-            }
+        /* 给按钮类的组件添加点击样式 */
+        if ($target.hasClass("button")   ||
+            $target.hasClass("tab-item") ||
+            $target.hasClass("item")) {
 
-            $target = $target.parent();     // 向上递归检测
-        } while($target && $target[0] != this);
+            handle = setTimeout((function($actobj) {
+                return function() {
+                    $actobj.addClass("active");
+                }
+            })($target), 24);
+            $target.data("_active_handle", handle);
+        }
     });
 
     // 清除激活类
@@ -44,38 +70,26 @@ $.ready(function() {
         }
     }
 
-    $document.on("touchmove", $.delayCall(function(e) {
+    $document.on(event.move, $.delayCall(function(e) {
         e.preventDefault(); // 修复微信下拉显示网页地址
-        var $target = $(e.target);
+        clearActive($(e.target));
+    }, 16));
 
-        do {
-            clearActive($target);
-
-            $target = $target.parent();     // 向上递归检测
-        } while($target && $target[0] != this);
-    }, 50));
-
-    $document.on("touchend", function(e) {
-        var touch   = e.changedTouches[0], cx, cy, ct,
-            $target = $(e.target);
+    $document.on(event.end, function(e) {
+        var cx, cy, ct, $target = $(e.target),
+            touch = e.changedTouches ? e.changedTouches[0] : e;
 
         cx = Math.abs(touch.pageX - tap.startX);
         cy = Math.abs(touch.pageY - tap.startY);
         ct = $.getTime() - tap.startT;
 
-        if (cx<5 && cy < 5 && ct < 200) {
-            var ev = document.createEvent('Event');
-            ev.initEvent("tap", true, true);
-            ev.pageX  = touch.pageX;
-            ev.pageY  = touch.pageY;
-
-            e.target.dispatchEvent(ev);
+        if (cx<5 && cy < 5 && ct < delay) {
+            $target.trigger("tap");
         }
 
-        do {
+        /* 如果点击时间太短，手动延迟动画移除时间 */
+        setTimeout(function() {
             clearActive($target);   // 清除激活类
-
-            $target = $target.parent();     // 向上递归检测
-        } while($target && $target[0] != this);
+        }, 220-ct >= 0 ? 220-ct : 0);
     });
 });

@@ -124,33 +124,38 @@ require("extend");      // 原生对象扩展
             },
 
             /* 对象事件操作的简单方法 */
-            on: function(type, fn, data) {
+            on: function(type, select, fn, capture) {
                 if (this[0] /* 有对象才绑定 */) {
-                    _EVENT.bind(this[0], type, fn, data);
+                    _EVENT.bind(this[0], type, select, fn, capture);
                 }
 
                 return this;
             },
 
-            off: function(type, fn) {
+            off: function(type, fn, capture) {
                 if (this[0] /* 有对象才绑定 */) {
-                    _EVENT.unbind(this[0], type, fn);
+                    _EVENT.unbind(this[0], type, fn, capture);
                 }
 
                 return this;
             },
 
-            once: function(type, fn, data) {
+            once: function(type, select, fn, capture) {
                 if (this[0] /* 有对象才绑定 */) {
-                    _EVENT.once(this[0], type, fn, data);
+                    _EVENT.once(this[0], type, select, fn, capture);
                 }
 
                 return this;
             },
 
-            trigger: function(type, event) {
+            trigger: function(type /* data... */) {
                 if (this[0] /* 有对象才绑定 */) {
-                    _EVENT.trigger(this[0], type, event);
+                    var argv = [this[0]]; // 修复参数列表
+                    for(var i=0; i<arguments.length; i++) {
+                        argv.push(arguments[i]);
+                    }
+
+                    _EVENT.trigger.apply(null, argv);
                 }
 
                 return this;
