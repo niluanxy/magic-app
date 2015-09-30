@@ -1995,6 +1995,7 @@ if ($ && $.fn && !$.fn.scroll) {
             bindToWrapper : true,
             scrollbars    : true,
             fadeScrollbars: true,
+            click         : true,
             preventDefault: true,
             probeType     : probe,
             refresh       : false,
