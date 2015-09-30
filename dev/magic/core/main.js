@@ -231,7 +231,7 @@ require("extend");      // 原生对象扩展
             html : function(html) {
                 if (!this[0]) return this;
 
-                if (html /* 有值时设置值并返回自身 */) {
+                if (html != undefined /* 有值时设置值并返回自身 */) {
                     this[0].innerHTML = html;
                     return this;
                 } else {

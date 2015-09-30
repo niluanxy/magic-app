@@ -2,17 +2,18 @@ module.exports = (function() {
     $$.component("mg-lefter", {
         template: "<content></content>",
         ready: function() {
-            var $el = $(this.$el), val, that = this, txt;
+            var $el = $(this.$el), val, that = this, txt, end;
 
             val = $el.attr("runing");  // 记录倒计时是否运行，运行中为true
             txt = $el.html().replace(/\{/g, "{{")
                             .replace(/\}/g, "}}");
+            end = $el.attr("time");
 
             $el.addClass("lefter").lefter({
-                endtime: $el.attr("time"),
+                endtime: end,
                 space  : $el.attr("space"),
                 show   : txt,
-                endshow: $el.attr("show"),
+                endshow: $el.attr("end"),
                 finish : function() {
                             var call = that[$el.attr("finish")];
                             if (that[val] !== undefined) that[val] = false;
@@ -21,8 +22,14 @@ module.exports = (function() {
                 before : that[$el.attr("before")]
             })
 
-            /* 初始化设置正在运行值为真 */
-            if (that[val] !== undefined) that[val] = true;
+            /* 初始化设置正在运行值 */
+            if (that[val] !== undefined) {
+                if ($.getTime() > end*1000) {
+                    that[val] = false;
+                } else {
+                    that[val] = true;
+                }
+            }
 
             $el.removeAttr("time", null);
             $el.removeAttr("space", null);
