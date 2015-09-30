@@ -8,3 +8,4 @@ require("./slider");            // SLIDER组件
 require("./confirm");           // CONFIRM组件
 require("./select");            // SELECT组件
 require("./star");              // STAR组件
+require("./lefter");            // LEFTER倒计时组件

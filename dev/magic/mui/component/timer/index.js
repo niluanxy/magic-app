@@ -499,7 +499,7 @@ module.exports = (function() {
         }});
     };
 
-    if ($ && $.fn && !$.fn.modal) {
+    if ($ && $.fn && !$.fn.timer) {
         $.fn.extend({timer: function(time, option) {
 
             return new Timer(time, option).init();
