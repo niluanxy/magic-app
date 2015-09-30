@@ -93,15 +93,16 @@ function task_dev_magic_js() {
             },
             resolve: {
                 alias: {
-                    util    : LIB_MINJS + "util.js",
-                    query   : LIB_MINJS + "selector.js",
-                    event   : LIB_MINJS + "event.js",
-                    director: LIB_MINJS + "director.js",
-                    domready: LIB_MINJS + "ondomready.js",
-                    dom     : LIB_MINJS + "dom.js",
-                    extend  : LIB_MINJS + "extend.js",
-                    promise : LIB_MINJS + "promise.js",
-                    jsonp   : LIB_MINJS + "jsonp.js",
+                    util      : LIB_MINJS + "util.js",
+                    query     : LIB_MINJS + "selector.js",
+                    event     : LIB_MINJS + "event.js",
+                    director  : LIB_MINJS + "director.js",
+                    domready  : LIB_MINJS + "ondomready.js",
+                    dom       : LIB_MINJS + "dom.js",
+                    extend    : LIB_MINJS + "extend.js",
+                    promise   : LIB_MINJS + "promise.js",
+                    jsonp     : LIB_MINJS + "jsonp.js",
+                    templayed : LIB_MINJS + "templayed.js",
                 }
             },
             module: {

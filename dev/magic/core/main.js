@@ -8,7 +8,8 @@ require("extend");      // 原生对象扩展
             },
             _UTIL  = require("util"),
             _DOM   = require("dom"),
-            _EVENT = require("event");
+            _EVENT = require("event"),
+            _TPL   = require("templayed");
 
         magic.fn = magic.prototype = {
             constructor: Magic,
@@ -215,6 +216,17 @@ require("extend");      // 原生对象扩展
                 return -1;  // 默认返回 -1
             },
 
+            /* 精简的模板引擎 */
+            tpl : function(template, datas) {
+                if (template && datas) {
+                    var html = _TPL(template)(datas);
+
+                    this.html(html);    // 更新当前元素内容
+                }
+
+                return this;
+            },
+
             /* 设置或读取元素的内联HTML内容 */
             html : function(html) {
                 if (!this[0]) return this;
@@ -344,6 +356,17 @@ require("extend");      // 原生对象扩展
         magic.extend({
             /* 简单的查询方法，返回标准的dom对象 */
             query: require("query"),
+
+            /* 简易的模板引擎 */
+            tpl : function(template, datas) {
+                var html = "";
+
+                if (template && datas) {
+                    html = _TPL(template)(datas);
+                }
+
+                return html;    // 返回渲染后的数据
+            },
 
             /* 返回一个节流执行的函数 */
             delayCall: _UTIL.delayCall,
