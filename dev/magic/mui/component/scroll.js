@@ -2086,7 +2086,7 @@ if ($ && $.fn && !$.fn.scroll) {
         }
 
         if (option.refresh) {
-            var $body = $el.children(), last = 0,
+            var $body = $el, last = 0,
                 bind  = option.refresh === "true" ? "on" : "once";
 
             $el[bind]("touchstart", function() {

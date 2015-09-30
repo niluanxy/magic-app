@@ -21,4 +21,11 @@ module.exports = {
             }, 600)
         },
     },
+
+    events: {
+        "hook:ready": function() {
+            var $div = $("#lefter").lefter(1443628800);
+
+        }
+    }
 }

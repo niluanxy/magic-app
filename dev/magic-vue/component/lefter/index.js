@@ -15,14 +15,19 @@ module.exports = (function() {
                 endshow: $el.attr("show"),
                 finish : function() {
                             var call = that[$el.attr("finish")];
-                            if (that[val] !== undefined) {
-                                that[val] = false;
-                            }
-
+                            if (that[val] !== undefined) that[val] = false;
                             typeof call == "function" && call();
                          },
                 before : that[$el.attr("before")]
             })
+
+            /* 初始化设置正在运行值为真 */
+            if (that[val] !== undefined) that[val] = true;
+
+            $el.removeAttr("time", null);
+            $el.removeAttr("space", null);
+            $el.removeAttr("runing", null);
+            $el.removeAttr("end", null);
         }
     });
 })();

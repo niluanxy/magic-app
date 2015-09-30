@@ -95,7 +95,8 @@ module.exports = (function() {
             var call = this.options[type],
                 item = this.item(pagex);
 
-            call(item);        // 执行指定的回调
+            // 尝试执行指定的回调
+            typeof call == "function" && call(item);
         }
 
         return this;

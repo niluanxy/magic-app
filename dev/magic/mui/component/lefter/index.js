@@ -56,35 +56,36 @@ module.exports = (function() {
 
     /* 倒计时初始化 */
     Lefter.prototype.init = function(time) {
-        var that = this, opt = that.options, date = new Date();
+        var that = this, opt = that.options, prefix = new Date();
 
         if (!isNaN(time)) opt.endtime = time;
 
         // 标准时间戳转为JS的时间戳
         opt.endtime = opt.endtime * 1000;
-        date.setTime(opt.endtime);
-        date.setHours(0, 0, 0, 0);
-        opt.endtime = date.getTime();
+        prefix.setTime(opt.endtime);
+        prefix.setHours(0, 0, 0, 0);
+        prefix = prefix.getTime();
 
         clearInterval(that.handle);
         /* 运行计时器开始回调 */
         typeof opt.before == "function" && opt.before();
         /* 开始倒计时任务 */
-        that.check();       // 初始化时执行一次，防止闪烁
+        that.check(prefix);       // 初始化时执行一次，防止闪烁
         that.handle = setInterval(function() {
-            that.check();
+            that.check(prefix);
         }, opt.space)
 
         return this;
     };
 
-    /* 检测当前倒计时状态，同时更新提示文本 */
-    Lefter.prototype.check = function() {
+    /* 检测当前倒计时状态，同时更新提示文本
+     * prefix 为 时分秒为空的时间戳 */
+    Lefter.prototype.check = function(prefix) {
         var data, opt = this.options,
             len = Lefter.timelen(opt.endtime);
 
         if (len > 0) {
-            data = Lefter.operat(len, opt.endtime);
+            data = Lefter.operat(prefix+len, opt.endtime);
             this.el.tpl(opt.show, data);
         } else {
             // 执行倒计时结束回调
