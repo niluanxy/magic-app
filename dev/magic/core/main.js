@@ -218,7 +218,7 @@ require("extend");      // 原生对象扩展
 
             /* 精简的模板引擎 */
             tpl : function(template, datas) {
-                if (template) {
+                if (template != undefined) {
                     var html = _TPL(template)(datas);
 
                     this.html(html);    // 更新当前元素内容
@@ -361,7 +361,9 @@ require("extend");      // 原生对象扩展
             tpl : function(template, datas) {
                 var html = "";
 
-                if (template) html = _TPL(template)(datas);
+                if (template != undefined) {
+                    html = _TPL(template)(datas);
+                }
 
                 return html;    // 返回渲染后的数据
             },
