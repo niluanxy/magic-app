@@ -32,11 +32,24 @@
     <meta name="format-detection" content="telephone=no" />
     <link rel="stylesheet" href="page/main.css">
 
-    <script src="pub/lib/vue.min.js"></script>
-    <script src="page/main.js"></script>
+    <script type="text/javascript" src="pub/lib/magic.js"></script>
 
 </head>
 <body>
-    <mg-view></mg-view>
+    <a href="#good" class="button button-block">good</a>
+    <a href="#shop" class="button button-block">shop</a>
+    <a href="#user" class="button button-block">user</a>
+
+    <script type="text/javascript">
+        $(document).on("touchend", function(e) {
+            var $href = $(e.target);
+
+            console.log($href);
+        }, true)
+
+        $(window).on("popstate", function(e) {
+            console.log(e.originalEvent)
+        })
+    </script>
 </body>
 </html>

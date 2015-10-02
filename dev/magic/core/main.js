@@ -48,8 +48,8 @@ require("extend");      // 原生对象扩展
                     // 如果是DOM对象，返回包装的对象
                     this[0] = select;
                     this.length = 1;
-                } else if (select === document) {
-                    this[0] = document;
+                } else if (select === document || select === window) {
+                    this[0] = select;
                     this.length = 1;
                 } else if (select instanceof Magic) {
                     return select;
