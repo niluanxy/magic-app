@@ -422,6 +422,13 @@ require("extend");      // 原生对象扩展
                 callname = data.jsonp || "callback";    
                 data.jsonp && delete data.jsonp;    // 删除属性
 
+                // 参数过滤，剔除空值
+                for (var key in data) {
+                    if (!data[key]) {
+                        delete data[key];
+                    }
+                }
+
                 jsonp({ url: url, data: data,
                     callbackName: callname,
                     success: function(data) {
@@ -445,3 +452,4 @@ require("extend");      // 原生对象扩展
 
 require("../mui/muicore.js");       // 加载核心UI组件
 require("../plug/main.js");         // 加载硬件扩展方法
+require("../lib/minjs/route.js");   // 路由对象

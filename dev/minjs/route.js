@@ -43,8 +43,8 @@ module.exports = (function() {
 
 
     /* 设置当前路由的参数信息，init 为 true 时，初始化模式 */
-    Route.prototype.config ＝ function(options, init) {
-    	if (options) return false;	// 参数不全则退出
+    Route.prototype.config = function(options, init) {
+    	if (options) return false;
 
   		var def = Route.DEFAULT, opt = this.options;
 
@@ -52,7 +52,7 @@ module.exports = (function() {
   			if (init && def[key] !== undefined) {
   				var item = options[key];	// 当前项的值
 
-  				opt[key] = item !== undefined ? item : def[key];
+  				opt[key] = (item !== undefined ? item : def[key]);
   			} else if (options[key] !== undefined) {
   				opt[key] = options[key];
   			}
@@ -61,12 +61,34 @@ module.exports = (function() {
 
     /* 路由初始化方法 */
     Route.prototype.init = function() {
+        var that = this, opt = that.options;
 
+        /* 初始化项目的路由匹配规则 */
+        that.table = Route.prefix(that.table);
+
+
+    }
+
+    /* 初始化路由表，设置每个项正确的 正则表达式 */
+    Route.prefix = function(table) {
+        for (var key in table) {
+            if (key.search("/") == 0) {
+                /* 添加对应项具体的正则语句 */
+                if (typeof find[key] == "function") {
+                    find[key] = { on: find[key]};   // 修正格式(只传了on方法)
+                }
+
+                table[key].__match = key.replace(/:[^_\/-]*/g, "([^/]*)");
+                Route.prefix(table[key]);   // 递归循环处理子项目，直到全部处理完
+            }
+        }
+
+        return table;
     }
 
     /* 尝试匹配给定URL的路由信息 */
     Route.prototype.match = function(url) {
-    	url = url == undefined ? location.hash;		// 修正参数
+    	url = url == undefined ? location.hash : url;		// 修正参数
     	url.replace(/^#/, "").replace(/\/$/, "");	// 替换开头 # 和结尾 /
 
     	var match = url.split("/"), table = this.table, opt = this.options,
@@ -78,16 +100,11 @@ module.exports = (function() {
     	}
 
     	/* 循环匹配路由项目 */
-    	do {
-    		key = match[pos++];
-    		val = find[key];
-
-    		if (val != undefined) {
-    			result.push(val);
-    		}
-
-    		find = find[key];
-    	} while (find != undefined)
+    	for (var key in table) {
+            if (key.search("/") === 0) {
+                
+            }
+        }
 
     	return this.match = (pos == match.length ? [] : result);
     }
@@ -101,4 +118,6 @@ module.exports = (function() {
     Route.prototype.off = function(url, call) {
 
     }
+
+    return window.Route = Route;
 })();

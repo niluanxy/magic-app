@@ -30,10 +30,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-touch-fullscreen" content="yes" />
     <meta name="format-detection" content="telephone=no" />
+
+    
     <link rel="stylesheet" href="page/main.css">
 
-    <script type="text/javascript" src="pub/lib/magic.js"></script>
-
+    <script type="text/javascript" src="page/main.js"></script>
 </head>
 <body>
     <a href="#good" class="button button-block">good</a>
@@ -42,9 +43,12 @@
 
     <script type="text/javascript">
         $(document).on("touchend", function(e) {
-            var $href = $(e.target);
+            var $href   = $(e.target),
+                tagname = e.target.tagName;
 
-            console.log($href);
+            if (tagname == "A") {
+                console.log($href);
+            }
         }, true)
 
         $(window).on("popstate", function(e) {

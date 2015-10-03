@@ -103,6 +103,7 @@ function task_dev_magic_js() {
                     promise   : LIB_MINJS + "promise.js",
                     jsonp     : LIB_MINJS + "jsonp.js",
                     templayed : LIB_MINJS + "templayed.js",
+                    route     : LIB_MINJS + "route.js",
                 }
             },
             module: {
@@ -113,6 +114,7 @@ function task_dev_magic_js() {
             }
         })
     .pipe(gulp.dest(DIR_MAGIC_VUE+"lib/"))
+    .pipe(gulp.dest(DIR_APP + "pub/lib/"))
     .on("finish", function() { defer.resolve(); });
 
     return defer.promise;
