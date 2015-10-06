@@ -39,7 +39,7 @@
 <body>
     <a href="#good" class="button button-block" id="good">good</a>
     <a href="#shop" class="button button-block">shop</a>
-    <a href="#user" class="button button-block">user</a>
+    <a href="#user/123/home" class="button button-block">user</a>
 
     <script type="text/javascript">
         $("#good").on("touchend", function(e) {
@@ -73,8 +73,22 @@
             },
 
             "/user/:userid": {
-                "/home": {
+                before: function() {
+                    console.log("/user/:userid before run");
+                },
 
+                on: function() {
+                    console.log("/user/:userid on run");
+                },
+
+                "/home": {
+                    before: function() {
+                        console.log("/user/home before run");
+                    },
+
+                    on: function() {
+                        console.log("/user/home on run");
+                    },
                 },
 
                 "/info": {
