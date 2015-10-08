@@ -5,7 +5,6 @@ module.exports = (function() {
     var Route = function(table, options) {
     	this.table   = table;			// 路由表信息
     	this.state   = [];				// 状态信息
-    	this.match	 = [];				// 当前匹配到的路由
         this.last    = {};              // 上一次的路由地址
         this.statpos = 0;               // 记录路由的状态位置
   		this.options = {};				// 路由设置信息
@@ -39,9 +38,10 @@ module.exports = (function() {
     };
 
     /* 手动触发 PopStateEvent 事件 */
-    function triggerPopEve() {
+    function triggerPopEve(init) {
         var eve = document.createEvent('PopStateEvent');
         eve.initEvent("popstate", true, true);
+        eve.routeEventInit = init;
         window.dispatchEvent(eve);
     }
 
@@ -58,9 +58,9 @@ module.exports = (function() {
     }
 
     /* 执行给定对象的执行方法，forward 为 true 反向执行 */
-    Route.exec = function(tables, key, type) {
+    Route.prototype.exec = function(tables, key, ext) {
         var len  = tables.length - 1, last = tables[len], ret,
-            back = type == "backward";   // 方法是否反向调用
+            type = this.options.recurse, back = type == "backward";   // 方法是否反向调用
 
         if (type === false /* 只执行最后一个对象 */) {
             if (isFun(last.item[key])) {
@@ -108,10 +108,8 @@ module.exports = (function() {
 
         if (repath)  {
             tmp = that.fire(opt.home);
-            that.go(opt.home, true, tmp);
+            that.go(opt.home, true, false, true);
         }
-
-        that.update();          // 初始化上次访问的页面信息
 
         return that;
     }
@@ -138,7 +136,7 @@ module.exports = (function() {
     /* 尝试匹配给定URL的路由信息 */
     Route.prototype.fire = function(url) {
     	url = url == undefined ? this.geturl() : url;              // 修正参数
-    	url = "/" + url.replace(/^#/, "").replace(/\/$/, "");	   // 替换开头 # 和结尾 /
+    	url = "/" + url.replace(/^[#|\/]*/g, "").replace(/\/$/g, "");	   // 替换开头 # 和结尾 /
 
     	var table = this.table, opt = this.options,
             result = [], tmp, para, key, reg, mat, check;
@@ -185,58 +183,41 @@ module.exports = (function() {
         change = window.ontouchstart !== undefined ? "touchend" : "mouseup";
 
         window.addEventListener("popstate", function(e) {
-            var href = that.geturl(), match = that.fire(), not, to, rcall;
+            var state = history.state, call, now = that.geturl(),
+                lstate = last.state, rcall;
 
-            /* 进入新页面动作，否则说明是后退或者前进动作 */
-            if (history.state === null && href != last.url) {
-                not = that.fire(opt.notpage) ? opt.notpage : opt.home;
-                not = that.geturl(not);     // 修复URL格式
-                to  = match ? href : not;   // 设置跳转后的URL
+            call = lstate.id > state.id ? "back" : "forward";
 
-                /* 运行全局 before 方法 */
-                if (isFun(opt.before)) rcall = opt.before(href);
+            if (state.clear === true || now === last.url) {
+                history[call]();    // 略过 无记录 标记的 URL或与当前一样的URL
+            } else {
+                var match = that.fire();    // 要跳到的页面的路由信息
 
-                /* 如果 before 方法返回false 或 页面未找到，阻止默认跳转 */
-                if (rcall === false || match == null) {
-                    if (to == not && not != last) {
-                        if (isFun(opt.notcall)) {
-                            rcall = opt.notcall(href);
-                        }
+                if (isFun(opt.before)) rcall = opt.before(now, match);
 
-                        /* 如果 notcall 返回 false，则不执行跳转到错误页面的动作 */
-                        rcall != false && that.go(not, true, that.fire(not), true);
-                    }
+                /* 如果 before 返回 false，回退到上个页面 */
+                if (rcall === false) {
+                    history.replaceState(lstate, lstate.title, last.url);
                 } else {
-                    /* 尝试运行上个页面的 leave 方法 */
-                    if (that.last) {
-                        rcall = Route.exec(that.last.match, "leave", opt.recurse);
+                    rcall = that.exec(last.match, "leave", match);
+
+                    /* 如果上个页面的 leave 返回 false ，中止本次跳转 */
+                    if (rcall !== false) rcall = that.exec(match, "before", last.match);
+
+                    /* 如果 before 返回 false，中止本次跳转 */
+                    if (rcall !== false) rcall = that.exec(match, "on", last.match);
+
+
+                     /* 进行具体的页面跳转，记录状态等动作 */
+                    if (rcall !== false) {
+                        that.update(now, match, state); // 更新记录信息
+                        console.log(that);
                     }
-
-                    /* 如果上个页面 leave 方法返回 false，则修改URL为原来页面 */
-                    rcall != false && that.go(href, true, that.fire(href), true);
-
-                    /* 运行当前页面的指定方法回调 */
-                    Route.exec(match, "before", opt.recurse);
-                    Route.exec(match, "on", opt.recurse);
-                }
-            } else if (href != last.url) {
-                /* 运行全局 before 方法 */
-                if (isFun(opt.before)) rcall = opt.before(href);
-
-                /* 尝试运行上个页面的 leave 方法 */
-                if (rcall != false) {
-                    rcall = Route.exec(that.last.match, "leave", opt.recurse);
                 }
 
-                /* 如果上个页面 leave 方法返回 false，则不执行新页面跳转动作 */
-                if (rcall != false) {
-                    /* 运行当前页面的指定方法回调 */
-                    Route.exec(match, "before", opt.recurse);
-                    Route.exec(match, "on", opt.recurse);
-                }
+                /* 运行全局的 after 方法 */
+                isFun(opt.after) && opt.after(now, match); 
             }
-
-            that.update();      // 更新路由相关的记录信息
         });
 
         /* 页面跳转前检测，尝试阻止多余的URL跳转方法 */
@@ -244,15 +225,17 @@ module.exports = (function() {
             var target = e.target, tag = target.tagName,
                 href = target.getAttribute("href"), now = that.geturl();
 
-            if (tag === "A" && href != now) {
+            if (tag === "A" && href) {
+                e.preventDefault(); /* 阻止浏览器默认跳转 */
+
                 var match = that.fire(href), not, to;
 
                 not = that.fire(opt.notpage) ? opt.notpage : opt.home;
                 not = that.geturl(not);     // 修复URL格式
                 to  = match ? href : not;   // 设置最终要跳转的URL
 
-                /* 要跳转的页面和当前页面一样时，阻止跳转 */
-                to == now && e.preventDefault();
+                
+                to != now && that.go(to, false, to == not);
             }
         });
     }
@@ -266,26 +249,55 @@ module.exports = (function() {
     }
 
     /* 跳到指定的页面 */
-    Route.prototype.go = function(url, replace, route, slience) {
-        var that = this, opt = that.options, call, state = {}, last;
+    Route.prototype.go = function(url, replace, clear, refresh) {
+        var that = this, opt = that.options, call, last = that.last,
+            state = {}, end, rcall, match = that.fire(url), now;
 
-        if (opt.html5mode) {
-            url = url.replace(/^[#,\/]*/g, "/");
-        } else {
-            url = url.replace(/^[#,\/]*/g, "#");
-        }
+        /* 修正URL的格式，便于比较和计算 */
+        url = that.geturl(url);     now = that.geturl();
 
         /* 要跳转的页面和当前页面不一样时才跳转 */
-        if (url != that.last.url && url != that.geturl()) {
-            last = route && route.length ? route[route.length-1] : null;
+        if (match && (refresh || url != that.geturl() )) {
+            if (url === now && refresh) replace = true;
+
+            end  = match[match.length-1];
             call = replace ? "replaceState" : "pushState";
 
-            state.id    = that.statpos++;      // 记录当前路由的序列ID
-            state.title = last && last.title ? last.title : ""; // 标题
-            history[call](state, state.title, url);
+            state.title = end && end.title ? end.title : ""; // 标题
+            state.clear = clear || end.clear;          // 是否无记录模式
 
-            /* 默认手动触发 popstate 事件 */
-            !slience && triggerPopEve();
+            /* 运行全局的 before 方法 */
+            if (isFun(opt.before)) rcall = opt.before(url, match);
+
+            /* 如果全局 before 返回 false ，中止本次跳转 */
+            if (rcall !== false) {
+                if (last.match) rcall = that.exec(last.match, "leave", match);
+
+                /* 如果上个页面的 leave 返回 false ，中止本次跳转 */
+                if (rcall !== false) rcall = that.exec(match, "before", last.match);
+
+                /* 如果 before 返回 false，中止本次跳转 */
+                if (rcall !== false) rcall = that.exec(match, "on", last.match);
+
+                /* 进行具体的页面跳转，记录状态等动作 */
+                if (rcall !== false) {
+                    if (last && last.state && last.state.id <= that.state.length) {
+                        that.statpos = last.state.id;
+                        that.state = that.state.slice(0, last.state.id-1);
+                    }
+
+                    state.id = ++that.statpos;      // 记录当前路由的序列ID
+
+                    that.state.push(state);
+                    history[call](state, state.title, url);
+                    that.update(url, match, state); // 更新记录信息
+
+                    console.log(that);
+                }
+            }
+
+            /* 运行全局的 after 方法 */
+            isFun(opt.after) && opt.after(url, match); 
         }
             
         return that;
