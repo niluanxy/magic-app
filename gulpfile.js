@@ -338,23 +338,25 @@ gulp.task("android_base", shell.task([
     "cordova platform add android"
 ], {errorMessage: errmsg, cwd: "cordova"}))
 
-gulp.task("cordova-android", ["android_base"], function() {
-    var path = DIR_CORDOVA + "platforms/android/res";
+gulp.task("cordova-res-android", function() {
+    var path = DIR_CORDOVA + "platforms/android";
 
-    del(path, function() {
-        gulp.src(DIR_RESOURCE + "android/res/**/*")
-            .pipe(gulp.dest(path))
-    });
+    gulp.src(DIR_RESOURCE + "android/**/*")
+            .pipe(gulp.dest(path));
+})
+
+gulp.task("cordova-android", ["android_base"], function() {
+    gulp.run("cordova-res-android");
 })
 
 /* 直接安装apk到手机上 */
-gulp.task("cordova-run", shell.task([
+gulp.task("cordova-run", ["cordova-res-android"], shell.task([
     "gulp cordova",
     "cordova run android"
 ], {errorMessage: errmsg, cwd: "cordova"}))
 
 /* 只生成 apk 安装文件 */
-gulp.task("cordova-build", shell.task([
+gulp.task("cordova-build", ["cordova-res-android"], shell.task([
     "gulp cordova",
     "cordova build android"
 ], {errorMessage: errmsg, cwd: "cordova"}))
