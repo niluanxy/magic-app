@@ -7,9 +7,7 @@ module.exports = (function() {
     	this.state   = [];				// 状态信息
         this.last    = {};              // 上一次的路由地址
         this.statpos = 0;               // 记录路由的状态位置
-  		this.options = {};				// 路由设置信息
-
-  		this.config(options, true);		// 初始化路由设置信息
+  		this.options = extend({}, Route.DEFAULT, options, true);
     };
 
     /**
@@ -37,14 +35,30 @@ module.exports = (function() {
         return typeof call == "function"
     };
 
-    /* 手动触发 PopStateEvent 事件 */
-    function triggerPopEve(init) {
-        var eve = document.createEvent('PopStateEvent');
-        eve.initEvent("popstate", true, true);
-        eve.routeEventInit = init;
-        window.dispatchEvent(eve);
-    }
+    /* 最后一项为真时，表示忽略无效的值 */
+    function extend(/* ... */) {
+        var argv = arguments, obj = argv[0],
+            len = argv.length, undef = false;
 
+        if (argv[len-1] === true) {
+            undef = true;
+            len -= 1;
+        }
+
+        for(var i=1; i<len; i++) {
+            var item = argv[i];
+
+            for(var key in item) {
+                if (undef && item[key] === undefined) {
+                    continue;    
+                }
+
+                obj[key] = item[key];
+            }
+        }
+
+        return obj;
+    }
 
     Route.DEFAULT = {
     	home     : "/home",				// 默认首页
@@ -71,7 +85,7 @@ module.exports = (function() {
                 var now = tables[i], item = tables[i].item;
 
                 if (isFun(item[key])) {
-                    ret = item[key](now.para);
+                    ret = item[key](now.para, ext);
                 }
 
                 if (ret === false) break; // 返回 false 则终止程序执行
@@ -79,23 +93,6 @@ module.exports = (function() {
         }
 
         return ret;     // 返回最后执行的结果
-    }
-
-    /* 设置当前路由的参数信息，init 为 true 时，初始化模式 */
-    Route.prototype.config = function(options, init) {
-        options = options ? options : {};   // 修正参数
-
-  		var def = Route.DEFAULT, that = this, opt = that.options;
-
-  		for(var key in def) {
-  			if (init && def[key] !== undefined) {
-  				var item = options[key];	// 当前项的值
-
-  				opt[key] = (item !== undefined ? item : def[key]);
-  			} else if (options[key] !== undefined) {
-  				opt[key] = options[key];
-  			}
-  		}
     }
 
     /* 路由初始化方法，repath 为 true，则跳到首页 */
@@ -188,8 +185,8 @@ module.exports = (function() {
 
             call = lstate.id > state.id ? "back" : "forward";
 
-            if (state.clear === true || now === last.url) {
-                history[call]();    // 略过 无记录 标记的 URL或与当前一样的URL
+            if (state.clear === true && !that.islast(state)) {
+                history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
             } else {
                 var match = that.fire();    // 要跳到的页面的路由信息
 
@@ -206,18 +203,13 @@ module.exports = (function() {
 
                     /* 如果 before 返回 false，中止本次跳转 */
                     if (rcall !== false) rcall = that.exec(match, "on", last.match);
-
-
-                     /* 进行具体的页面跳转，记录状态等动作 */
-                    if (rcall !== false) {
-                        that.update(now, match, state); // 更新记录信息
-                        console.log(that);
-                    }
                 }
 
                 /* 运行全局的 after 方法 */
                 isFun(opt.after) && opt.after(now, match); 
             }
+
+            that.update(); // 更新记录信息
         });
 
         /* 页面跳转前检测，尝试阻止多余的URL跳转方法 */
@@ -240,6 +232,13 @@ module.exports = (function() {
         });
     }
 
+    /* 判断给定的URL状态是不是当前状态表的最后一项 */
+    Route.prototype.islast = function(state) {
+        var len = this.state.length-1, last = this.state[len];
+
+        return state.id == last.id;     // 判断当前是否最后的状态
+    }
+
     /* 更新当前记录信息 */
     Route.prototype.update = function(url, match, state) {
         /* 更新当前路由的 last 记录信息 */
@@ -258,7 +257,7 @@ module.exports = (function() {
 
         /* 要跳转的页面和当前页面不一样时才跳转 */
         if (match && (refresh || url != that.geturl() )) {
-            if (url === now && refresh) replace = true;
+            if (refresh && url === now) replace = true;
 
             end  = match[match.length-1];
             call = replace ? "replaceState" : "pushState";
@@ -281,18 +280,16 @@ module.exports = (function() {
 
                 /* 进行具体的页面跳转，记录状态等动作 */
                 if (rcall !== false) {
-                    if (last && last.state && last.state.id <= that.state.length) {
+                    if (last && last.state && last.state.id < that.state.length) {
                         that.statpos = last.state.id;
                         that.state = that.state.slice(0, last.state.id-1);
                     }
 
                     state.id = ++that.statpos;      // 记录当前路由的序列ID
 
-                    that.state.push(state);
+                    that.state.push(extend({}, state, {match: match}));
                     history[call](state, state.title, url);
                     that.update(url, match, state); // 更新记录信息
-
-                    console.log(that);
                 }
             }
 

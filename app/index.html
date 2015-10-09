@@ -49,7 +49,9 @@
 
         var table = new Route({
             "/home": {
-
+                on: function() {
+                    console.log("console home on run")
+                }
             },
 
             "/good": {
@@ -95,7 +97,7 @@
 
                 }
             }
-        }).init(true);
+        }, {recurse: "forward" }).init(true);
     </script>
 </body>
 </html>
