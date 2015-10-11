@@ -105,7 +105,7 @@ module.exports = (function() {
     /* 重新启动定时器，尝试切换到给定的页面 */
     Slider.prototype.resume = function(pagex) {
         if (this.pageWidth > 0) {
-            var that  = this, opt  = that.options;
+            var that = this, opt = that.options;
 
             clearInterval(that.timeHandle);
             if (opt.autoPlay && opt.time) {
@@ -114,7 +114,7 @@ module.exports = (function() {
                 }, opt.time)
             }
 
-            that.go(pagex);                 // 尝试切换到给定页面
+            pagex && that.go(pagex);        // 尝试切换到给定页面
         }
 
         return this;
