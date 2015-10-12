@@ -1,10 +1,10 @@
 require("./lib/magic.js");
 
 $(function() {
-    var mvue, Router, mroute = {}, mconfig, loadView, spinner;
+    var mvue, mroute, mconfig, loadView, spinner;
 
     // 路由和magic对象初始化
-    Router = require("./lib/director.js").Router;
+    mroute = new require("./lib/route.js");
     mvue = {
         __VUE__   : null,       // 全局VUE对象
         __PAGE__  : null,       // 当前MG-PAGE对象
@@ -20,8 +20,7 @@ $(function() {
             pageParams: {},
         },
         ready: function() {
-            var $view = $(this.$el).query("mg-view");
-            mvue.__VIEW__ = $view;
+            mvue.__VIEW__ = $(this.$el).find("mg-view");
         }
     })
 
@@ -40,8 +39,8 @@ $(function() {
     }
 
 
-    // APP添加路由方法
-    mvue.when = function(url, call) {
+    // APP路由初始化方法
+    mvue.route = function(url, call) {
         mroute[url] = {
             on: call,
             before: loadBefore(url)

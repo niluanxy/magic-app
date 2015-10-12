@@ -53,7 +53,7 @@ gulp.task("dev-mixin", task_dev_mixin);
 function task_dev_minjs() {
     var defer = Q.defer();
 
-    gulp.src(DIR_MINJS+"director.js")
+    gulp.src(DIR_MINJS+"route.js")
     .pipe(gulp.dest(DIR_MAGIC_VUE+"lib/"));
 
     gulp.src(DIR_MINJS+"*.js")
@@ -96,7 +96,6 @@ function task_dev_magic_js() {
                     util      : LIB_MINJS + "util.js",
                     query     : LIB_MINJS + "selector.js",
                     event     : LIB_MINJS + "event.js",
-                    director  : LIB_MINJS + "director.js",
                     domready  : LIB_MINJS + "ondomready.js",
                     dom       : LIB_MINJS + "dom.js",
                     extend    : LIB_MINJS + "extend.js",
