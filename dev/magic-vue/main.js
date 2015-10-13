@@ -1,57 +1,49 @@
 require("./lib/magic.js");
 
 $(function() {
-    var mvue, mroute, mconfig, loadView, spinner;
+    var mvue, config = {}, Router = require("./lib/route.js");
 
-    // 路由和magic对象初始化
-    mroute = new require("./lib/route.js");
-    mvue = {
+    window.$$ = mvue = {
         __VUE__   : null,       // 全局VUE对象
-        __PAGE__  : null,       // 当前MG-PAGE对象
         __VIEW__  : null,       // 全局MG-VIEW对象
+        __PAGE__  : null,       // 当前页面对象
+        __CACHE__ : null,       // 全局页面缓存
         __ROUTER__: null,       // 全局ROUTER对象
+        __PARAMS__: null,       // 当前URL的参数值
     };
 
-    // 创建全局的VUE对象
-    mvue.__VUE__ = new Vue({
-        el: "body",
-        data: {
-            cacheView : [],
-            pageParams: {},
-        },
-        ready: function() {
-            mvue.__VIEW__ = $(this.$el).find("mg-view");
-        }
-    })
-
     // APP初始化方法
-    mvue.init = function(url, tourl) {
-        $$.key("_magic_runid", $.getRandom());
-        mroute.notFound = function() {
-            location.hash = url || "#index";
-        }
-        this.__ROUTER__ = Router(mroute).init();
-        if (!location.href.match(/#/)) {
-            location.hash = url || "#index";
-        }
+    mvue.init = function(repath) {
+        $$.key("__MAGIC_RUNID", $.getRandom());
+        
+        mvue.__ROUTER__ = new Router(config.tables, {
+            before : function(last, now, match) {
+                var last = match[match.length-1];
 
-        if (url && tourl) location.hash = url;
+                mvue.__PARAMS__ = last.para;
+            }
+        }).init(repath);
+
+        mvue.__VUE__ = new Vue({ el: "body" });
+
+        mvue.__VIEW__ = $("body").query("mg-view");
     }
 
 
     // APP路由初始化方法
-    mvue.route = function(url, call) {
-        mroute[url] = {
-            on: call,
-            before: loadBefore(url)
-        };
+    mvue.route = function(tables) {
+        config.tables = tables;
+
         return this;
     }
 
-    spinner = $.tip("", {type: "loading", delay: "short"});
+    // 即时注册路由的方法，只能在 init 方法调用后执行
+    mvue.when = function(url, option) {
+        mvue.__ROUTER__.on(url, option);
+    }
 
     // 加载页面方法
-    loadView = function(page) {
+    window.loadView = function(page) {
         var pageData  = $.extend({}, page);
         pageData.data = $.extend(true, {}, page.data);
 
@@ -68,8 +60,8 @@ $(function() {
         pageData.template = pageData.template.replace(old, fix);
         pageData.replace = true;    // 统一设置属性为 replace
 
-        // 修改对象的参数值
-        params = $.extend({}, mvue.__VUE__.pageParams);
+        // 修改对象的参数值，替换 000 为 空字符串
+        params = $.extend({}, mvue.__PARAMS__);
         for (var key in params) {
             if (params[key] == "000") {
                 params[key] = "";
@@ -79,7 +71,6 @@ $(function() {
 
         defer = $.defer();          // 决定何时渲染
         if (typeof pageData.resolve == "function") {
-            spinner.show();     // 显示加载中动画效果
 
             pageData.resolve(params, defer);
         } else {
@@ -109,30 +100,8 @@ $(function() {
 
             mvue.__PAGE__ = new Vue(pageData).$mount();
             mvue.__VIEW__ && mvue.__PAGE__.$appendTo(mvue.__VIEW__);
-            spinner.hide();     // 隐藏加载中动画效果
         })
     };
-
-    // 页面家在前的方法，用于设置变量名
-    function loadBefore(seturl) {
-        return function() {
-            var old, now = location.href.match(/\#\/?.*$/)[0];
-            // 全部转URL为数组，方便后面匹配赋值
-            now = now.replace(/\#\/?/, '/').split('/');
-            old = seturl.split("/");
-
-            mvue.__VUE__.pageParams = {};  // 设为空值
-
-            if (now /* 匹配到值才继续执行 */) {
-                for(var i=0; i<old.length; i++) {
-                    if (old[i].indexOf(":") > -1) {
-                        var key = old[i].replace(":", '');
-                        mvue.__VUE__.pageParams[key] = now[i]
-                    }
-                }
-            }
-        }
-    }
 
     mvue.component = function(ids, opt) {
         if (opt /* 参数默认值全局设置 */) {
@@ -146,10 +115,6 @@ $(function() {
 
         return Vue.component(ids, opt);
     }
-
-    // 将方法暴漏出来
-    window.loadView = loadView;
-    window.$$       = mvue;
 
     /* 加载常用工具方法 */
     require("./util/main.js");

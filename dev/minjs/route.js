@@ -79,7 +79,7 @@ module.exports = (function() {
 
         if (type === false /* 只执行最后一个对象 */) {
             if (isFun(last.item[key])) {
-                ret = last.item[key](last.para);
+                ret = last.item[key](last.para, ext);
             }
         } else {
             for (var i = back?len:0; back?i>=0:i<=len; back?i--:i++) {
@@ -118,8 +118,8 @@ module.exports = (function() {
             if (key.search("/") == 0) {
                 
                 /* 修正格式(只传了on方法) */
-                if (isFun(find[key])) {
-                    find[key] = { on: find[key]}
+                if (isFun(table[key])) {
+                    table[key] = { on: table[key]}
                 }
 
                 /* 添加对应项具体的正则语句 */
@@ -216,8 +216,6 @@ module.exports = (function() {
                     that.update(); // 更新记录信息
                 }
             }
-
-            return true;
         });
 
         /* 页面跳转前检测，尝试阻止多余的URL跳转方法 */
@@ -233,9 +231,8 @@ module.exports = (function() {
                 not = that.fire(opt.notpage) ? opt.notpage : opt.home;
                 not = that.geturl(not);     // 修复URL格式
                 to  = match ? href : not;   // 设置最终要跳转的URL
-
                 
-                to != now && that.go(to, false, to == not);
+                to != now && that.go(to, false, !match && to == not);
             }
         });
     }
@@ -274,7 +271,7 @@ module.exports = (function() {
             url   = this.last.url;
         }
 
-        history.replace(state, title, url);
+        history.replaceState(state, title, url);
 
         return this;
     }
