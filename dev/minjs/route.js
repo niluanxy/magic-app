@@ -132,7 +132,7 @@ module.exports = (function() {
     }
 
     /* 尝试匹配给定URL的路由信息 */
-    Route.prototype.fire = function(url) {
+    Route.prototype.fire = function(url, last) {
     	url = url == undefined ? this.geturl() : url;              // 修正参数
     	url = "/" + url.replace(/^[#|\/]*/g, "").replace(/\/$/g, "");	   // 替换开头 # 和结尾 /
 
@@ -171,7 +171,12 @@ module.exports = (function() {
             }
         } while (url.length > 0 && check != key);
 
-    	return url.length == 0 && result ? result : null;
+        /* 如果last参数为真，则只返回最后的一个项目 */
+        if (url.length == 0 && last) {
+            result = result[result.length-1];
+        }
+
+    	return url.length == 0 && result.length ? result : null;
     }
 
     /* 手动触发指定页面的事件方法，match 参数必须给定 */
