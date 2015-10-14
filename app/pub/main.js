@@ -1,4 +1,3 @@
-window.Vue = require("./lib/vue.min.js")
 require("./lib/magic.vue.js");
 
 $(function() {
