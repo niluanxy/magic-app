@@ -69,6 +69,7 @@ module.exports = (function() {
         notpage  : "",                  // 页面未找到的时候，显示的页面，为空则跳到首页
     	before   : null,				// 页面跳转前的回调方法
     	after    : null,				// 页面跳转后的回调方法
+        always   : null,                // 每次点击，不论是否阻止默认跳转，都会执行的方法
     	recurse  : false,				// 路由递归触发方式，forward 正序，backward 反序，默认最后项
     }
 
@@ -107,6 +108,7 @@ module.exports = (function() {
         if (repath)  {
             tmp = that.fire(opt.home);
             that.go(opt.home, true, false, true);
+            isFun(opt.always) && opt.always("init", null, that);
         }
 
         return that;
@@ -213,7 +215,7 @@ module.exports = (function() {
     Route.prototype.bind = function() {
         var that = this, opt = that.options, last = that.last, change;
 
-        change = window.ontouchstart !== undefined ? "touchstart" : "mouseup";
+        change = window.ontouchstart !== undefined ? "touchend" : "mouseup";
 
         window.addEventListener("popstate", function(e) {
             var state = history.state, call, now = that.geturl(),
@@ -235,6 +237,9 @@ module.exports = (function() {
                             that.replace(lstate, lstate.title, last.url);
                         }
                     })
+
+                    /* 执行 always 方法 */
+                    isFun(opt.always) && opt.always("popstate", e, that);
                 }
             }
         });
@@ -244,8 +249,11 @@ module.exports = (function() {
             var target = e.target, tag = target.tagName,
                 href = target.getAttribute("href"), now = that.geturl();
 
+            console.log("should run change")
+
             if (tag === "A" && href) {
-                e.preventDefault(); /* 阻止浏览器默认跳转 */
+                e.preventDefault();     /* 阻止浏览器默认跳转 */
+                e.stopPropagation();
 
                 var match = that.fire(href), not, to;
 
@@ -253,9 +261,11 @@ module.exports = (function() {
                 not = that.geturl(not);     // 修复URL格式
                 to  = match ? href : not;   // 设置最终要跳转的URL
                 
-                to !== now &&that.go(to, false, !match && to == not);
+                to !== now && that.go(to, false, !match && to == not);
+
+                isFun(opt.always) && opt.always(change, e, that);
             }
-        }, false);
+        });
     }
 
     /* 判断给定的URL状态是不是当前状态表的最后一项 */

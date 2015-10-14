@@ -21,6 +21,16 @@ $(function() {
                 var last = match[match.length-1];
 
                 mvue.__PARAMS__ = last.para;
+            },
+
+            always : function(type, e, handle) {
+                /* 修复阻止默认跳转动作后，不清除 active 类的问题 */
+                setTimeout(function() {
+                    if (e && type != "popstate")  {
+                        $(e.target).removeClass("active");
+                    }
+                    console.log(handle.state)
+                }, 0)
             }
         }).init(repath);
 

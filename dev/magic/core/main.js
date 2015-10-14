@@ -55,7 +55,7 @@ require("extend");      // 原生对象扩展
                     return select;
                 }
                 
-                return this;
+                return this.length > 0 ? this : null;
             },
 
             /* 简单的查询方法，返回标准的dom对象 */
@@ -70,20 +70,20 @@ require("extend");      // 原生对象扩展
 
             /* 对象的类操作的一些方法 */
             hasClass: function(className) {
-                return _UTIL.hasClass(this[0], className);
+                return this[0] ? _UTIL.hasClass(this[0], className) : false;
             },
             addClass: function(className) {
-                _UTIL.addClass(this[0], className);
+                this[0] && _UTIL.addClass(this[0], className);
 
                 return this;
             },
             removeClass: function(className) {
-                _UTIL.removeClass(this[0], className);
+                this[0] && _UTIL.removeClass(this[0], className);
 
                 return this;
             },
             toggleClass: function(className, set) {
-                _UTIL.toggleClass(this[0], className, set);
+                this[0] && _UTIL.toggleClass(this[0], className, set);
                 
                 return this;
             },

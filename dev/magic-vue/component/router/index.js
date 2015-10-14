@@ -1,7 +1,7 @@
 module.exports = (function() {
     $$.component("mg-back", {
         template: "<content></content>",
-        ready: function() {
+        attached: function() {
             var that = this, $el = $(this.$el),
             	call = $el.attr("call"), router = $$.__ROUTER__;
             
@@ -16,7 +16,7 @@ module.exports = (function() {
 			});
 
 			// 如果当前是第一项，则直接隐藏
-			if (router.check(history.state, "first")) {
+			if (router.geturl() == router.state[0].url) {
 				$el.addClass("hide");	
 			}
         }
