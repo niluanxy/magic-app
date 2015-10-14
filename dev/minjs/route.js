@@ -64,9 +64,9 @@ module.exports = (function() {
     Route.DEFAULT = {
     	home     : "/home",				// 默认首页
         html5mode: false,               // 是否启用H5模式，启用则省略 # 符号（后台需rewrite）
-    	repath   : "",					// 页面未找到时候重置到的页面，为空则跳到首页
+        replace  : true,                // replace模式，自动把 只参数不同的页面 replace 加载，默认开启
     	notcall  : null,				// 页面未找到时候的回调方法
-        notpage  : "",                  // 页面未找到的时候，显示的页面
+        notpage  : "",                  // 页面未找到的时候，显示的页面，为空则跳到首页
     	before   : null,				// 页面跳转前的回调方法
     	after    : null,				// 页面跳转后的回调方法
     	recurse  : false,				// 路由递归触发方式，forward 正序，backward 反序，默认最后项
@@ -312,7 +312,7 @@ module.exports = (function() {
             if (refresh && url === now) replace = true;
 
             /* 如果当前页面和上个页面一样，只不过参数不同，则转为替换模式 */
-            if (last.match && last.match.length == match.length) {
+            if (opt.replace && last.match && last.match.length == match.length) {
                 var ret = true;     // 用于记录每个匹配项是否相等
 
                 for (var i = 0; i < match.length; i++) {
@@ -322,6 +322,11 @@ module.exports = (function() {
                 }
 
                 replace = ret ? true : replace;
+            }
+
+            /* 如果上个页面为 clear 页面，则当前页面直接 replace 加载 */
+            if (last && last.state && last.state.clear === true) {
+                replace = true;
             }
 
             end  = match[match.length-1];
