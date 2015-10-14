@@ -30,7 +30,7 @@ module.exports = (function() {
         that.el.wrapAll("<div class='slider_scroll'></div>");
         scroll = that.el.children();
         childs = scroll.query(".slider-item");
-        $first = $(childs[0]);
+        $first = $(childs[0] || childs);
 
         that.__render = $first.render(function() {
             that.pageWidth = $first.width();
