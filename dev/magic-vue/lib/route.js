@@ -174,11 +174,41 @@ module.exports = (function() {
     	return url.length == 0 && result ? result : null;
     }
 
+    /* 手动触发指定页面的事件方法，match 参数必须给定 */
+    Route.prototype.trigger = function(match, before, on) {
+        if (!match) return false;   // 参数不足直接退出
+
+        var that = this, opt = that.options, last = that.last,
+            now = that.geturl(), rcall, update;
+
+        if (isFun(opt.before)) rcall = opt.before(last.url, now, match);
+
+        // 尝试调用 before后 的回调，如果返回 false，会中止后面页面的回调
+        if (isFun(before)) update = before(rcall);     
+
+        /* 如果 before 返回 false，回退到上个页面 */
+        if (rcall !== false) {
+            if (last && last.match) rcall = that.exec(last.match, "leave", match);
+
+            /* 如果上个页面的 leave 返回 false ，中止本次跳转 */
+            if (rcall !== false) rcall = that.exec(match, "before", last.match);
+
+            /* 如果 before 返回 false，中止本次跳转 */
+            if (rcall !== false) rcall = that.exec(match, "on", last.match);
+
+            if (isFun(on)) update = on(rcall);         // 尝试调用 on后 的回调
+        }
+
+        /* 运行全局的 after 方法 */
+        isFun(opt.after) && opt.after(last.url, now, match);
+        update !== false && that.update(that.geturl(), match);
+    }
+
     /* 全局绑定时间，监控页面前进后退等操作 */
     Route.prototype.bind = function() {
         var that = this, opt = that.options, last = that.last, change;
 
-        change = window.ontouchstart !== undefined ? "touchend" : "mouseup";
+        change = window.ontouchstart !== undefined ? "touchstart" : "mouseup";
 
         window.addEventListener("popstate", function(e) {
             var state = history.state, call, now = that.geturl(),
@@ -193,27 +223,13 @@ module.exports = (function() {
                 if ( (state.clear === true  || now == last.url ) && !islast) {
                     islast &&　that.update();
                     history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
-                } else {
-                    var match = that.fire();    // 要跳到的页面的路由信息
-
-                    if (isFun(opt.before)) rcall = opt.before(last.url, now, match);
-
-                    /* 如果 before 返回 false，回退到上个页面 */
-                    if (rcall === false) {
-                        history.replaceState(lstate, lstate.title, last.url);
-                    } else {
-                        rcall = that.exec(last.match, "leave", match);
-
-                        /* 如果上个页面的 leave 返回 false ，中止本次跳转 */
-                        if (rcall !== false) rcall = that.exec(match, "before", last.match);
-
-                        /* 如果 before 返回 false，中止本次跳转 */
-                        if (rcall !== false) rcall = that.exec(match, "on", last.match);
-                    }
-
-                    /* 运行全局的 after 方法 */
-                    isFun(opt.after) && opt.after(last.url, now, match);
-                    that.update(); // 更新记录信息
+                } else if (now != last.url) {
+                    that.trigger(that.fire(), function(rcall) {
+                        if (rcall === false) {
+                            // before 执行失败则回退到上个页面
+                            that.replace(lstate, lstate.title, last.url);
+                        }
+                    })
                 }
             }
         });
@@ -232,9 +248,9 @@ module.exports = (function() {
                 not = that.geturl(not);     // 修复URL格式
                 to  = match ? href : not;   // 设置最终要跳转的URL
                 
-                to != now && that.go(to, false, !match && to == not);
+                to !== now &&that.go(to, false, !match && to == not);
             }
-        });
+        }, false);
     }
 
     /* 判断给定的URL状态是不是当前状态表的最后一项 */
@@ -263,6 +279,13 @@ module.exports = (function() {
         this.last.state = state || history.state;
     }
 
+    /* 强制刷新，重新加载当前页面，但不触发 popstate 事件 */
+    Route.prototype.refresh = function() {
+        this.go(this.geturl(), true, false, true);
+
+        return this;
+    }
+
     /* 用给定的参数替换当前URL(无选择上次URL)，并不会触发 popstate 事件和方法执行 */
     Route.prototype.replace = function(state, title, url) {
         if (!state || !url) {
@@ -285,8 +308,21 @@ module.exports = (function() {
         url = that.geturl(url);     now = that.geturl();
 
         /* 要跳转的页面和当前页面不一样时才跳转 */
-        if (match && (refresh || url != that.geturl() )) {
+        if (match && (refresh || url != now )) {
             if (refresh && url === now) replace = true;
+
+            /* 如果当前页面和上个页面一样，只不过参数不同，则转为替换模式 */
+            if (last.match && last.match.length == match.length) {
+                var ret = true;     // 用于记录每个匹配项是否相等
+
+                for (var i = 0; i < match.length; i++) {
+                    if (last.match[i].item != match[i].item) {
+                        ret = false; break; // 退出检测
+                    }
+                }
+
+                replace = ret ? true : replace;
+            }
 
             end  = match[match.length-1];
             call = replace ? "replaceState" : "pushState";
@@ -294,19 +330,7 @@ module.exports = (function() {
             state.title = end && end.title ? end.title : ""; // 标题
             state.clear = clear || end.clear;          // 是否无记录模式
 
-            /* 运行全局的 before 方法 */
-            if (isFun(opt.before)) rcall = opt.before(last.url, url, match);
-
-            /* 如果全局 before 返回 false ，中止本次跳转 */
-            if (rcall !== false) {
-                if (last.match) rcall = that.exec(last.match, "leave", match);
-
-                /* 如果上个页面的 leave 返回 false ，中止本次跳转 */
-                if (rcall !== false) rcall = that.exec(match, "before", last.match);
-
-                /* 如果 before 返回 false，中止本次跳转 */
-                if (rcall !== false) rcall = that.exec(match, "on", last.match);
-
+            that.trigger(match, null, function(rcall) {
                 /* 进行具体的页面跳转，记录状态等动作 */
                 if (rcall !== false) {
                     if (last && last.state && last.state.id < that.state.length) {
@@ -320,12 +344,10 @@ module.exports = (function() {
                         match: match, url: url
                     }));
                     history[call](state, state.title, url);
-                    that.update(url, match, state); // 更新记录信息
                 }
-            }
 
-            /* 运行全局的 after 方法 */
-            isFun(opt.after) && opt.after(last.url, that.geturl(), match); 
+                return rcall;   // 返回 false，会阻止后续调用 update 方法
+            })
         }
             
         return that;

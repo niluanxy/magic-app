@@ -13,9 +13,20 @@ $(function() {
 	        require(["../page/list"], loadView);
 	    },
 
-		"/user": function() {
+	    "/shop/:shopid": function(para) {
+			console.log("should load shop")
+			console.log(para)
+	        require(["../page/shop"], loadView);
+	    },
+
+		"/cart": function() {
+			console.log("should load cart")
+	        require(["../page/cart"], loadView);
+	    },
+
+	    "/user": function() {
 			console.log("should load user")
 	        require(["../page/user"], loadView);
-	    }
+	    },
 	}).init(true);
 })

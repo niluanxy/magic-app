@@ -165,7 +165,7 @@ module.exports = (function() {
             }
 
             handleNow.calls.push({
-                name  : eveName,                   // 事件全名
+                name  : eveName,                // 事件全名
                 call  : call,                   // 回调事件
                 select: select || ''            // 过滤器
             });
