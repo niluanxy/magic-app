@@ -14,13 +14,23 @@ mg-page {
         transition-duration: 0s;
     }
 
-    &.v-enter {
+    &.push-enter {
         opacity: 0;
         transform: translate3d(100px, 0, 0);
     }
-    
-    &.v-leave {
+
+    &.push-leave {
         opacity: 0;
         transform: translate3d(-100px, 0, 0);
+    }
+
+    &.back-enter {
+        opacity: 0;
+        transform: translate3d(-100px, 0, 0);
+    }
+    
+    &.back-leave {
+        opacity: 0;
+        transform: translate3d(0, 0, 0);
     }
 }

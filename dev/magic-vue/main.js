@@ -23,6 +23,7 @@ $(function() {
             view  = mvue.__VIEW__ = $("body").query("mg-view");
         
         mvue.__STATE__ = {
+            ROUTER_TYPE  : false,       // 路由事件触发加载方式
             ROUTER_AFTER : false,       // 路由事件执行状态
 
             PAGE_READY   : false,       // 页面加载状态
@@ -35,6 +36,7 @@ $(function() {
                     STAT = mvue.__STATE__;
 
                 STAT.ROUTER_AFTER = false;
+                STAT.ROUTER_TYPE  = that.evetype;
 
                 mvue.__PARAMS__ = last.para;
             },
@@ -82,7 +84,8 @@ $(function() {
 
         // 尝试使用正则添加 v-transition 属性
         if (old.search("v-transition") == -1) {
-            fix = fix.replace("<mg-page", "<mg-page v-transition");
+            var trans = $$.__STATE__.ROUTER_TYPE == "back" ? "back" : "push";
+            fix = fix.replace("<mg-page", "<mg-page v-transition='" + trans + "'");
         }
 
         // 将修改更新到模板字符串上

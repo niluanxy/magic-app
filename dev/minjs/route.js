@@ -8,6 +8,7 @@ module.exports = (function() {
         this.last    = {};              // 上一次的路由地址
         this.statpos = 0;               // 记录路由的状态位置
         this.taptime = 0;               // 记录点击开始的事件
+        this.evetype = "";              // 触发事件的方式
   		this.options = extend({}, Route.DEFAULT, options, true);
     };
 
@@ -224,10 +225,7 @@ module.exports = (function() {
             var state = history.state, call, now = that.geturl(),
                 lstate = last.state, islast = that.check(state, "last");
 
-            console.log("state: ")
-            console.log(state)
-
-            call = lstate.id > state.id ? "back" : "forward";
+            that.evetype = call = lstate.id > state.id ? "back" : "forward";
 
             if (state.clear === true && !islast) {
                 history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
@@ -242,11 +240,14 @@ module.exports = (function() {
                 /* 执行 always 方法 */
                 isFun(opt.always) && opt.always("popstate", e, that);
             }
+
+            that.evetype = "";      // 重置状态
         });
 
         /* 过滤点击时间过长的跳转 */
         document.addEventListener(start, function(e) {
             that.taptime = e.timeStamp;
+            that.evetype = "push";
         }, true)
 
         /* 页面跳转前检测，尝试阻止多余的URL跳转方法 */
@@ -269,6 +270,8 @@ module.exports = (function() {
                 }
 
                 isFun(opt.always) && opt.always(change, e, that);
+
+                that.evetype = "";  // 重置状态
             }
         }, true);
     }
