@@ -4,39 +4,58 @@ $(function() {
     var mvue, config = {}, Router = require("./lib/route.js");
 
     window.$$ = mvue = {
+        location  : null,       // 全局ROUTER对象
+
         __VUE__   : null,       // 全局VUE对象
         __VIEW__  : null,       // 全局MG-VIEW对象
         __PAGE__  : null,       // 当前页面对象
         __CACHE__ : null,       // 全局页面缓存
-        __ROUTER__: null,       // 全局ROUTER对象
         __PARAMS__: null,       // 当前URL的参数值
+
+        __STATE__ : null,         // 记录当前APP各种状态
     };
 
     // APP初始化方法
     mvue.init = function(repath) {
         $$.key("__MAGIC_RUNID", $.getRandom());
+
+        var vue   = mvue.__VUE__  = new Vue({ el: "body" }),
+            view  = mvue.__VIEW__ = $("body").query("mg-view");
         
-        mvue.__ROUTER__ = new Router(config.tables, {
-            before : function(last, now, match) {
-                var last = match[match.length-1];
+        mvue.__STATE__ = {
+            ROUTER_AFTER : false,       // 路由事件执行状态
+
+            PAGE_READY   : false,       // 页面加载状态
+        }
+
+        mvue.location = new Router(config.tables, {
+            /* 页面跳转前的回调方法 */
+            before : function(last, now, match, that) {
+                var last = match[match.length-1],
+                    STAT = mvue.__STATE__;
+
+                STAT.ROUTER_AFTER = false;
 
                 mvue.__PARAMS__ = last.para;
             },
 
+            /* 页面跳转成功后的回调方法 */
+            after : function(last, now, match, that) {
+                var STAT = mvue.__STATE__;
+
+                STAT.ROUTER_AFTER = true;
+            },
+
+            /* 不论是否跳转成功，总会执行的回调 */
             always : function(type, e, handle) {
                 /* 修复阻止默认跳转动作后，不清除 active 类的问题 */
                 setTimeout(function() {
                     if (e && type != "popstate")  {
                         $(e.target).removeClass("active");
                     }
-                    console.log(handle.state)
                 }, 0)
             }
         }).init(repath);
-
-        mvue.__VUE__ = new Vue({ el: "body" });
-
-        mvue.__VIEW__ = $("body").query("mg-view");
     }
 
 
@@ -98,7 +117,17 @@ $(function() {
 
             mixins = {
                 beforeDestroy: function() {
-                    this.$broadcast("pageDestroy")
+                    $$.__STATE__.PAGE_READY = false;
+
+
+                    this.$broadcast("pageDestroy");
+                },
+
+                ready: function() {
+                    $$.__STATE__.PAGE_READY = true;
+
+
+                    this.$broadcast("pageReady");
                 }
             }
 

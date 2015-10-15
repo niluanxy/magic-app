@@ -1,9 +1,9 @@
 module.exports = (function() {
     $$.component("mg-back", {
         template: "<content></content>",
-        attached: function() {
-            var that = this, $el = $(this.$el),
-            	call = $el.attr("call"), router = $$.__ROUTER__;
+        ready: function() {
+            var that = this, $el = $(this.$el), state = history.state,
+            	call = $el.attr("call"), router = $$.location;
             
 			$el.addClass("back").on("tap", function() {
 				var ret = true;		// 回调返回值
@@ -15,9 +15,13 @@ module.exports = (function() {
 				if (ret !== false) router.back();
 			});
 
-			// 如果当前是第一项，则直接隐藏
-			if (router.geturl() == router.state[0].url) {
-				$el.addClass("hide");	
+			/* 根据不同的情况选择判断逻辑隐藏后退按钮 */
+			if (router.check(state, "first")) {
+				if ($$.__STATE__.ROUTER_AFTER) {
+					$el.addClass("hide");
+				} else if (state.id != router.last.state.id) {
+					$el.addClass("hide");
+				}
 			}
         }
     });

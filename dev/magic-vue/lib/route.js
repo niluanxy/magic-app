@@ -7,6 +7,7 @@ module.exports = (function() {
     	this.state   = [];				// 状态信息
         this.last    = {};              // 上一次的路由地址
         this.statpos = 0;               // 记录路由的状态位置
+        this.taptime = 0;               // 记录点击开始的事件
   		this.options = extend({}, Route.DEFAULT, options, true);
     };
 
@@ -68,7 +69,7 @@ module.exports = (function() {
     	notcall  : null,				// 页面未找到时候的回调方法
         notpage  : "",                  // 页面未找到的时候，显示的页面，为空则跳到首页
     	before   : null,				// 页面跳转前的回调方法
-    	after    : null,				// 页面跳转后的回调方法
+    	after    : null,				// 页面 成功跳转后 的回调方法
         always   : null,                // 每次点击，不论是否阻止默认跳转，都会执行的方法
     	recurse  : false,				// 路由递归触发方式，forward 正序，backward 反序，默认最后项
     }
@@ -188,7 +189,7 @@ module.exports = (function() {
         var that = this, opt = that.options, last = that.last,
             now = that.geturl(), rcall, update;
 
-        if (isFun(opt.before)) rcall = opt.before(last.url, now, match);
+        if (isFun(opt.before)) rcall = opt.before(last.url, now, match, that);
 
         // 尝试调用 before后 的回调，如果返回 false，会中止后面页面的回调
         if (isFun(before)) update = before(rcall);     
@@ -204,68 +205,72 @@ module.exports = (function() {
             if (rcall !== false) rcall = that.exec(match, "on", last.match);
 
             if (isFun(on)) update = on(rcall);         // 尝试调用 on后 的回调
+
+            /* 运行全局的 成功跳转的after 方法 */
+            update !== false && isFun(opt.after) && opt.after(last.url, now, match, that);
         }
 
-        /* 运行全局的 after 方法 */
-        isFun(opt.after) && opt.after(last.url, now, match);
         update !== false && that.update(that.geturl(), match);
     }
 
     /* 全局绑定时间，监控页面前进后退等操作 */
     Route.prototype.bind = function() {
-        var that = this, opt = that.options, last = that.last, change;
+        var that = this, opt = that.options, last = that.last, start, change;
 
         change = window.ontouchstart !== undefined ? "touchend" : "mouseup";
+        start  = change == "touchend" ? "touchstart" : "mousedown";
 
         window.addEventListener("popstate", function(e) {
             var state = history.state, call, now = that.geturl(),
-                lstate = last.state, rcall, islast = that.check(state, "last");
+                lstate = last.state, islast = that.check(state, "last");
 
-            /* 修正点击 a 的伪类触发的点击事件会欺骗过点击过滤的问题 */
-            if (state == null) {
-                that.replace(lstate, lstate.title, last.url);
-            } else {
-                call = lstate.id > state.id ? "back" : "forward";
+            console.log("state: ")
+            console.log(state)
 
-                if ( (state.clear === true  || now == last.url ) && !islast) {
-                    islast &&　that.update();
-                    history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
-                } else if (now != last.url) {
-                    that.trigger(that.fire(), function(rcall) {
-                        if (rcall === false) {
-                            // before 执行失败则回退到上个页面
-                            that.replace(lstate, lstate.title, last.url);
-                        }
-                    })
+            call = lstate.id > state.id ? "back" : "forward";
 
-                    /* 执行 always 方法 */
-                    isFun(opt.always) && opt.always("popstate", e, that);
-                }
+            if (state.clear === true && !islast) {
+                history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
+            } else if (now != last.url) {
+                that.trigger(that.fire(), function(rcall) {
+                    if (rcall === false) {
+                        // before 执行失败则回退到上个页面
+                        that.replace(lstate, lstate.title, last.url);
+                    }
+                })
+
+                /* 执行 always 方法 */
+                isFun(opt.always) && opt.always("popstate", e, that);
             }
         });
+
+        /* 过滤点击时间过长的跳转 */
+        document.addEventListener(start, function(e) {
+            that.taptime = e.timeStamp;
+        }, true)
 
         /* 页面跳转前检测，尝试阻止多余的URL跳转方法 */
         document.addEventListener(change, function(e) {
             var target = e.target, tag = target.tagName,
                 href = target.getAttribute("href"), now = that.geturl();
 
-            console.log("should run change")
-
             if (tag === "A" && href) {
                 e.preventDefault();     /* 阻止浏览器默认跳转 */
                 e.stopPropagation();
 
-                var match = that.fire(href), not, to;
+                if (e.timeStamp - that.taptime <= 300) {
+                    var match = that.fire(href), not, to;
 
-                not = that.fire(opt.notpage) ? opt.notpage : opt.home;
-                not = that.geturl(not);     // 修复URL格式
-                to  = match ? href : not;   // 设置最终要跳转的URL
-                
-                to !== now && that.go(to, false, !match && to == not);
+                    not = that.fire(opt.notpage) ? opt.notpage : opt.home;
+                    not = that.geturl(not);     // 修复URL格式
+                    to  = match ? href : not;   // 设置最终要跳转的URL
+                    
+                    to !== now && that.go(to, false, !match && to == not);
+                }
 
                 isFun(opt.always) && opt.always(change, e, that);
             }
-        });
+        }, true);
     }
 
     /* 判断给定的URL状态是不是当前状态表的最后一项 */
@@ -355,7 +360,7 @@ module.exports = (function() {
                 if (rcall !== false) {
                     if (last && last.state && last.state.id < that.state.length) {
                         that.statpos = last.state.id;
-                        that.state = that.state.slice(0, last.state.id-1);
+                        that.state = that.state.slice(0, last.state.id);
                     }
 
                     state.id = ++that.statpos;      // 记录当前路由的序列ID
