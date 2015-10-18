@@ -241,7 +241,7 @@ module.exports = (function() {
             that.evetype = "";      // 重置状态
         });
 
-        /* 跳转动作判断，过滤无效点击 */
+        /* 跳转动作判断，过滤无效点击，必须运行在冒泡阶段才能阻止默认 popstate 事件 */
         start = function(e) {
             that.taptime = e.timeStamp;
             that.evetype = "push";
