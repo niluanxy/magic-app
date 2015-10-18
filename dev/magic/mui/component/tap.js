@@ -6,20 +6,9 @@
  */
 
 $.ready(function() {
-    var $body = $("body"), $document = $(document), tap = {},
-        inputs, event = { start: "", move: "", end: ""}, delay = 300;
+    var $document = $(document), tap = {}, inputs, delay = 300;
 
-    if (window.ontouchstart !== undefined) {
-        event.start = "touchstart";
-        event.move  = "touchmove";
-        event.end   = "touchend";
-    } else {
-        event.start = "mousedown";
-        event.move  = "mousemove";
-        event.end   = "mouseup";
-    }
-
-    $document.on(event.start, function(e) {
+    $document.on("touchstart, mousedown", function(e) {
         /* 忽略多指手势操作 */
         var touchs = e.targetTouches;
 
@@ -70,12 +59,12 @@ $.ready(function() {
         }
     }
 
-    $document.on(event.move, $.delayCall(function(e) {
+    $document.on("touchmove, mousemove", $.delayCall(function(e) {
         e.preventDefault(); // 修复微信下拉显示网页地址
         clearActive($(e.target));
     }, 16));
 
-    $document.on(event.end, function(e) {
+    $document.on("touchend, mouseup", function(e) {
         var cx, cy, ct, $target = $(e.target),
             touch = e.changedTouches ? e.changedTouches[0] : e;
 

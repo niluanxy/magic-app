@@ -218,9 +218,6 @@ module.exports = (function() {
     Route.prototype.bind = function() {
         var that = this, opt = that.options, last = that.last, start, change;
 
-        change = window.ontouchstart !== undefined ? "touchend" : "mouseup";
-        start  = change == "touchend" ? "touchstart" : "mousedown";
-
         window.addEventListener("popstate", function(e) {
             var state = history.state, call, now = that.geturl(),
                 lstate = last.state, islast = that.check(state, "last");
@@ -244,14 +241,16 @@ module.exports = (function() {
             that.evetype = "";      // 重置状态
         });
 
-        /* 过滤点击时间过长的跳转 */
-        document.addEventListener(start, function(e) {
+        /* 跳转动作判断，过滤无效点击 */
+        start = function(e) {
             that.taptime = e.timeStamp;
             that.evetype = "push";
-        }, true)
+        }
+        document.addEventListener("touchstart", start, true);
+        document.addEventListener("mousedown", start, true);
 
         /* 页面跳转前检测，尝试阻止多余的URL跳转方法 */
-        document.addEventListener(change, function(e) {
+        change = function(e) {
             var target = e.target, tag = target.tagName,
                 href = target.getAttribute("href"), now = that.geturl();
 
@@ -265,7 +264,7 @@ module.exports = (function() {
                     not = that.fire(opt.notpage) ? opt.notpage : opt.home;
                     not = that.geturl(not);     // 修复URL格式
                     to  = match ? href : not;   // 设置最终要跳转的URL
-                    
+
                     to !== now && that.go(to, false, !match && to == not);
                 }
 
@@ -273,7 +272,9 @@ module.exports = (function() {
 
                 that.evetype = "";  // 重置状态
             }
-        }, true);
+        }
+        document.addEventListener("touchend", change, true);
+        document.addEventListener("mouseup", change, true);
     }
 
     /* 判断给定的URL状态是不是当前状态表的最后一项 */
