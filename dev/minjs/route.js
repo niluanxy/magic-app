@@ -76,7 +76,7 @@ module.exports = (function() {
     }
 
     /* 执行给定对象的执行方法，forward 为 true 反向执行 */
-    Route.prototype.exec = function(tables, key, ext) {
+    Route.prototype._exec = function(tables, key, ext) {
         var len  = tables.length - 1, last = tables[len], ret,
             type = this.options.recurse, back = type == "backward";   // 方法是否反向调用
 
@@ -101,17 +101,19 @@ module.exports = (function() {
 
     /* 路由初始化方法，repath 为 true，则跳到首页 */
     Route.prototype.init = function(repath) {
-        var that = this, opt = that.options, tmp, url;
+        var that = this, opt = that.options;
 
         /* 初始化项目的路由匹配规则 */
         that.table = Route.prefix(that.table);
-        that.bind();            // 绑定全局事件
+        that._bind();            // 绑定全局事件
 
         if (repath)  {
-            tmp = that.fire(opt.home);
             that.go(opt.home, true, false, true);
-            isFun(opt.always) && opt.always("init", null, that);
+        } else {
+            var url = that.geturl();
+            that.go(url, true, false, true);
         }
+        isFun(opt.always) && opt.always("init", null, that);
 
         return that;
     }
@@ -184,7 +186,7 @@ module.exports = (function() {
     }
 
     /* 手动触发指定页面的事件方法，match 参数必须给定 */
-    Route.prototype.trigger = function(match, before, on) {
+    Route.prototype._trigger = function(match, before, on) {
         if (!match) return false;   // 参数不足直接退出
 
         var that = this, opt = that.options, last = that.last,
@@ -197,13 +199,13 @@ module.exports = (function() {
 
         /* 如果 before 返回 false，回退到上个页面 */
         if (rcall !== false) {
-            if (last && last.match) rcall = that.exec(last.match, "leave", match);
+            if (last && last.match) rcall = that._exec(last.match, "leave", match);
 
             /* 如果上个页面的 leave 返回 false ，中止本次跳转 */
-            if (rcall !== false) rcall = that.exec(match, "before", last.match);
+            if (rcall !== false) rcall = that._exec(match, "before", last.match);
 
             /* 如果 before 返回 false，中止本次跳转 */
-            if (rcall !== false) rcall = that.exec(match, "on", last.match);
+            if (rcall !== false) rcall = that._exec(match, "on", last.match);
 
             if (isFun(on)) update = on(rcall);         // 尝试调用 on后 的回调
 
@@ -215,7 +217,7 @@ module.exports = (function() {
     }
 
     /* 全局绑定时间，监控页面前进后退等操作 */
-    Route.prototype.bind = function() {
+    Route.prototype._bind = function() {
         var that = this, opt = that.options, last = that.last, start, change;
 
         window.addEventListener("popstate", function(e) {
@@ -227,7 +229,7 @@ module.exports = (function() {
             if (state.clear === true && !islast) {
                 history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
             } else if (now != last.url) {
-                that.trigger(that.fire(), function(rcall) {
+                that._trigger(that.fire(), function(rcall) {
                     if (rcall === false) {
                         // before 执行失败则回退到上个页面
                         that.replace(lstate, lstate.title, last.url);
@@ -359,7 +361,7 @@ module.exports = (function() {
             state.title = end && end.title ? end.title : ""; // 标题
             state.clear = clear || end.clear;          // 是否无记录模式
 
-            that.trigger(match, null, function(rcall) {
+            that._trigger(match, null, function(rcall) {
                 /* 进行具体的页面跳转，记录状态等动作 */
                 if (rcall !== false) {
                     if (last && last.state && last.state.id < that.state.length) {

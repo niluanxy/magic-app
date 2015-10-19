@@ -156,10 +156,12 @@ module.exports = (function() {
                     calls  : []             // 事件回掉数组
                 };
 
-                handleNow.handle = function (e) {
+                handleNow.handle = (function (ele, call) {
                     /* 使用事件触发方法触发绑定的函数 */
-                    triggerCall(ele, handleNow.calls, e);
-                };
+                    return function(e) {
+                        triggerCall(ele, call, e);
+                    }
+                })(ele, handleNow.calls);
 
                 ele.addEventListener(evePre, handleNow.handle, !!capture);
             }
