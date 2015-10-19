@@ -10,7 +10,7 @@ $.ready(function() {
 
     $document.on("touchstart mousedown", function(e) {
         /* 忽略多指手势操作 */
-        var touchs = e.targetTouches;
+        var touchs = e.changedTouches;
         if (touchs && touchs.length > 1) return true;
 
         var $target = $(e.target), handle, tagName;

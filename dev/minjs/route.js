@@ -7,7 +7,7 @@ module.exports = (function() {
     	this.state   = [];				// 状态信息
         this.last    = {};              // 上一次的路由地址
         this.statpos = 0;               // 记录路由的状态位置
-        this.taptime = 0;               // 记录点击开始的事件
+        this.tapinfo = {};              // 记录点击开始的事件
         this.evetype = "";              // 触发事件的方式
   		this.options = extend({}, Route.DEFAULT, options, true);
     };
@@ -223,44 +223,59 @@ module.exports = (function() {
         window.addEventListener("popstate", function(e) {
             var state = history.state, call, now = that.geturl(),
                 lstate = last.state, islast = that.check(state, "last");
+                
+            if (state && state.id /* 防错处理 */) {
+                that.evetype = call = lstate.id > state.id ? "back" : "forward";
 
-            that.evetype = call = lstate.id > state.id ? "back" : "forward";
+                if (state.clear === true && !islast) {
+                    history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
+                } else if (now != last.url) {
+                    that._trigger(that.fire(), function(rcall) {
+                        if (rcall === false) {
+                            // before 执行失败则回退到上个页面
+                            that.replace(lstate, lstate.title, last.url);
+                        }
+                    })
 
-            if (state.clear === true && !islast) {
-                history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
-            } else if (now != last.url) {
-                that._trigger(that.fire(), function(rcall) {
-                    if (rcall === false) {
-                        // before 执行失败则回退到上个页面
-                        that.replace(lstate, lstate.title, last.url);
-                    }
-                })
+                    /* 执行 always 方法 */
+                    isFun(opt.always) && opt.always("popstate", e, that);
+                }
 
-                /* 执行 always 方法 */
-                isFun(opt.always) && opt.always("popstate", e, that);
+                that.evetype = "";      // 重置状态
             }
-
-            that.evetype = "";      // 重置状态
         });
 
         /* 跳转动作判断，过滤无效点击，必须运行在冒泡阶段才能阻止默认 popstate 事件 */
         start = function(e) {
-            that.taptime = e.timeStamp;
+            that.tapinfo.time = e.timeStamp;
             that.evetype = "push";
+
+            if (e.touches && e.touches.length > 1) {
+                that.tapinfo.pagex = null;
+                that.tapinfo.pagey = null;
+            } else {
+                var src = e.type == "touchstart" ? e.changedTouches[0] : e;
+
+                that.tapinfo.pageX = src.pageX;
+                that.tapinfo.pageY = src.pageY;
+            }
         }
         document.addEventListener("touchstart", start, true);
         document.addEventListener("mousedown", start, true);
 
         /* 页面跳转前检测，尝试阻止多余的URL跳转方法 */
         change = function(e) {
-            var target = e.target, tag = target.tagName,
-                href = target.getAttribute("href"), now = that.geturl();
+            var target = e.target, tag = target.tagName, tap = that.tapinfo,
+                href = target.getAttribute("href"),now = that.geturl(), src;
 
-            if (tag === "A" && href) {
+            src = e.type == "touchend" ? e.changedTouches[0] : e;
+
+            if (tag === "A" && href && (src.pageX - tap.pageX < 5)
+                && (src.pageY - tap.pageY < 5)) {
                 e.preventDefault();     /* 阻止浏览器默认跳转 */
                 e.stopPropagation();
 
-                if (e.timeStamp - that.taptime <= 300) {
+                if (e.timeStamp - tap.time <= 300) {
                     var match = that.fire(href), not, to;
 
                     not = that.fire(opt.notpage) ? opt.notpage : opt.home;
