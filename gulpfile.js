@@ -228,7 +228,6 @@ function task_dev_app_css() {
             .pipe(sass())
             .pipe(autoprefixer())
             .pipe(gulpif(release, minifycss()))
-            .pipe(gulpif(release, minifycss()))
             .pipe(gulp.dest(fpath+"page/"))
             .on("finish", function() {
                 gulp.src(fpath+"index.html")
@@ -408,11 +407,11 @@ gulp.task("serve", function() {
 
     /* APP 动态刷新任务 */
     gulp.watch(["app/index.html"], ["dev-app-html", reload])
-    gulp.watch(["app/pub/lib/css/**/*.scss"], ["dev-app-css", reload])
+    gulp.watch(["app/pub/css/**/*.scss"], ["dev-app-css", reload])
     gulp.watch(["app/pub/lib/*.js", "app/page/**/*", "app/srvs/*.js",
                 "app/pub/main.js"], ["dev-app-js", reload])
-    gulp.watch(["app/pub/**/*", "!app/pub/main*", "!app/pub/lib/magic*",
-                "!app/pub/lib/mixin.scss"], ["dev-app-pub", reload])
+    gulp.watch(["app/pub/**/*", "!app/pub/main.*", "!app/pub/lib/magic*",
+                "!app/pub/lib/mixin.scss", "!app/pub/css/**/*"], ["dev-app-pub", reload])
 })
 
 /* 全局构建任务 */
