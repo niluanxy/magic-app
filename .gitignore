@@ -10,6 +10,7 @@
 # APP目录忽略设置
 /app/dist/*
 /app/pub/main.css
+/app/pub/css/lib/mixin.scss
 /app/pub/lib/magic.js
 /app/pub/lib/magic.vue.js
 /app/pub/lib/magic.css
