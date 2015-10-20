@@ -8,7 +8,7 @@
     overflow: hidden;
     color: $item-default-text;
     position: relative;
-    margin-bottom: $margin-base;
+    margin-bottom: $list-margin-bottom;
     background-color: $item-default-bg;
     @include retina-border(top bottom, $item-default-border);
 
