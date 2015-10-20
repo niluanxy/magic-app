@@ -30,18 +30,26 @@ var release = false;    // 是否为发布输出，发布输出会压缩优化
 var cordova = false;    // APP打包是否为cordova输出
 /* mixin 想关任务方法 */
 function task_dev_mixin() {
-    var defer = Q.defer();
+    var defer = Q.defer(), path = DIR_APP+"pub/css/lib/";
 
     gulp.src([DIR_MIXIN+"core/*.scss",
         DIR_MIXIN+"eui/varible/_z-index.scss",
         DIR_MIXIN+"eui/varible/_color.scss",
         DIR_MIXIN+"eui/varible/_base.scss",
         DIR_MIXIN+"eui/varible/button.scss",
-        DIR_MIXIN+"eui/varible/*.scss",
-        DIR_MIXIN+"eui/component/*.scss"])
+        DIR_MIXIN+"eui/varible/*.scss"])
+    .pipe(concat("mixin_core.scss"))
+    .pipe(gulp.dest(path))
+
+    gulp.src(DIR_MIXIN+"eui/component/*.scss")
+    .pipe(concat("mixin_end.scss"))
+    .pipe(gulp.dest(path))
+
+    gulp.src([path+"mixin_core.scss",
+        path+"mixin_end.scss"])
     .pipe(concat("mixin.scss"))
+
     .pipe(gulp.dest(DIR_MAGIC+"lib/"))
-    .pipe(gulp.dest(DIR_APP+"pub/css/lib/"))
     .on("finish", function() { defer.resolve(); });
 
     return defer.promise;
@@ -194,26 +202,32 @@ function task_dev_app_css() {
                         DIR_APP+"dist/";
 
     del(fpath+"page/main.css", function() {
-        gulp.src([DIR_APP+"pub/css/_base.scss",
+        gulp.src([DIR_APP+"pub/css/lib/mixin_core.scss",
+
             DIR_APP+"pub/css/varible/_z-index.scss",
             DIR_APP+"pub/css/varible/_color.scss",
             DIR_APP+"pub/css/varible/_base.scss",
             DIR_APP+"pub/css/varible/button.scss",
             DIR_APP+"pub/css/varible/*.scss",
+
+            DIR_APP+"pub/css/lib/mixin_end.scss",
             DIR_APP+"pub/css/component/*.scss",
+
             DIR_APP+"pub/css/*.scss",
-            DIR_APP+"pub/css/_main.scss"])
+            DIR_APP+"pub/css/main.scss",
+
+            DIR_APP+"pub/css/build.scss"])
         .pipe(concat("main.scss"))
-        .pipe(sass())
-        .pipe(autoprefixer())
-        .pipe(gulpif(release, minifycss()))
         .pipe(gulp.dest(DIR_APP+"pub/"))
         .on("finish", function() {
             var hash = hashint((new Date).getTime())+"",
                 name = "main"+hash.substr(0, 5)+".css",
                 newn = release?name:"main.css";
 
-            gulp.src(DIR_APP+"pub/main.css")
+            gulp.src(DIR_APP+"pub/main.scss")
+            .pipe(sass())
+            .pipe(autoprefixer())
+            .pipe(gulpif(release, minifycss()))
             .pipe(gulpif(release, minifycss()))
             .pipe(gulp.dest(fpath+"page/"))
             .on("finish", function() {
@@ -440,6 +454,7 @@ gulp.task("build", function(rel) {
 gulp.task("clean", function() {
     del(DIR_APP + "dist/");
     del(DIR_APP + "pub/main.css");
+    del(DIR_APP + "pub/main.scss");
     del(DIR_APP + "pub/lib/magic*");
     del(DIR_APP + "pub/lib/mixin.scss");
 })
