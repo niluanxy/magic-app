@@ -1,0 +1,25 @@
+/*********************************************************************
+ * reset 浏览器重置样式输出
+ *********************************************************************/
+@include reset();
+@include tools();
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+/*********************************************************************
+ * coreui 核心UI组件样式输出
+ *********************************************************************/
+.loading    { @include loading(); }
+.bar        { @include bar(); }
+.button     { @include button(); }
+.form       { @include form(); }
+.tabs       { @include tabs(); }
+.content    { @include content(); }
+.list       { @include list(); }
+.slider     { @include slider(); }
+
+@include scroll();      // scroll 组件样式代码
+@include layout();      // layout 布局组件样式代码
