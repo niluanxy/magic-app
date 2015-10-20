@@ -41,7 +41,7 @@ function task_dev_mixin() {
         DIR_MIXIN+"eui/component/*.scss"])
     .pipe(concat("mixin.scss"))
     .pipe(gulp.dest(DIR_MAGIC+"lib/"))
-    .pipe(gulp.dest(DIR_APP+"pub/lib/"))
+    .pipe(gulp.dest(DIR_APP+"pub/css/lib/"))
     .on("finish", function() { defer.resolve(); });
 
     return defer.promise;
@@ -155,9 +155,13 @@ function task_dev_app_pub() {
 
     gulp.src([DIR_APP+"pub/**/*", "!"+DIR_APP+"pub/main*",
               "!"+DIR_APP+"pub/lib/magic*",
-              "!"+DIR_APP+"pub/lib/mixin.scss"])
+              "!"+DIR_APP+"pub/lib/mixin.scss",
+              "!"+DIR_APP+"pub/css/"])
     .pipe(gulp.dest(fpath+"pub/"))
-    .on("finish", function() { defer.resolve() });
+    .on("finish", function() {
+        del(fpath+"/pub/css");      // 空文件夹删除
+        defer.resolve();            // 方法执行完通知
+    });
 
     return defer.promise;
 }
@@ -189,8 +193,17 @@ function task_dev_app_css() {
         fpath = cordova?DIR_CORDOVA+"www/":
                         DIR_APP+"dist/";
 
-    del(fpath+"page/main*.css", function() {
-        gulp.src(DIR_APP+"pub/main.scss")
+    del(fpath+"page/main.css", function() {
+        gulp.src([DIR_APP+"pub/css/_base.scss",
+            DIR_APP+"pub/css/varible/_z-index.scss",
+            DIR_APP+"pub/css/varible/_color.scss",
+            DIR_APP+"pub/css/varible/_base.scss",
+            DIR_APP+"pub/css/varible/button.scss",
+            DIR_APP+"pub/css/varible/*.scss",
+            DIR_APP+"pub/css/component/*.scss",
+            DIR_APP+"pub/css/*.scss",
+            DIR_APP+"pub/css/_main.scss"])
+        .pipe(concat("main.scss"))
         .pipe(sass())
         .pipe(autoprefixer())
         .pipe(gulpif(release, minifycss()))
@@ -200,9 +213,7 @@ function task_dev_app_css() {
                 name = "main"+hash.substr(0, 5)+".css",
                 newn = release?name:"main.css";
 
-            gulp.src([DIR_APP+"pub/lib/magic.css",
-                      DIR_APP+"pub/main.css"])
-            .pipe(concat(newn))
+            gulp.src(DIR_APP+"pub/main.css")
             .pipe(gulpif(release, minifycss()))
             .pipe(gulp.dest(fpath+"page/"))
             .on("finish", function() {
@@ -217,7 +228,7 @@ function task_dev_app_css() {
 
     return defer.promise;
 }
-gulp.task("dev-app-css", task_dev_app_css);
+gulp.task("dev-app-css", ["dev-mixin"], task_dev_app_css);
 
 function task_dev_app_js() {
     var UglifyJsPlugin = require("webpack/lib/optimize/UglifyJsPlugin.js");
@@ -383,8 +394,7 @@ gulp.task("serve", function() {
 
     /* APP 动态刷新任务 */
     gulp.watch(["app/index.html"], ["dev-app-html", reload])
-    gulp.watch(["app/pub/lib/*.css", "app/pub/lib/*.scss",
-                "app/pub/main.scss"], ["dev-app-css", reload])
+    gulp.watch(["app/pub/lib/css/**/*.scss"], ["dev-app-css", reload])
     gulp.watch(["app/pub/lib/*.js", "app/page/**/*", "app/srvs/*.js",
                 "app/pub/main.js"], ["dev-app-js", reload])
     gulp.watch(["app/pub/**/*", "!app/pub/main*", "!app/pub/lib/magic*",

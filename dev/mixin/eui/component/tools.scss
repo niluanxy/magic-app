@@ -3,6 +3,14 @@
 // ========================================================
 
 @mixin tools() {
+    .block {
+        display: block !important;
+    }
+
+    .hide {
+        display: none;
+    } 
+
     .float-left {
         float: left;
     }

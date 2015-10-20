@@ -224,25 +224,24 @@ module.exports = (function() {
             var state = history.state, call, now = that.geturl(),
                 lstate = last.state, islast = that.check(state, "last");
                 
-            if (state && state.id /* 防错处理 */) {
-                that.evetype = call = lstate.id > state.id ? "back" : "forward";
+            that.evetype = "popstate";
 
-                if (state.clear === true && !islast) {
-                    history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
-                } else if (now != last.url) {
-                    that._trigger(that.fire(), function(rcall) {
-                        if (rcall === false) {
-                            // before 执行失败则回退到上个页面
-                            that.replace(lstate, lstate.title, last.url);
-                        }
-                    })
+            if (state && state.clear === true && !islast) {
+                call = lstate.id > state.id ? "back" : "forward";
+                history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
+            } else if (now != last.url) {
+                that._trigger(that.fire(), function(rcall) {
+                    if (rcall === false) {
+                        // before 执行失败则回退到上个页面
+                        that.replace(lstate, lstate.title, last.url);
+                    }
+                })
 
-                    /* 执行 always 方法 */
-                    isFun(opt.always) && opt.always("popstate", e, that);
-                }
-
-                that.evetype = "";      // 重置状态
+                /* 执行 always 方法 */
+                isFun(opt.always) && opt.always("popstate", e, that);
             }
+
+            that.evetype = "";      // 重置状态
         });
 
         /* 跳转动作判断，过滤无效点击，必须运行在冒泡阶段才能阻止默认 popstate 事件 */
