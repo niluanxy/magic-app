@@ -14,7 +14,7 @@ $.ready(function() {
                   item.getAttribute || item.getAttribute("class");
 
         /* 转换为数组，便于后面操作 */
-        cls  = cls.split(" ");
+        cls  = (cls || "").split(" ");
         find = (test || "button item tab-item").split(" ");
 
         for (var i=0; i<find.length; i++) {
