@@ -371,16 +371,20 @@ require("extend");      // 原生对象扩展
             /* 返回一个节流执行的函数 */
             delayCall: _UTIL.delayCall,
 
+            /* 返回一个只执行一次的方法 */
+            onceCall: _UTIL.onceCall,
+
             /* 返回一个随机数字字符串 */
-            getRandom: function() {
-                return (''+Math.random()).replace(/\D/g, '');
-            },
+            getRandom: _UTIL.getRandom,
 
             /* 返回当前时间的时间戳 */
             getTime: _UTIL.getTime,
 
             /* 返回一个继承了给定父类的所有方法和属性的新对象 */
             inheart: _UTIL.inheart,
+
+            /* 实现一个继承方法，可以重写，调用，覆盖父类方法 */
+            class: _UTIL.class,
 
             /* 尽可能快的在dom加载完成后执行给定函数 */
             ready: require("domready"),

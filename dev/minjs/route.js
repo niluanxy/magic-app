@@ -108,8 +108,9 @@ module.exports = (function() {
         that.table = Route.prefix(that.table, opt.regexp);
         that._bind();            // 绑定全局事件
 
-        if (repath)  {
-            that.go(opt.home, true, false, true);
+        if (repath || !that.fire())  {
+            var to = opt.notpage || opt.home;
+            that.go(to, true, false, true);
         } else {
             var url = that.geturl();
             that.go(url, true, false, true);
@@ -226,8 +227,6 @@ module.exports = (function() {
         window.addEventListener("popstate", function(e) {
             var state = history.state, call, now = that.geturl(),
                 lstate = last.state, islast = that.check(state, "last");
-                
-            console.log("popstate run")
 
             that.evetype = "popstate";
 
@@ -285,7 +284,6 @@ module.exports = (function() {
 
             if (href && (src.pageX - tap.pageX < 5)
                 && (src.pageY - tap.pageY < 5)) {
-                console.log("should prevent")
                 e.preventDefault();     /* 阻止浏览器默认跳转 */
                 e.stopPropagation();
 

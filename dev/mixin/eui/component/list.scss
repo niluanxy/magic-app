@@ -17,6 +17,22 @@
         @include retina-border-radius($list-border-radius);
     }
 
+    &.allact .item.active,
+    .item[href].active {
+        @include retina-border-width(bottom, 0);
+
+        &:after {
+            content: " ";
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            height: 100%;
+            left: -50%;
+            width: 200%;
+            background-color: $item-default-active-bg;
+        }
+    }
+
     .item {
         display: block;
         position: relative;
@@ -28,21 +44,6 @@
         font-size: $item-font-size;
         padding: $item-padding;
         @include retina-border(bottom, $item-default-border);
-
-        &[href].active {
-            @include retina-border-width(bottom, 0);
-
-            &:after {
-                content: " ";
-                position: absolute;
-                z-index: -1;
-                top: 0;
-                height: 100%;
-                left: -50%;
-                width: 200%;
-                background-color: $item-default-active-bg;
-            }
-        }
 
         &:last-child {
             border-bottom-width: 0;

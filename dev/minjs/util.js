@@ -56,6 +56,21 @@ module.exports = (function() {
         };
     };
 
+    /* 创建只会执行一次的方法 */
+    util.onceCall = function(func) {
+        var hasrun = false;
+
+        return function() {
+            if (!hasrun) {
+                var args = arguments;
+
+                func.apply(this, args);
+            }
+
+            hasrun = true;
+        }
+    }
+
     /**
      * 返回当前时间的时间戳
      *
@@ -65,6 +80,13 @@ module.exports = (function() {
      */
     util.getTime = Date.now || function getTime() {
         return new Date().getTime();
+    };
+
+    /**
+     * 返回一个随机的数字字符串
+     */
+    util.getRandom = function() {
+        return (''+Math.random()).replace(/\D/g, '');
     };
 
     /**
@@ -363,7 +385,7 @@ module.exports = (function() {
     };
 
     /**
-     * 继承给定父类的所有属性
+     * 采用原型实现继承给定父类的所有属性
      *
      * @param       {Object}   p - 要继承的父类对象
      * @return      {Object}   继承后的新的对象
@@ -380,6 +402,59 @@ module.exports = (function() {
         function f() {};
         f.prototype = p;
         return new f();
+    };
+
+    
+    /**
+     * 实现一个继承方法，可以重写，调用，覆盖父类方法
+     * @param       {Object}  cls - 要继承的父类对象
+     * @param       {Object}  sub - 实现继承的构造器方法
+     * @return      {Object}    继承后的新的对象
+     * @author      mufeng  <smufeng@gmail.com>
+     * @version     0.1     <2015-10-21>
+     */
+    util.class = function(cls, sub) {
+        if (typeof cls != "function" ||
+            typeof sub != "function") return sub;
+
+        var prot = util.inheart(cls.prototype), $su, scope, mclass;
+
+        /* 创建一个新的方法 */
+        mclass = function() {
+            var argv = arguments;
+
+            scope = this;
+            sub.apply(this, argv);
+            cls.apply(this, argv);
+        }
+
+        /* 最终返回的类方法初始化 */
+        prot.constructor = sub;
+        mclass.prototype = prot;
+
+        /* $super 对象初始化操作 */
+        $su = function () {
+            scope = this;
+            cls.apply(this, arguments);
+        }
+        $su.constructor = cls;
+
+        /* 复制 父类的方法到 $super，并修正运行上下文 */
+        for(var key in cls.prototype) {
+            var item = cls.prototype[key];
+
+            if (typeof item == "function") {
+                $su[key] = function() {
+                    item.apply(scope, arguments);
+                }
+            } else {
+                $su[key] = item;
+            }
+        }
+
+        mclass.prototype.$super = $su;
+
+        return mclass;
     };
 
     return util; // 最终返回闭包的对象

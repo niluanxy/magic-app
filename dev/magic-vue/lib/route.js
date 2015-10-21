@@ -73,6 +73,7 @@ module.exports = (function() {
     	after    : null,				// 页面 成功跳转后 的回调方法
         always   : null,                // 每次点击，不论是否阻止默认跳转，都会执行的方法
     	recurse  : false,				// 路由递归触发方式，forward 正序，backward 反序，默认最后项
+        regexp   : ":[^/-]*",        // 参数匹配正则语句，用于匹配参数信息
     }
 
     /* 执行给定对象的执行方法，forward 为 true 反向执行 */
@@ -104,11 +105,12 @@ module.exports = (function() {
         var that = this, opt = that.options;
 
         /* 初始化项目的路由匹配规则 */
-        that.table = Route.prefix(that.table);
+        that.table = Route.prefix(that.table, opt.regexp);
         that._bind();            // 绑定全局事件
 
-        if (repath)  {
-            that.go(opt.home, true, false, true);
+        if (repath || !that.fire())  {
+            var to = opt.notpage || opt.home;
+            that.go(to, true, false, true);
         } else {
             var url = that.geturl();
             that.go(url, true, false, true);
@@ -119,7 +121,9 @@ module.exports = (function() {
     }
 
     /* 初始化路由表，设置每个项正确的 正则表达式 */
-    Route.prefix = function(table) {
+    Route.prefix = function(table, regexp) {
+        var params = new RegExp(regexp, "g");       // 获得参数匹配正则语句
+
         for (var key in table) {
             if (key.search("/") == 0) {
                 
@@ -129,8 +133,8 @@ module.exports = (function() {
                 }
 
                 /* 添加对应项具体的正则语句 */
-                table[key].__match = key.replace(/:[^_\/-]*/g, "([^/]*)");
-                Route.prefix(table[key]);   // 递归循环处理子项目，直到全部处理完
+                table[key].__match = key.replace(params, "([^/]*)");
+                Route.prefix(table[key], regexp);   // 递归循环处理子项目，直到全部处理完
             }
         }
 
@@ -139,7 +143,7 @@ module.exports = (function() {
 
     /* 尝试匹配给定URL的路由信息 */
     Route.prototype.fire = function(url, last) {
-    	url = url == undefined ? this.geturl() : url;              // 修正参数
+    	url = url === undefined ? this.geturl() : url;              // 修正参数
     	url = "/" + url.replace(/^[#|\/]*/g, "").replace(/\/$/g, "");	   // 替换开头 # 和结尾 /
 
     	var table = this.table, opt = this.options,
@@ -223,26 +227,25 @@ module.exports = (function() {
         window.addEventListener("popstate", function(e) {
             var state = history.state, call, now = that.geturl(),
                 lstate = last.state, islast = that.check(state, "last");
-                
-            if (state && state.id /* 防错处理 */) {
-                that.evetype = call = lstate.id > state.id ? "back" : "forward";
 
-                if (state.clear === true && !islast) {
-                    history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
-                } else if (now != last.url) {
-                    that._trigger(that.fire(), function(rcall) {
-                        if (rcall === false) {
-                            // before 执行失败则回退到上个页面
-                            that.replace(lstate, lstate.title, last.url);
-                        }
-                    })
+            that.evetype = "popstate";
 
-                    /* 执行 always 方法 */
-                    isFun(opt.always) && opt.always("popstate", e, that);
-                }
+            if (state && state.clear === true && !islast) {
+                call = lstate.id > state.id ? "back" : "forward";
+                history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
+            } else if (now != last.url) {
+                that._trigger(that.fire(), function(rcall) {
+                    if (rcall === false) {
+                        // before 执行失败则回退到上个页面
+                        that.replace(lstate, lstate.title, last.url);
+                    }
+                })
 
-                that.evetype = "";      // 重置状态
+                /* 执行 always 方法 */
+                isFun(opt.always) && opt.always("popstate", e, that);
             }
+
+            that.evetype = "";      // 重置状态
         });
 
         /* 跳转动作判断，过滤无效点击，必须运行在冒泡阶段才能阻止默认 popstate 事件 */
@@ -265,12 +268,21 @@ module.exports = (function() {
 
         /* 页面跳转前检测，尝试阻止多余的URL跳转方法 */
         change = function(e) {
-            var target = e.target, tag = target.tagName, tap = that.tapinfo,
-                href = target.getAttribute("href"),now = that.geturl(), src;
+            var target, path = e.path, tap = that.tapinfo,
+                href, now = that.geturl(), src;
+
+            for (var i = 0; i<path.length; i++) {
+                var item = path[i];
+
+                if (item && item.tagName && item.tagName == "A") {
+                    href = item.getAttribute("href");
+                    break;  // 跳出后续的检测
+                }
+            }
 
             src = e.type == "touchend" ? e.changedTouches[0] : e;
 
-            if (tag === "A" && href && (src.pageX - tap.pageX < 5)
+            if (href && (src.pageX - tap.pageX < 5)
                 && (src.pageY - tap.pageY < 5)) {
                 e.preventDefault();     /* 阻止浏览器默认跳转 */
                 e.stopPropagation();
