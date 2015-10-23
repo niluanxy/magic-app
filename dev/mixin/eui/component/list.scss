@@ -63,6 +63,10 @@
         &.inline-last {
             margin-bottom: $item-padding/3*1.5;
         }
+
+        .icon {
+            color: $item-icon-color;
+        }
     }
     &.list-embed {
         padding: 0 $item-padding;
@@ -248,6 +252,10 @@
             right: $item-padding;
             top:50%;
             transform: translate(0,-50%);
+
+            &:before {
+                color: $item-icon-right-color;
+            }
         }
     }
     &.list-embed .item {
@@ -281,7 +289,7 @@
 
             .button {
                 font-size: $item-button-font-size;
-                padding: 0 $button-padding/2;
+                padding: 0 $item-button-padding;
                 line-height: $item-button-height;
                 min-height: $item-button-height;
 

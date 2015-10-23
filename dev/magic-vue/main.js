@@ -29,7 +29,9 @@ $(function() {
             PAGE_READY   : false,       // 页面加载状态
         }
 
-        mvue.location = new Router(config.tables, {
+        config.router = $({}, config)
+
+        mvue.location = new Router(config.tables, $.extend(config.router, {
             /* 页面跳转前的回调方法 */
             before : function(last, now, match, that) {
                 var last = match[match.length-1],
@@ -57,13 +59,14 @@ $(function() {
                     }
                 }, 0)
             }
-        }).init(repath);
+        })).init(repath);
     }
 
 
     // APP路由初始化方法
-    mvue.route = function(tables) {
+    mvue.route = function(tables, option) {
         config.tables = tables;
+        config.router = option;
 
         return this;
     }

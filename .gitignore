@@ -12,6 +12,8 @@
 /app/pub/main.css
 /app/pub/main.scss
 /app/pub/css/lib/mixin_*.scss
+/app/pub/css/varible/*.scss
+/app/pub/css/component/*.scss
 /app/pub/lib/magic.js
 /app/pub/lib/magic.vue.js
 /app/pub/lib/magic.css

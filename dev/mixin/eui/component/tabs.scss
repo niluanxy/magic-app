@@ -1,7 +1,7 @@
 // ========================================================
 // tab UI生成器
 // ========================================================
-@mixin tabs-style($name, $bg-color, $border-color, $color) {
+@mixin tabs-style($name, $bg-color, $border-color, $color, $color-active, $striped) {
     &.tabs-#{$name} {
         color: $color;
         background-color: $bg-color;
@@ -17,8 +17,12 @@
 
         &.tabs-striped, &.tabs-striped-top {
             .tab-item.actived:before {
-                background-color: $color;
+                background-color: $striped !important;
             }
+        }
+
+        &.actived {
+            color: $color-active;
         }
     } 
 }
@@ -28,6 +32,7 @@
 
     z-index: $z-index-tabs;
 
+    color: $tabs-default-text;
     display: flex;
     flex-direction: row;
     position: relative;
@@ -37,15 +42,15 @@
 
     text-align: center;
     background-size: 0;
+    background-color: $tabs-default-bg;
 
     @include retina-border(top, $bar-default-border);
-    
+
     .tab-item {
         display: block;
         flex: 1;
         opacity: 1;
         position: relative;
-        color: $tabs-stable-text;
         font-size: $tabs-text-font-size;
         text-decoration: none;
         @include text-ellipsis();
@@ -55,6 +60,14 @@
 
         &.active {
             opacity: $active-opacity;
+        }
+
+        &.actived {
+            color: $tabs-default-active;
+
+            &:before {
+                background-color: $tabs-default-striped !important;
+            }
         }
 
         &.disabled,
@@ -116,7 +129,7 @@
             content: ' ';
             width: $tabs-striped-width;
             height: $tabs-striped-height;
-            background-color: $tabs-stable-text;
+            background-color: $tabs-default-text;
         }
     }
 
@@ -135,11 +148,11 @@
     @each $style in $styles {
         @if $style == stable {
             @include tabs-style($style, $tabs-stable-bg, $tabs-stable-border,
-                $tabs-stable-text);
+                $tabs-stable-text, $tabs-stable-active, $tabs-stable-striped);
         }
         @if $style == positive {
             @include tabs-style($style, $tabs-positive-bg, $tabs-positive-border,
-                $tabs-positive-text);
+                $tabs-positive-text, $tabs-positive-active, $tabs-positive-striped);
         }
     }
 }

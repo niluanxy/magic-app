@@ -3,7 +3,7 @@
 // ========================================================
 @mixin button-style($name, $bg-color, $border-color, $active-bg-color, $active-border-color, $color) {
     &.button-#{""+$name} {
-        color: $color !important;
+        color: $color;
         border-color: $border-color;
         background-color: $bg-color;
 
@@ -16,6 +16,10 @@
 
         &.button-clear {
             color: $border-color !important;
+        }
+
+        &.button-link {
+            color: $border-color;
         }
     }
 }
@@ -153,7 +157,7 @@
             opacity: .4;
         }
 
-        .button-clear {
+        .button-clear, .button-link {
             padding: 0 $button-clear-padding;
 
             color: $button-default-text;
@@ -167,6 +171,14 @@
             &.activated {
                 opacity: $active-opacity;
             }
+        }
+
+        .button-link {
+            color: $button-link-color;
+            font-size: inherit;
+            padding: 0;
+            min-height: auto;
+            line-height: inherit;
         }
     }
 }
