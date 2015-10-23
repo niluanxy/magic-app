@@ -199,9 +199,9 @@ module.exports = (function() {
 
             typeRun = handle[evePre].calls;
 
-            for(var i=0; i<typeRun.length; i++) {
-                if (typeRun[i].name.search(eveName) === 0) {
-                    typeRun.splice(i--, 1);
+            for(var j=0; j<typeRun.length; j++) {
+                if (typeRun[j].name.search(eveName) === 0) {
+                    typeRun.splice(j--, 1);
                 }
             }
 
