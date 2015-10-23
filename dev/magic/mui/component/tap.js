@@ -6,7 +6,7 @@
  */
 
 $.ready(function() {
-    var $document = $(document), tap = {}, inputs, delay = 300;
+    var $document = $(document), tap = {}, delay = 300, fastmove;
 
 
     function checkClass(item, test) {
@@ -33,14 +33,13 @@ $.ready(function() {
         }
     }
 
-    /* TODO: fastclick 功能完成 */
-    $document.on("touchstart", function(e) {
-        /* 忽略多指手势操作 */
-        console.log(e)
+    /* 事件初始化监听 */
+    function faststart(e) {
         var touchs = e.changedTouches;
         if (touchs && touchs.length > 1) return true;
 
-        var $target = $(e.target), handle, tagName, path = e.path;
+        var $target = $(e.target), handle, tagName,
+            path = e.path, inputs;
 
         /* 记录此次点击事件的相关信息，用于方法判断 */
         if (touchs && touchs[0]) {
@@ -71,17 +70,19 @@ $.ready(function() {
                 $target.data("_active_handle", handle);
             }
         }
-    });
+    }
 
-    $document.on("touchmove", $.delayCall($.onceCall(function(e) {
+    /* 节流move事件，节省资源 */
+    fastmove = $.delayCall(function(e) {
         e.preventDefault(); // 修复微信下拉显示网页地址
 
         for(var i = 0; i<e.path.length; i++) {
             clearActive($(e.target));
         }
-    }), 16));
+    }, 16);
 
-    $document.on("touchend", function(e) {
+    /* 点击结束事件 */
+    function fastend(e) {
         var cx, cy, ct, $target = $(e.target),
             touch = e.changedTouches ? e.changedTouches[0] : e;
 
@@ -97,5 +98,26 @@ $.ready(function() {
         setTimeout(function() {
             clearActive($target);   // 清除激活类
         }, 220-ct >= 0 ? 220-ct : 0);
+    }
+
+    /* 事件检测初始化 */
+    $document.on("touchstart.itap mousedown.itap", function(e) {
+        var touch = e.type.search("touch") > -1, kt = touch?0:1,
+            ename = touch ? "touch" : "mouse", start, move, end,
+            map = { s: ["start", "down"], e : ["end", "up"] };
+
+        start = ename + map.s[kt];
+        move  = ename + "move";
+        end   = ename + map.e[kt];
+
+        /* 移除初始化事件 */
+        $document.off("touchstart.itap mousedown.itap");
+
+        /* 重新添加对应事件 */
+        $document.on(start, faststart);
+        $document.on(move,  fastmove);
+        $document.on(end,   fastend);
+
+        faststart(e);   // 修复触发start事件
     });
 });

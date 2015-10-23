@@ -8,7 +8,7 @@ module.exports = (function() {
 
     $$.error = function(text, option) {
         if (!text) return;
-        $tip.show("操作失败，"+text, option);
+        $tip.show("操作失败，"+text, $.extend({show: 2000}, option));
     }
     
     $$.tipHide = function() { $tip.hide(); };

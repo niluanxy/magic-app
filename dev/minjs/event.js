@@ -89,25 +89,28 @@ module.exports = (function() {
     }
 
     /* 手动执行绑定的回掉事件 */
-    function triggerCall(ele, runs, event, porp) {
-        if (!ele || !runs || !event) return false;
+    function triggerCall(ele, calls, event, porp) {
+        if (!ele || !calls || !event) return false;
 
         event = event instanceof EventObj ? event :
             new EventObj(event, porp);
         if (!event.target) event.target = ele;
 
-        var data = event.originalData || [];
+        /* 复制执行数组，修复once事件导致length异常问题 */
+        var data = event.originalData || [],
+            clone = calls.slice(0);
 
         if (!(data[0] instanceof EventObj)) {
             data.unshift(event);   // 修正执行参数数组
         }
 
-        for(var i = 0; i < runs.length; i++) {
-            var item = runs[i];     // 当前事件对象
+        for(var i = 0; i < clone.length; i++) {
+            var item = clone[i];     // 当前事件对象
 
             if (item.name.search(event.type) === 0 &&
                 checkIn(event.target, item.select)) {
 
+                data[0].originalType = item.name; 
                 item.call.apply(ele, data);
             }
 
@@ -194,7 +197,7 @@ module.exports = (function() {
             /* 如果事件不存在，直接跳过 */
             if (!handle || !handle[evePre]) continue;
 
-            typeRun = handle[evePre].runs;
+            typeRun = handle[evePre].calls;
 
             for(var i=0; i<typeRun.length; i++) {
                 if (typeRun[i].name.search(eveName) === 0) {
@@ -268,18 +271,28 @@ module.exports = (function() {
      * @param call      绑定的要执行的回调函数
      * @param select    过滤器参数
      *
-     * TODO: 性能调优，执行后直接从回调数组中删除
      */
 
     Event.once = function (ele, types, call, select) {
-        var hasRun = false, fixCall = function() {
-            if (!hasRun /* 未运行时运行方法 */) {
-                call.apply(ele, arguments);
-                hasRun = true;  // 设置标记
-            }
+        if (!ele || !types || !call) return false;
+
+        var key = ".once_"+(''+Math.random()).replace(/\D/g, ''),
+            match = types.split(" "), ftypes ;
+
+        /* 添加once标记后缀，用于后面自移除 */
+        for(var i=0; i<match.length; i++) {
+            match[i] += key;
         }
 
-        Event.bind(ele, types, fixCall, select);
+        ftypes = match.join(" ");
+
+        Event.bind(ele, ftypes, function() {
+            var argv = arguments,
+                type = argv[0].originalType;
+
+            call.apply(this, argv);
+            Event.unbind(ele, type);
+        }, select);
     }
 
     return Event;
