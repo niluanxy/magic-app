@@ -5,7 +5,8 @@ module.exports = (function() {
             var that = this, $el = $(this.$el), state = history.state,
             	call = $el.attr("call"), router = $$.location;
             
-			$el.addClass("back").on("tap", function(e) {
+			$el.addClass("back button button-clear ion-ios-arrow-left")
+			.on("tap", function(e) {
 				var ret = true;		// 回调返回值
 
 				if (that[call] && typeof that[call] == "function") {

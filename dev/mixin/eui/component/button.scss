@@ -116,6 +116,8 @@
             display: block;
 
             width: 100%;
+            min-height: $button-block-height;
+            line-height: $button-block-height - $button-border-width * 2;
             margin-bottom: $margin-base;
         }
 

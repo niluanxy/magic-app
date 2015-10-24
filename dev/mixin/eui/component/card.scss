@@ -1,0 +1,23 @@
+// ========================================================
+// card UI生成器
+// ========================================================
+
+@mixin card() {
+    display: block;
+    overflow: hidden;
+    position: relative;
+    padding: $card-default-padding;
+    background-color: $card-default-bg;
+    line-height: $card-line-height;
+    margin-bottom: $card-default-margin;
+    @include retina-border(all, $card-border-color);
+
+    .header {
+        position: relative;
+        left: -$card-default-padding;
+        right: -$card-default-padding;
+        font-size: $card-header-font;
+        line-height: $card-header-line-height;
+        @include retina-border(top bottom, $card-border-color);
+    }
+}

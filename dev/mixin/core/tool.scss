@@ -104,7 +104,7 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
 }
 
 // retina 屏幕下 视网膜屏幕边框 核心代码
-@mixin retina-border-content($color, $radio) {
+@mixin retina-border-content($color, $radio: $retina-pixel-ratio) {
     z-index: 1;
     content: " ";
     position: absolute;

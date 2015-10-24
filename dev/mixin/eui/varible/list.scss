@@ -6,13 +6,13 @@
 $list-border-radius:              $border-radius-base !default;
 $list-margin-bottom:			  $margin-base !default;
 
-$item-font-size:                  14px !default;
-$item-border-width:                1px !default;
-$item-padding:                    12px !default;
+$item-font-size:                  $font-size-base !default;
+$item-border-width:               $border-default-width !default;
+$item-padding:                    $padding-item-inset !default;
 
-$item-default-bg:                 #fff !default;
+$item-default-bg:                 $base-background-color !default;
 $item-default-border:             $border-default-color !default;
-$item-default-text:               #444 !default;
+$item-default-text:               $color-dark !default;
 $item-default-active-bg:          #D9D9D9 !default;
 
 $item-line-height:                $line-height-computed !default;

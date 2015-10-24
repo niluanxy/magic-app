@@ -43,9 +43,12 @@
 
     overflow: hidden;
 
+    color: $bar-default-text;
+
     height: $bar-height;
     padding: $bar-padding-portrait;
     background-size: 0;
+    background-color: $bar-default-bg;
 
     user-select: none;
     @include retina-border(bottom, $bar-default-border);

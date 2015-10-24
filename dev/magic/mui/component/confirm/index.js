@@ -1,5 +1,3 @@
-require("./style.scss");
-
 module.exports = (function() {
     var Confirm = function(el, options) {
         this.el      = $(el);

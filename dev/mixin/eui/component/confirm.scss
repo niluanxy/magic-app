@@ -1,0 +1,43 @@
+// ========================================================
+// confirm UI生成器
+// ========================================================
+
+
+@mixin confirm() {
+	overflow: hidden;
+	display: block;
+	position: absolute;
+	min-width: 80%;
+	border-radius: $confirm-default-radius;
+
+	.continer {
+		margin: 0;
+
+		&.clear {
+			padding: 0;
+		}
+	}
+
+	.list+.footer:before {
+		display: none;
+	}
+
+	.footer {
+		display: flex;
+		position: relative;
+		@include retina-border(top, $confirm-default-border);
+
+		.button {
+			flex: 1;
+			margin-left: $confirm-default-padding;
+
+			&:first-child {
+				margin-left: 0;
+			}
+		}
+	}
+
+	.header, .continer, .footer {
+		padding: $confirm-default-padding;
+	}
+}

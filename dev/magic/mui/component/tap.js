@@ -6,7 +6,7 @@
  */
 
 $.ready(function() {
-    var $document = $(document), tap = {}, delay = 300, fastmove;
+    var $document = $(document), tap = {}, delay = 300, fastmove, input;
 
 
     function checkClass(item, test) {
@@ -38,8 +38,7 @@ $.ready(function() {
         var touchs = e.changedTouches;
         if (touchs && touchs.length > 1) return true;
 
-        var $target = $(e.target), handle, tagName,
-            path = e.path, inputs;
+        var handle, tagName, path = e.path;
 
         /* 记录此次点击事件的相关信息，用于方法判断 */
         if (touchs && touchs[0]) {
@@ -51,23 +50,25 @@ $.ready(function() {
         }
         tap.startT = $.getTime();
 
-        /* 修复移动端input点击焦点不更新的问题 */
-        tagName = e.target.tagName;
-        if ("INPUT TEXTAREA".search(tagName) >= 0) {
-            inputs = e.target;
-        } else {
-            inputs && inputs.blur();    // 刷新焦点
-        }
-
         /* 给按钮类的组件添加点击样式 */
         for (var i = 0; i<path.length; i++) {
-            if (checkClass($target)) {
+            var $item = $(path[i]);
+            tagName = $item[0].tagName;
+
+            /* 修复移动端input点击焦点不更新的问题 */
+            if ("INPUT TEXTAREA".search(tagName) >= 0) {
+                input = e.target;
+            } else {
+                input && input.blur();    // 刷新焦点
+            }
+
+            if (checkClass($item)) {
                 handle = setTimeout((function($actobj) {
                     return function() {
                         $actobj.addClass("active");
                     }
-                })($target), 24);
-                $target.data("_active_handle", handle);
+                })($item), 24);
+                $item.data("_active_handle", handle);
             }
         }
     }
@@ -77,7 +78,8 @@ $.ready(function() {
         e.preventDefault(); // 修复微信下拉显示网页地址
 
         for(var i = 0; i<e.path.length; i++) {
-            clearActive($(e.target));
+            var $item = $(e.path[i]);
+            clearActive($item);
         }
     }, 16);
 
@@ -96,7 +98,10 @@ $.ready(function() {
 
         /* 如果点击时间太短，手动延迟动画移除时间 */
         setTimeout(function() {
-            clearActive($target);   // 清除激活类
+            for(var i = 0; i<e.path.length; i++) {
+                var $item = $(e.path[i]);
+                clearActive($item);
+            }
         }, 220-ct >= 0 ? 220-ct : 0);
     }
 

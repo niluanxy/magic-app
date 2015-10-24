@@ -209,7 +209,7 @@ module.exports = (function() {
 
             if (val === undefined) {
                 // val 不存在则为读取属性值
-                return e.getAttribute(lattr);
+                return e.getAttribute ? e.getAttribute(lattr) : null;
             } else {
                 // 否则则为设置具体的属性值
                 e.setAttribute(lattr, val);

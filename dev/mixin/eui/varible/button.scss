@@ -3,18 +3,19 @@
 // ========================================================
 
 
-$button-color:                    #222 !default;
-$button-link-color:				  $button-color !default;
-$button-block-margin:             10px !default;
+$button-link-color:				  $color-stable !default;
 $button-clear-padding:            6px !default;
+$button-icon-padding:             0.2em !default;
 $button-border-radius:            2px !default;
 $button-border-width:             1px !default;
-$button-icon-padding:             0.2em !default;
 
 $button-font-size:                16px !default;
-$button-height:                   42px !default;
+$button-height:                   32px !default;
 $button-padding:                  10px !default;
 $button-icon-size:                24px !default;
+
+$button-block-margin:             10px !default;
+$button-block-height:			  40px !default;
 
 $button-large-font-size:          24px !default;
 $button-large-height:             54px !default;
@@ -63,3 +64,4 @@ $button-default-text:             $button-stable-text !default;
 $button-default-border:           $button-stable-border !default;
 $button-default-active-bg:        $button-stable-active-bg !default;
 $button-default-active-border:    $button-stable-active-border !default;
+
