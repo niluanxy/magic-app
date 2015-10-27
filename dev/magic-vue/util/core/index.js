@@ -52,5 +52,27 @@ module.exports = (function() {
                 }
             });
         }
+    },
+
+    $$.update = function(scope, action, item, ext, find) {
+        if (scope && action && scope[item] && ext !== undefined) {
+            var edit = scope[item];
+
+            if (action == "del" && edit[ext]) {
+                edit.splice(ext, 1);
+            } else if (action == "add") {
+                edit.push(ext);
+            } else if (action == "edit", find) {
+                for(var i=0; i<edit.length; i++) {
+                    if (edit[i][find] == ext[find]) {
+                        $.extend(edit[i], ext);
+                        break;  // 跳出后续的循环
+                    }
+                }
+            }
+
+            /* 更改数据，出发框架自动更新 */
+            scope[item] = null; scope[item] = edit;
+        }
     }
 })();

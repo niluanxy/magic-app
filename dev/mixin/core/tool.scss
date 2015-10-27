@@ -126,7 +126,7 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
 }
 
 // 修复 retina 屏幕下 border 变宽的问题
-@mixin retina-border($type, $color) {
+@mixin retina-border($type: all, $color: $border-default-color) {
 	// $type: top | bottom
 	// $color: color
 

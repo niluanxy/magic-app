@@ -247,63 +247,6 @@ module.exports = (function() {
 
             that.evetype = "";      // 重置状态
         });
-
-        /* 跳转动作判断，过滤无效点击，必须运行在冒泡阶段才能阻止默认 popstate 事件 */
-        start = function(e) {
-            that.tapinfo.time = e.timeStamp;
-            that.evetype = "push";
-
-            if (e.touches && e.touches.length > 1) {
-                that.tapinfo.pagex = null;
-                that.tapinfo.pagey = null;
-            } else {
-                var src = e.type == "touchstart" ? e.changedTouches[0] : e;
-
-                that.tapinfo.pageX = src.pageX;
-                that.tapinfo.pageY = src.pageY;
-            }
-        }
-        document.addEventListener("touchstart", start, true);
-        document.addEventListener("mousedown", start, true);
-
-        /* 页面跳转前检测，尝试阻止多余的URL跳转方法 */
-        change = function(e) {
-            var target, path = e.path, tap = that.tapinfo,
-                href, now = that.geturl(), src;
-
-            for (var i = 0; i<path.length; i++) {
-                var item = path[i];
-
-                if (item && item.tagName && item.tagName == "A") {
-                    href = item.getAttribute("href");
-                    break;  // 跳出后续的检测
-                }
-            }
-
-            src = e.type == "touchend" ? e.changedTouches[0] : e;
-
-            if (href && (src.pageX - tap.pageX < 5)
-                && (src.pageY - tap.pageY < 5)) {
-                e.preventDefault();     /* 阻止浏览器默认跳转 */
-                e.stopPropagation();
-
-                if (e.timeStamp - tap.time <= 300) {
-                    var match = that.fire(href), not, to;
-
-                    not = that.fire(opt.notpage) ? opt.notpage : opt.home;
-                    not = that.geturl(not);     // 修复URL格式
-                    to  = match ? href : not;   // 设置最终要跳转的URL
-
-                    to !== now && that.go(to, false, !match && to == not);
-                }
-
-                isFun(opt.always) && opt.always(change, e, that);
-
-                that.evetype = "";  // 重置状态
-            }
-        }
-        document.addEventListener("touchend", change, true);
-        document.addEventListener("mouseup", change, true);
     }
 
     /* 判断给定的URL状态是不是当前状态表的最后一项 */

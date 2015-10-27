@@ -48,16 +48,6 @@ $(function() {
                 var STAT = mvue.__STATE__;
 
                 STAT.ROUTER_AFTER = true;
-            },
-
-            /* 不论是否跳转成功，总会执行的回调 */
-            always : function(type, e, handle) {
-                /* 修复阻止默认跳转动作后，不清除 active 类的问题 */
-                setTimeout(function() {
-                    if (e && type != "popstate")  {
-                        $(e.target).removeClass("active");
-                    }
-                }, 0)
             }
         })).init(repath);
     }

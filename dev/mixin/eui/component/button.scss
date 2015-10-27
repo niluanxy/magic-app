@@ -23,7 +23,7 @@
         }
     }
 }
-@mixin button($styles: stable positive energized assertive orange) {
+@mixin button($styles: stable positive energized assertive) {
     font-size: $button-font-size;
     line-height: $button-height - $button-border-width * 2;
 

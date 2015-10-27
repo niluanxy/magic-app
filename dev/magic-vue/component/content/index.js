@@ -4,7 +4,7 @@ module.exports = (function() {
     $$.component("mg-content", {
         template: "<div class='scroll_body'><content></content></div>",
         ready: function() {
-            var $el = $(this.$el), $scroll, $parent,
+            var $el = $(this.$el), $scroll, childs,
                 handle, refresh, opt = {}, repos;   // 定义操作对象
 
             refresh = $el.attr("refresh")   // 默认开启自动刷新
@@ -14,14 +14,15 @@ module.exports = (function() {
 
             $scroll = $el.addClass("content").scroll(opt); // 初始化
 
-            $parent = $el.parent();     // 查找元素父类，修正样式
-            if ($parent.find("mg-header").length) {
-                $el.addClass("has-header");
-            }
+            childs = $el.parent()[0].children;
+            for(var i=0; i<childs.length; i++) {
+                var tagname = childs[i].tagName.toLowerCase();
 
-            if ($parent.find("mg-footer").length || 
-                $parent.find(".tabs-footer").length) {
-                $el.addClass("has-footer");
+                if (tagname == "mg-header") {
+                    $el.addClass("has-header");
+                } else if ("mg-footer mg-tabs".search(tagname) > -1) {
+                    $el.addClass("has-footer");
+                }
             }
 
             handle = $el.attr("handle");

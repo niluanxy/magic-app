@@ -314,8 +314,16 @@ module.exports = (function() {
         if (!!!e.className) {
             e.className = c;    // 无Class直接添加
         } else {
-            var newclass = e.className.split(' ');
-            newclass.push(c);
+            var newclass = e.className.split(' '),
+                addclass = c.split(' ');
+
+            for(var i=0; i<addclass.length; i++) {
+                var now = addclass[i];
+                if (!util.hasClass(e, now)) {
+                   newclass.push(now)
+                }
+            }
+
             e.className = newclass.join(' ');
         }
     };

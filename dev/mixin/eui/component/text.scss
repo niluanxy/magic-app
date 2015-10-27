@@ -1,0 +1,35 @@
+// ========================================================
+// text UI生成器
+// ========================================================
+
+@mixin text() {
+	body {
+		font-size: $text-size-default;
+		font-family: $font-family-sans-serif;
+		-webkit-font-smoothing: antialiased;
+  		-moz-osx-font-smoothing: grayscale;
+  		color: $text-color-default;
+	}
+
+	.text-energized {
+		color: $text-color-energized;
+	}
+
+	.text-mark {
+		color: $text-mark-color;
+		font-size: $text-mark-font;
+	}
+
+	.text-money {
+		font-family: $text-money-family;
+		color: $text-money-color;
+	}
+
+	.text-strong {
+		font-size: $text-size-large;
+	}
+
+	.text-small {
+		font-size: $text-size-small;
+	}
+}

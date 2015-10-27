@@ -24,32 +24,22 @@ module.exports = (function() {
         that.el = that.__modal.el;
 
         that.el.children().addClass("confirm");
-        // 尝试绑定确认动作到按钮上
-        act = that.el.find("[role='confirm']");
-        if (act.length > 0) {
-            act.on("tap", function() {
-                var ret = true;     // 初始默认返回为真
+
+        that.el.on("tap", function(e) {
+            var role = $(e.target).attr("role"), ret;
+
+            if (role == "confirm") {
                 if (typeof opt.confirm == "function") {
                     ret = opt.confirm();   // 调用确认回调
                 }
-                if (opt.confirmHide && ret !== false) {
-                    that.hide();    // 确认动作后自动隐藏窗口
-                }
-            })
-        }
-        // 尝试绑定取消动作到按钮上
-        act = that.el.find("[role='cancel']");
-        if (act.length > 0) {
-            act.on("tap", function(event) {
-                var ret = true;     // 初始默认返回为真
+            } else if (role == "cancel") {
                 if (typeof opt.cancel == "function") {
                     ret = opt.cancel();   // 调用取消回调
                 }
-                if (opt.cancelHide && ret !== false) {
-                    that.hide();    // 取消动作后自动隐藏窗口
-                }
-            })
-        }
+            }
+
+            if (role && ret !== false) that.hide();
+        })
 
         return this;
     };

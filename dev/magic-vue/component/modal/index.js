@@ -5,6 +5,10 @@ module.exports = (function() {
             var $el = $(this.$el), handle = $el.attr("handle");
 
             if (this[handle] !== undefined) {
+                if (this.$el.children.length > 1) {
+                    $el.wrapAll("<div></div>");
+                }
+
                 $el.addClass("modal hideOut");
                 this[handle] = $el.modal({
                     align   : $el.attr("align"),

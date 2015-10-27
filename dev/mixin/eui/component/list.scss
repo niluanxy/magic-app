@@ -33,6 +33,14 @@
         }
     }
 
+    .item.clear.active {
+        @include retina-border-width(bottom, 1px);
+
+        &:after {
+            display: none;
+        }
+    }
+
     .item {
         display: block;
         position: relative;
@@ -62,6 +70,14 @@
 
         &.inline-last {
             margin-bottom: $item-padding/3*1.5;
+        }
+
+        &.item-embed {
+            margin-left: $item-padding;
+            margin-right: $item-padding;
+
+            padding-left: 0;
+            padding-right: 0;
         }
 
         .icon {
@@ -162,7 +178,8 @@
         }
     }
     &.list-embed .item,
-    &.list-embed-left .item {
+    &.list-embed-left .item,
+    .item.item-embed, {
         &.item-avator,
         &.item-avator-large {
             .avator {
@@ -194,7 +211,8 @@
         } 
     }
     &.list-embed .item,
-    &.list-embed-left .item {
+    &.list-embed-left .item,
+    .item.item-embed {
         &.label-left .label,
         &.icon-left .icon,
         &.icon-left .icon-small {
@@ -258,7 +276,8 @@
             }
         }
     }
-    &.list-embed .item {
+    &.list-embed .item,
+    .item.item-embed {
         &.icon-right .icon-right,
         &.item-button-right .button {
             right: 0;
@@ -273,7 +292,7 @@
         &.icon-right {
             padding-right: $item-icon-right-padding;
 
-            .icon-right {
+            .icon-right:before {
                 font-size: $item-icon-right-font-size;
             }
         }

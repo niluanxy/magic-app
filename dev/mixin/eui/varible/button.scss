@@ -52,13 +52,6 @@ $button-assertive-border:         darken($color-assertive, 10%) !default;
 $button-assertive-active-bg:      darken($color-assertive, 10%) !default;
 $button-assertive-active-border:  darken($color-assertive, 10%) !default;
 
-$button-orange-bg:                $color-orange !default;
-$button-orange-text:              #fff !default;
-$button-orange-border:            darken($color-orange, 10%) !default;
-$button-orange-active-bg:         darken($color-orange, 10%) !default;
-$button-orange-active-border:     darken($color-orange, 10%) !default;
-
-
 $button-default-bg:               $button-stable-bg !default;
 $button-default-text:             $button-stable-text !default;
 $button-default-border:           $button-stable-border !default;

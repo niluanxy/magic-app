@@ -32,6 +32,7 @@ $.ready(function() {
             $target.removeClass("active");
         }
     }
+    $._ui_clearActive = clearActive;
 
     /* 事件初始化监听 */
     function faststart(e) {
