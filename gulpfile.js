@@ -203,12 +203,11 @@ function task_dev_app_html() {
 gulp.task("dev-app-html", task_dev_app_html);
 
 function task_dev_app_css() {
-    var defer = Q.defer(),
+    var defer = Q.defer(), base = [], build,
         fpath = cordova?DIR_CORDOVA+"www/":
                         DIR_APP+"dist/";
 
-    del(fpath+"page/main.css", function() {
-        gulp.src([DIR_APP+"pub/css/lib/mixin_core.scss",
+    base = [DIR_APP+"pub/css/lib/mixin_core.scss",
 
             DIR_APP+"pub/css/varible/_z-index.scss",
             DIR_APP+"pub/css/varible/_color.scss",
@@ -219,30 +218,52 @@ function task_dev_app_css() {
             DIR_APP+"pub/css/lib/mixin_end.scss",
             DIR_APP+"pub/css/component/*.scss",
 
-            DIR_APP+"pub/css/*.scss",
-            DIR_APP+"pub/css/main.scss",
+            DIR_APP+"pub/css/*.scss"]
 
-            DIR_APP+"pub/css/build.scss"])
-        .pipe(concat("main.scss"))
-        .pipe(gulp.dest(DIR_APP+"pub/"))
-        .on("finish", function() {
-            var hash = hashint((new Date).getTime())+"",
-                name = "main"+hash.substr(0, 5)+".css",
-                newn = release?name:"main.css";
+    build = base.slice(0).concat([DIR_APP+"pub/css/main.scss",
+                                  DIR_APP+"pub/css/build.scss"]);
 
-            gulp.src(DIR_APP+"pub/main.scss")
-            .pipe(sass())
-            .pipe(autoprefixer())
-            .pipe(gulpif(release, minifycss()))
-            .pipe(gulp.dest(fpath+"page/"))
+    del(fpath+"page/main.css", function() {
+
+        gulp.src(base).pipe(concat("mixin.scss"))
+            .pipe(gulp.dest(DIR_APP+"modules/style/base"))
             .on("finish", function() {
-                gulp.src(fpath+"index.html")
-                .pipe(replace(/main.*\.css/, newn))
-                .pipe(gulp.dest(fpath))
+                gulp.src([DIR_APP+"pub/css/lib/mixin_core.scss",
 
-                defer.resolve();
+                    DIR_APP+"pub/css/varible/_z-index.scss",
+                    DIR_APP+"pub/css/varible/_color.scss",
+                    DIR_APP+"pub/css/varible/_base.scss",
+                    DIR_APP+"pub/css/varible/button.scss",
+                    DIR_APP+"pub/css/varible/*.scss",
+
+                    DIR_APP+"pub/css/lib/mixin_end.scss",
+                    DIR_APP+"pub/css/component/*.scss",
+
+                    DIR_APP+"pub/css/*.scss",
+                    DIR_APP+"pub/css/main.scss",
+
+                    DIR_APP+"pub/css/build.scss"])
+                .pipe(concat("main.scss"))
+                .pipe(gulp.dest(DIR_APP+"pub/"))
+                .on("finish", function() {
+                    var hash = hashint((new Date).getTime())+"",
+                        name = "main"+hash.substr(0, 5)+".css",
+                        newn = release?name:"main.css";
+
+                    gulp.src(DIR_APP+"pub/main.scss")
+                    .pipe(sass())
+                    .pipe(autoprefixer())
+                    .pipe(gulpif(release, minifycss()))
+                    .pipe(gulp.dest(fpath+"page/"))
+                    .on("finish", function() {
+                        gulp.src(fpath+"index.html")
+                        .pipe(replace(/main.*\.css/, newn))
+                        .pipe(gulp.dest(fpath))
+
+                        defer.resolve();
+                    })
+                });
             })
-        });
     });
 
     return defer.promise;
@@ -272,6 +293,7 @@ function task_dev_app_js() {
                         DIR_APP+"dist/",
         wname = release?"[name][hash:5].js":"[name].js";
 
+
     del(fpath+"page/*.js", function() {
         webpack({
                 context: DIR_APP,
@@ -288,9 +310,11 @@ function task_dev_app_js() {
                     ]
                 },
                 resolve: {
+                    modulesDirectories: [DIR_APP, DIR_APP+"modules/"],
                     alias: {
                         modules   : DIR_APP + "modules/",
                         page      : DIR_APP + "page/",
+                        public    : DIR_APP + "pub/",
                     }
                 },
                 plugins: pugls,

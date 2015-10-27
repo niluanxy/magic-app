@@ -19,9 +19,9 @@ module.exports = (function() {
 			/* 根据不同的情况选择判断逻辑隐藏后退按钮 */
 			if (router.check(state, "first")) {
 				if ($$.__STATE__.ROUTER_AFTER) {
-					$el.addClass("hide");
+					$el.remove();
 				} else if (state.id != router.last.state.id) {
-					$el.addClass("hide");
+					$el.remove();
 				}
 			}
         }

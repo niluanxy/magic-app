@@ -31,6 +31,7 @@ module.exports = (function() {
         }
 
         that.el.addClass("align"+opt.align.toUpFirst());
+        if (opt.page) that.el.addClass("page");
 
         if (opt.autoHide /* 绑定默认关闭方法 */) {
             var that = this, ele = this.el[0];

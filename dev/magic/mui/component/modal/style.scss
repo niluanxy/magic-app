@@ -39,6 +39,11 @@ $opacity:                .6;
         }
     }
 
+    &.page {
+        top: 0;
+        bottom: 0;
+    }
+
     &.showIn {
         display: block;
         animation-name: slideInUp;
