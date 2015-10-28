@@ -3,39 +3,39 @@
 // ========================================================
 
 
-$list-border-radius:              $border-radius-base !default;
-$list-margin-bottom:			  $margin-base !default;
+$list-border-radius:              		$border-radius-base !default;
+$list-margin-bottom:			  		$margin-base !default;
 
-$item-font-size:                  $font-size-base !default;
-$item-border-width:               $border-default-width !default;
-$item-padding:                    $padding-item-inset !default;
+$list-item-font-size:                  	$font-size-base !default;
+$list-item-border-width:               	$border-default-width !default;
+$list-item-padding:                    	$padding-item-inset !default;
 
-$item-default-bg:                 $base-background-color !default;
-$item-default-border:             $border-default-color !default;
-$item-default-text:               $color-dark !default;
-$item-default-active-bg:          #D9D9D9 !default;
+$list-item-default-bg:                 	$base-background-color !default;
+$list-item-default-border:             	$border-default-color !default;
+$list-item-default-text:              	$color-dark !default;
+$list-item-default-active-bg:          	#D9D9D9 !default;
 
-$item-line-height:                $line-height-computed !default;
+$list-item-line-height:                	$line-height-computed !default;
 
-$item-avator-fix:                  3px !default;
-$item-avator:                     $item-line-height*2.6 !default;
-$item-avator-large:               $item-line-height*3.3 !default;
+$list-item-avator-fix:                  3px !default;
+$list-item-avator:                     	$list-item-line-height*2.6 !default;
+$list-item-avator-large:               	$list-item-line-height*3.3 !default;
 
-$item-inset-top-padding:           6px !default;
-$item-inset-left-padding:         96px !default;
+$list-item-inset-top-padding:           6px !default;
+$list-item-inset-left-padding:         	96px !default;
 
-$item-button-font-size:           12px !default;
-$item-button-height:              30px !default;
-$item-button-padding:			  $button-padding/2 !default;
+$list-item-button-font-size:           	12px !default;
+$list-item-button-height:              	30px !default;
+$list-item-button-padding:			  	$button-padding/2 !default;
 
-$item-icon-color:				  $item-default-text !default;
-$item-icon-font-size:             32px !default;
-$item-icon-padding:               $item-padding + $item-icon-font-size + 3px !default;
+$list-item-icon-color:				  	$list-item-default-text !default;
+$list-item-icon-font-size:             	32px !default;
+$list-item-icon-padding:               	$list-item-padding + $list-item-icon-font-size + 3px !default;
 
-$item-icon-font-small:            20px !default;
-$item-icon-padding-small:         $item-padding + $item-icon-font-small + 5px !default;
+$list-item-icon-font-small:            	20px !default;
+$list-item-icon-padding-small:         	$list-item-padding + $list-item-icon-font-small + 5px !default;
 
-$item-icon-right-color:			  $item-default-text !default;
-$item-icon-right-font-size:       $button-icon-size !default;
-$item-icon-right-padding:         $item-padding + $item-icon-right-font-size + 5px !default;
+$list-item-icon-right-color:			$list-item-default-text !default;
+$list-item-icon-right-font-size:       	$button-icon-size !default;
+$list-item-icon-right-padding:         	$list-item-padding + $list-item-icon-right-font-size + 5px !default;
 

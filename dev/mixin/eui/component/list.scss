@@ -6,11 +6,11 @@
 @mixin list() {
     display: block;
     overflow: hidden;
-    color: $item-default-text;
+    color: $list-item-default-text;
     position: relative;
     margin-bottom: $list-margin-bottom;
-    background-color: $item-default-bg;
-    @include retina-border(top bottom, $item-default-border);
+    background-color: $list-item-default-bg;
+    @include retina-border(top bottom, $list-item-default-border);
 
     &.list-inset {
         @include retina-border-width(all);
@@ -29,7 +29,7 @@
             height: 100%;
             left: -50%;
             width: 200%;
-            background-color: $item-default-active-bg;
+            background-color: $list-item-default-active-bg;
         }
     }
 
@@ -46,12 +46,12 @@
         position: relative;
         z-index: $z-index-item;
 
-        line-height: $item-line-height;
-        min-height: $item-padding*2 + $item-line-height;
+        line-height: $list-item-line-height;
+        min-height: $list-item-padding*2 + $list-item-line-height;
 
-        font-size: $item-font-size;
-        padding: $item-padding;
-        @include retina-border(bottom, $item-default-border);
+        font-size: $list-item-font-size;
+        padding: $list-item-padding;
+        @include retina-border(bottom, $list-item-default-border);
 
         &:last-child {
             border-bottom-width: 0;
@@ -59,46 +59,46 @@
         }
 
         &.item-inline {
-            padding: $item-padding/3 $item-padding;
-            min-height: $item-padding/3 + $item-line-height;
+            padding: $list-item-padding/3 $list-item-padding;
+            min-height: $list-item-padding/3 + $list-item-line-height;
             border-bottom-width: 0;
         }
 
         &.inline-first {
-            margin-top: $item-padding/3*1.5;
+            margin-top: $list-item-padding/3*1.5;
         }
 
         &.inline-last {
-            margin-bottom: $item-padding/3*1.5;
+            margin-bottom: $list-item-padding/3*1.5;
         }
 
         &.item-embed {
-            margin-left: $item-padding;
-            margin-right: $item-padding;
+            margin-left: $list-item-padding;
+            margin-right: $list-item-padding;
 
             padding-left: 0;
             padding-right: 0;
         }
 
         .icon {
-            color: $item-icon-color;
+            color: $list-item-icon-color;
         }
     }
     &.list-embed {
-        padding: 0 $item-padding;
+        padding: 0 $list-item-padding;
 
         .item {
-            padding: $item-padding 0;
+            padding: $list-item-padding 0;
 
             &.item-inline {
-                padding: $item-padding/3 0;
+                padding: $list-item-padding/3 0;
             }
         }
     }
     &.list-embed-left {
         .item {
             padding-left: 0;
-            margin-left: $item-padding;
+            margin-left: $list-item-padding;
         }
     }
 
@@ -108,7 +108,7 @@
      *====================================================*/
     .item {
         &.item-input {
-            padding: $item-inset-top-padding $item-padding;
+            padding: $list-item-inset-top-padding $list-item-padding;
 
             input {
                 font-size: inherit;
@@ -126,9 +126,9 @@
             .avator {
                 border-radius: $list-border-radius;
                 position: absolute;
-                top: $item-padding;
-                left: $item-padding;
-                bottom: $item-padding;
+                top: $list-item-padding;
+                left: $list-item-padding;
+                bottom: $list-item-padding;
 
                 img {
                     width: 100%;
@@ -140,40 +140,40 @@
                 position: relative;
 
                 &:first-of-type {
-                    top: -$item-avator-fix;
+                    top: -$list-item-avator-fix;
                 }
 
                 &:last-of-type {
-                    bottom: -$item-avator-fix;
+                    bottom: -$list-item-avator-fix;
                 }
             }
         }
 
         &.item-avator {
-            min-height: $item-padding*2 + $item-avator;
-            padding-left: $item-padding*2 + $item-avator;
+            min-height: $list-item-padding*2 + $list-item-avator;
+            padding-left: $list-item-padding*2 + $list-item-avator;
 
             .avator {
-                width: $item-avator;
-                height: $item-avator;
+                width: $list-item-avator;
+                height: $list-item-avator;
             }
 
             .line {
-                line-height: $item-avator/2;
+                line-height: $list-item-avator/2;
             }
         }
 
         &.item-avator-large {
-            min-height: $item-padding*2 + $item-avator-large;
-            padding-left: $item-padding*2 + $item-avator-large;
+            min-height: $list-item-padding*2 + $list-item-avator-large;
+            padding-left: $list-item-padding*2 + $list-item-avator-large;
 
             .avator {
-                width: $item-avator-large;
-                height: $item-avator-large;
+                width: $list-item-avator-large;
+                height: $list-item-avator-large;
             }
 
             .line {
-                line-height: $item-avator-large/3;
+                line-height: $list-item-avator-large/3;
             }
         }
     }
@@ -188,11 +188,11 @@
         }
 
         &.item-avator {
-            padding-left: $item-padding + $item-avator;
+            padding-left: $list-item-padding + $list-item-avator;
         }
 
         &.item-avator-large {
-            padding-left: $item-padding + $item-avator-large;
+            padding-left: $list-item-padding + $list-item-avator-large;
         }
     }
 
@@ -205,7 +205,7 @@
         &.icon-left .icon,
         &.icon-left .icon-small {
             position: absolute;
-            left: $item-padding;
+            left: $list-item-padding;
             top:50%;
             transform: translate(0,-50%);
         } 
@@ -226,13 +226,13 @@
      *====================================================*/
     .item {
         &.label-left {
-            padding-left: $item-inset-left-padding;
+            padding-left: $list-item-inset-left-padding;
 
             .label {
                 display: block;
-                width: $item-inset-left-padding - $item-padding;
-                min-height: $item-line-height;
-                line-height: $item-line-height;
+                width: $list-item-inset-left-padding - $list-item-padding;
+                min-height: $list-item-line-height;
+                line-height: $list-item-line-height;
             }
         }
     }
@@ -243,18 +243,18 @@
      *====================================================*/
     .item {
         &.icon-left {
-            padding-left: $item-icon-padding;
+            padding-left: $list-item-icon-padding;
 
             .icon {
-                font-size: $item-icon-font-size;
+                font-size: $list-item-icon-font-size;
             }
         }
 
         &.icon-small {
-            padding-left: $item-icon-padding-small;
+            padding-left: $list-item-icon-padding-small;
 
             .icon {
-                font-size: $item-icon-font-small;
+                font-size: $list-item-icon-font-small;
             }
         }
     }
@@ -267,12 +267,12 @@
         &.icon-right .icon-right,
         &.item-button-right .button {
             position: absolute;
-            right: $item-padding;
+            right: $list-item-padding;
             top:50%;
             transform: translate(0,-50%);
 
             &:before {
-                color: $item-icon-right-color;
+                color: $list-item-icon-right-color;
             }
         }
     }
@@ -290,10 +290,10 @@
      *====================================================*/
     .item {
         &.icon-right {
-            padding-right: $item-icon-right-padding;
+            padding-right: $list-item-icon-right-padding;
 
             .icon-right:before {
-                font-size: $item-icon-right-font-size;
+                font-size: $list-item-icon-right-font-size;
             }
         }
     }
@@ -304,17 +304,17 @@
      *====================================================*/
     .item {
         &.item-button-right {
-            padding-right: $item-inset-left-padding;
+            padding-right: $list-item-inset-left-padding;
 
             .button {
-                font-size: $item-button-font-size;
-                padding: 0 $item-button-padding;
-                line-height: $item-button-height;
-                min-height: $item-button-height;
+                font-size: $list-item-button-font-size;
+                padding: 0 $list-item-button-padding;
+                line-height: $list-item-button-height;
+                min-height: $list-item-button-height;
 
                 &.button-clear {
                     padding: 0;
-                    font-size: $item-font-size;
+                    font-size: $list-item-font-size;
 
                     &:before {
                         line-height: inherit !important;

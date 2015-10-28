@@ -21,6 +21,27 @@ html, body {
 .content    { @include content(); }
 .list       { @include list(); }
 .slider     { @include slider(); }
+.card		{ @include card(); }
 
 @include scroll();      // scroll 组件样式代码
 @include layout();      // layout 布局组件样式代码
+
+.expand {
+	display: block;
+}
+
+.empty-tip {
+	padding-top: 45%;
+	width: 100%;
+	display: block;
+	text-align: center;
+
+	.icon {
+		font-size: 76px;
+	}
+
+	.text {
+		font-size: 1.2em;
+		margin-top: 12px;
+	}
+}

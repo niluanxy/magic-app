@@ -216,17 +216,16 @@ function task_dev_app_css() {
             DIR_APP+"pub/css/varible/*.scss",
 
             DIR_APP+"pub/css/lib/mixin_end.scss",
-            DIR_APP+"pub/css/component/*.scss",
+            DIR_APP+"pub/css/component/*.scss"]
 
-            DIR_APP+"pub/css/*.scss"]
-
-    build = base.slice(0).concat([DIR_APP+"pub/css/main.scss",
+    build = base.slice(0).concat([DIR_APP+"pub/css/*.scss",
+                                  DIR_APP+"pub/css/main.scss",
                                   DIR_APP+"pub/css/build.scss"]);
 
     del(fpath+"page/main.css", function() {
 
         gulp.src(base).pipe(concat("mixin.scss"))
-            .pipe(gulp.dest(DIR_APP+"modules/style/base"))
+            .pipe(gulp.dest(DIR_APP+"pub/"))
             .on("finish", function() {
                 gulp.src([DIR_APP+"pub/css/lib/mixin_core.scss",
 
@@ -349,7 +348,7 @@ function task_dev_app_js() {
 
     return defer.promise;
 }
-gulp.task("dev-app-js", task_dev_app_js);
+gulp.task("dev-app-js", ["dev-app-css"], task_dev_app_js);
 
 gulp.task("dev-app", function(rel) {
     release = rel ? true : false;
