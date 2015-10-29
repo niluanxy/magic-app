@@ -8,10 +8,14 @@
         background-color: $bg-color;
 
         &.active,
-        &.activated {
+        &.actived {
             border-color: $active-border-color;
             background-color: $active-bg-color;
             box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+
+            &.button-clear {
+                color: rgba($border-color, $button-active-opacity) !important;
+            }
         }
 
         &.button-clear {
@@ -19,7 +23,11 @@
         }
 
         &.button-link {
-            color: $border-color;
+            color: $border-color !important;
+
+            &.active {
+                color: rgba($border-color, $button-active-opacity) !important;
+            }
         }
     }
 }
@@ -157,13 +165,13 @@
             cursor: default !important;
             pointer-events: none;
 
-            opacity: .4;
+            opacity: $button-disable-opacity;
         }
 
         .button-clear, .button-link {
             padding: 0 $button-clear-padding;
 
-            color: $button-default-text;
+            color: $button-link-text;
             border-width: 0;
             background: none !important;
             box-shadow: none !important;
@@ -172,12 +180,12 @@
 
             &.active,
             &.activated {
-                opacity: $active-opacity;
+                color: rgba($button-link-text, $button-clear-active);
             }
         }
 
         .button-link {
-            color: $button-link-color;
+            color: $button-link-text;
             font-size: inherit;
             padding: 0;
             min-height: auto;

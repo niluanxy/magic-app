@@ -45,14 +45,16 @@
 $retina-pixel-ratio: 2 !default; // 缩放系数
 
 // 设置 retain 屏幕下的 边框颜色
-@mixin retina-border-color($color, $type: all) {
+@mixin retina-border-color($color, $type: all, $after: false) {
+    $inset: before; @if $after == true { $inset: after; }
+
     @each $pos in $type {
         @if $pos == all {
-            &:before {
+            &:#{$inset} {
                 border-color: $color;
             }
         }@else {
-            &:before {
+            &:#{$inset} {
                 border-#{$pos}-color: $color;
             }
         }
@@ -60,14 +62,16 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
 }
 
 // 设置 retina 屏幕下的 边框大小
-@mixin retina-border-width($type, $size: 1px) {
+@mixin retina-border-width($type, $size: 1px, $after: false) {
+    $inset: before; @if $after == true { $inset: after; }
+
     @each $pos in $type {
         @if $pos == all {
-            &:before {
+            &:#{$inset} {
                 border-width: $size;
             }
         }@else {
-            &:before {
+            &:#{$inset} {
                 border-#{$pos}-width: $size;
             }
         }
@@ -75,12 +79,14 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
 }
 
 // 设置 retina 屏幕下 边框圆角
-@mixin retina-border-radius($size: 1px, $type: all) {
+@mixin retina-border-radius($size: 1px, $type: all, $after: false) {
+    $inset: before; @if $after == true { $inset: after; }
+
     @each $pos in $type {
         @if $pos == all {
             border-radius: $size;
 
-            &:before {
+            &:#{$inset} {
                 border-radius: $size;
 
                 @media (-webkit-min-device-pixel-ratio: $retina-pixel-ratio),
@@ -91,7 +97,7 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
         }@else {
             border-radius: $size;
 
-            &:before {
+            &:#{$inset} {
                 border-#{$pos}-radius: $size;
 
                 @media (-webkit-min-device-pixel-ratio: $retina-pixel-ratio),
@@ -126,11 +132,14 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
 }
 
 // 修复 retina 屏幕下 border 变宽的问题
-@mixin retina-border($type: all, $color: $border-default-color) {
+@mixin retina-border($type: all, $color: $border-default-color, $after: false) {
 	// $type: top | bottom
 	// $color: color
+    // $after: true | false  插入元素的伪类名 
+    
+    $inset: before; @if $after == true { $inset: after; }// 
 
-    &:before {
+    &:#{$inset} {
         @include retina-border-content($color, $retina-pixel-ratio);
 
         @each $pos in $type {

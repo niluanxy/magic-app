@@ -3,11 +3,14 @@
 // ========================================================
 
 
-$button-link-color:				  $color-stable !default;
+$button-link-text:				  $color-stable !default;
 $button-clear-padding:            6px !default;
 $button-icon-padding:             0.2em !default;
 $button-border-radius:            2px !default;
 $button-border-width:             1px !default;
+$button-active-opacity:			  $active-opacity !default;
+$button-disable-opacity:		  0.4 !default;				
+$button-clear-active:			  0.3 !default;
 
 $button-font-size:                16px !default;
 $button-height:                   32px !default;
