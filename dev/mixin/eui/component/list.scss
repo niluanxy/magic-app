@@ -245,16 +245,9 @@
         &.icon-left {
             padding-left: $list-item-icon-padding;
 
-            .icon {
+            .icon:before {
                 font-size: $list-item-icon-font-size;
-            }
-        }
-
-        &.icon-small {
-            padding-left: $list-item-icon-padding-small;
-
-            .icon {
-                font-size: $list-item-icon-font-small;
+                padding-top: $list-item-icon-fix;
             }
         }
     }

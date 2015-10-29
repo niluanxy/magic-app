@@ -62,7 +62,6 @@ function task_dev_mixin() {
 }
 gulp.task("dev-mixin", task_dev_mixin);
 
-
 /* minjs 相关任务方法 */
 function task_dev_minjs() {
     var defer = Q.defer();
@@ -258,8 +257,9 @@ function task_dev_app_css() {
                         gulp.src(fpath+"index.html")
                         .pipe(replace(/main.*\.css/, newn))
                         .pipe(gulp.dest(fpath))
-
-                        defer.resolve();
+                        .on("finish", function() {
+                            defer.resolve();
+                        })
                     })
                 });
             })
@@ -294,7 +294,15 @@ function task_dev_app_js() {
 
 
     del(fpath+"page/*.js", function() {
-        webpack({
+        gulp.src(DIR_APP+"**/style.scss")
+        .pipe(sass({
+            includePaths: [DIR_APP, DIR_APP+"modules/"]
+        }))
+        .pipe(autoprefixer())
+        .pipe(gulpif(release, minifycss()))
+        .pipe(gulp.dest(DIR_APP))
+        .on("finish", function() {
+            webpack({
                 context: DIR_APP,
                 entry: [DIR_APP + "pub/main.js"],
                 output: {
@@ -304,12 +312,11 @@ function task_dev_app_js() {
                 module: {
                     loaders: [
                         { test: /\.html$/, loader: "html" },
-                        { test: /\.scss$/, loader: "style!css!sass!autoprefixer" },
+                        { test: /\.css$/, loader: "style!css" },
                         { test: /\.(jpg|png|gif)$/, loader: "url-loader?limit=8192&name=../pub/img/[name].[ext]" },
                     ]
                 },
                 resolve: {
-                    modulesDirectories: [DIR_APP, DIR_APP+"modules/"],
                     alias: {
                         modules   : DIR_APP + "modules/",
                         page      : DIR_APP + "page/",
@@ -318,31 +325,32 @@ function task_dev_app_js() {
                 },
                 plugins: pugls,
             })
-        .pipe(gulp.dest(fpath + "page"))
-        .on("finish", function() {
-            if (release /* 发布时才添加hash */) {
-                var hash = hashint((new Date).getTime())+"",
-                    name = "main"+hash.substr(0, 5)+".js",
-                    path = fpath+"page/";
+            .pipe(gulp.dest(fpath + "page"))
+            .on("finish", function() {
+                if (release /* 发布时才添加hash */) {
+                    var hash = hashint((new Date).getTime())+"",
+                        name = "main"+hash.substr(0, 5)+".js",
+                        path = fpath+"page/";
 
-                fs.readdir(path, function(error, files) {
-                    for(var i=0; i<files.length; i++) {
-                        var str = files[i].toString();
-                        if (str.match(/main.*\.js/)) {
-                            fs.rename(path+str, path+name);
+                    fs.readdir(path, function(error, files) {
+                        for(var i=0; i<files.length; i++) {
+                            var str = files[i].toString();
+                            if (str.match(/main.*\.js/)) {
+                                fs.rename(path+str, path+name);
 
-                            // 修改 index.html 中的引用
-                            gulp.src(fpath+"index.html")
-                            .pipe(replace(/main.*\.js/, name))
-                            .pipe(gulp.dest(fpath))
+                                // 修改 index.html 中的引用
+                                gulp.src(fpath+"index.html")
+                                .pipe(replace(/main.*\.js/, name))
+                                .pipe(gulp.dest(fpath))
 
-                            break;      defer.resolve();
+                                break;      defer.resolve();
+                            }
                         }
-                    }
-                })
-            } else {
-                defer.resolve();
-            }
+                    })
+                } else {
+                    defer.resolve();
+                }
+            })
         });
     });
 
@@ -445,9 +453,9 @@ gulp.task("serve", function() {
     gulp.watch(["app/index.html"], ["dev-app-html", reload])
     gulp.watch(["app/pub/css/**/*.scss"], ["dev-app-css", reload])
     gulp.watch(["app/pub/lib/*.js", "app/page/**/*", "app/srvs/*.js",
-                "app/pub/main.js", "app/modules/**/*"], ["dev-app-js", reload])
+                "app/pub/main.js", "app/modules/**/*", "!app/**/style.css"], ["dev-app-js", reload])
     gulp.watch(["app/pub/**/*", "!app/pub/main.*", "!app/pub/lib/magic*",
-                "!app/pub/lib/mixin.scss", "!app/pub/css/**/*"], ["dev-app-pub", reload])
+                "!app/pub/mixin.scss", "!app/pub/css/**/*"], ["dev-app-pub", reload])
 })
 
 /* 全局构建任务 */

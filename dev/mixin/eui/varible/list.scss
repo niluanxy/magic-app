@@ -29,11 +29,9 @@ $list-item-button-height:              	30px !default;
 $list-item-button-padding:			  	$button-padding/2 !default;
 
 $list-item-icon-color:				  	$list-item-default-text !default;
-$list-item-icon-font-size:             	32px !default;
-$list-item-icon-padding:               	$list-item-padding + $list-item-icon-font-size + 3px !default;
-
-$list-item-icon-font-small:            	20px !default;
-$list-item-icon-padding-small:         	$list-item-padding + $list-item-icon-font-small + 5px !default;
+$list-item-icon-font-size:             	18px !default;
+$list-item-icon-padding:               	$list-item-padding * 1.6 !default;
+$list-item-icon-fix:					3px !default;
 
 $list-item-icon-right-color:			$list-item-default-text !default;
 $list-item-icon-right-font-size:       	$button-icon-size !default;
