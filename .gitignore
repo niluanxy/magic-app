@@ -20,6 +20,9 @@
 /app/pub/lib/magic.css
 /app/pub/lib/mixin.scss
 
+/app/page/**/style.css
+/app/modules/**/style.css
+
 # DEV目录忽略设置
 /dev/magic/lib/
 /dev/magic-vue/lib/magic.js
