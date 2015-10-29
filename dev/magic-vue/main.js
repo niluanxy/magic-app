@@ -1,7 +1,7 @@
 require("./lib/magic.js");
 
 $(function() {
-    var mvue, config = {}, Router = require("./lib/route.js");
+    var mvue, config = {tables: []}, Router = require("./lib/route.js");
 
     window.$$ = mvue = {
         location  : null,       // 全局ROUTER对象
@@ -16,7 +16,7 @@ $(function() {
     };
 
     // APP初始化方法
-    mvue.init = function(repath) {
+    mvue.init = function(option, repath) {
         $$.key("__MAGIC_RUNID", $.getRandom());
 
         var vue   = mvue.__VUE__  = new Vue({ el: "body" }),
@@ -29,9 +29,9 @@ $(function() {
             PAGE_READY   : false,       // 页面加载状态
         }
 
-        config.router = $({}, config)
+        var tables = $.extend.apply(this, config.tables);
 
-        mvue.location = new Router(config.tables, $.extend(config.router, {
+        mvue.location = new Router(tables, $.extend(option || {}, {
             /* 页面跳转前的回调方法 */
             before : function(last, now, match, that) {
                 var last = match[match.length-1],
@@ -54,9 +54,8 @@ $(function() {
 
 
     // APP路由初始化方法
-    mvue.route = function(tables, option) {
-        config.tables = tables;
-        config.router = option;
+    mvue.route = function(table) {
+        config.tables.push(table)
 
         return this;
     }
