@@ -29,6 +29,7 @@ module.exports = (function() {
             if (handle && this[handle] !== undefined) {
                 this[handle] = $scroll;
             }
+            this.$dispatch("pageRender", $scroll);
 
             // 是否监控数据自动刷新内容
             repos   = $el.attr("repos");

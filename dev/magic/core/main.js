@@ -101,6 +101,10 @@ require("extend");      // 原生对象扩展
                 return this;
             },
 
+            offset: function() {
+                return this[0] && _UTIL.offset(this[0]) || null;
+            },
+
             /* 对象的属性操作的一些方法 */
             attr: function(attr, val) {
                 return _UTIL.attr(this[0], attr, val);
