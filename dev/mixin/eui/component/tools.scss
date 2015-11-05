@@ -3,6 +3,10 @@
 // ========================================================
 
 @mixin tools() {
+    .disabled {
+        @include disabled();
+    }
+
     .block {
         display: block !important;
     }

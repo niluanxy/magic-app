@@ -45,7 +45,7 @@ module.exports = (function() {
             for(i=0; tmp=node[i]; i++) fragment.appendChild(tmp);
 
             ret = fragment; // 设置返回对象
-        } else if (text instanceof Element) {
+        } else if (text instanceof Element || text instanceof DocumentFragment) {
             ret = text;     // 如果是DOM元素直接返回
         }
 
@@ -135,8 +135,7 @@ module.exports = (function() {
     _dom.wrapAll = function(el, html) {
         var wrap, first, items;
 
-        if ( el && el.nodeType === 1 &&
-             (wrap = _dom.make(html)) ) {
+        if ( el && (wrap = _dom.make(html)) ) {
 
             wrap  = wrap.firstChild;
             first = el.firstChild;

@@ -162,10 +162,7 @@
 
         .button.disabled,
         .button[disabled] {
-            cursor: default !important;
-            pointer-events: none;
-
-            opacity: $button-disable-opacity;
+            @include disabled($button-disable-opacity);
         }
 
         .button-clear, .button-link {

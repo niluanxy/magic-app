@@ -1,117 +1,90 @@
 module.exports = (function() {
-    var SelectMain = {
-        data: {},
-
-        key: function(str) {
-            if (typeof str == "string") {
-                return "_select_"+str.hashCode();
-            }
-
-            return null;
-        },
-
-        add : function(str, handle) {
-            var key;
-            if ((key = this.key(str)) && handle) {
-                this.data[key] = handle;
-            }
-
-            return handle;
-        },
-
-        get : function(str) {
-            var key;
-            if (key = this.key(str)) {
-                return this.data[key];
-            }
-            return null;
-        },
-
-        del : function(str) {
-            var key, handle;
-            if (key = this.key(str)) {
-                handle = this.data[key];
-                if (handle) handle.destroy();
-                delete this.data[key];
-            }
-        }
-    };
-
     $$.component("mg-select", {
         template: "<content></content>",
         ready: function() {
-            var $el = $(this.$el), opt = {}, $bind,
-                $val, $pos, val, bind, handle, mult, $call;
+            var scope = this, $el = $(this.$el), bind,
+                opt = {}, val, pos, show, call, handle;
 
-            mult  = !!$el.attr("multiple");
-            bind  = $el.attr("bind");
-            val   = $el.attr("value");
-            $call = $$.objParse(this, $el.attr("call"));
-            $pos  = $$.objParse(this, $el.attr("index"));
-            $val  = $$.objParse(this, val);
-            $bind = $$.objParse(this, bind);
-            if($bind) $val = $bind; // 重置句柄
+            pos  = $el.attr("pos")
+            show = $el.attr("text");
+            val  = $el.attr("val");
+            call = $el.attr("call");
 
-            if ($bind || $val) {
-                opt.modal = $bind?true:false;
-                opt.mult  = mult;
-                opt.init  = $val && $val.val != undefined 
-                                ? $val.val : 
-                           ($pos && $pos.val != undefined 
-                                ? $pos.val : null);
+            opt.mult = !!$el.attr("multiple");
+            opt.init = pos && scope[pos] ? scope[pos] : -1;
 
-                opt.call = function(val, pos) {
-                    if ($val) $val.val = val;
-                    if ($pos) $pos.val = pos;
-                    if ($call && typeof $call.val == "function") {
-                        val = val || null;      // 默认重置为null
-                        $call.val(val, pos);    // 运行对象回调方法
-                    }
+            opt.call = function(newVal, newPos, newText) {
+                if (scope[val]  !== undefined) scope[val]  = newVal;
+                if (scope[pos]  !== undefined) scope[pos]  = newPos;
+                if (scope[show] !== undefined) scope[show] = newText;
+
+                if ($.isFun(scope[call]) /* 运行对象回调方法 */) {
+                    call(newVal, newPos, newText);
                 }
+            }
 
-                handle = $el.select(opt);   // 创建对象
-                this.$watch(val||bind, function(newVal) {
+            handle = $el.select(opt);   // 创建对象
+
+            if (val && scope[val] !== undefined) {
+                scope.$watch(val, function(newVal) {
                     if (handle.val() != newVal) {
                         // 同步更新组件
                         handle.set(newVal, true);
                     }
                 })
-                if ($val) $val.val = handle.val();
-                if ($pos) $pos.val = handle.pos();
-                if ((val || bind)) SelectMain.add(val||bind, handle);
             }
 
-            this.$on("pageDestroy", function() {
-                SelectMain.del(val || bind);
+            scope.$on("pageDestroy", function() {
+                handle.destroy();
             })
         }
     });
 
     Vue.directive("select", {
         bind: function() {
-            var $el = $(this.el), once = false, key = this.raw;
+            var $el = $(this.el), key = this.raw, ctrl,
+                data = $el.attr("data"), scope = this.vm;
 
-            $el.on("tap", function() {
-                var select = SelectMain.get(key), srcoll;
+            if (scope[data] !== undefined /* 值存在的话 */) {
+                var tval, pos, text, mult, call, handle, show;
 
-                if (select /* 不为空说明有数据 */) {
-                    // 切换select显示状态
-                    select.toggle();
-                    scroll = select.scroll;
+                pos  = $el.attr("pos");
+                show = $el.attr("text");
+                tval =  $el.attr("key-val");
+                text = $el.attr("key-text");
+                mult = $el.attr("multiple");
+                call = $el.attr("call");
+                ctrl = $el.attr("handle");
 
-                    if (!once /* 没初始化过则初始化 */) {
-                        $(scroll.wrapper).render(function() {
-                            scroll.refresh();
-                            once = false;   // 刷新滚动组件
-                        })
+                handle = $.select(scope[data] || [], {
+                    text : text, val : tval, mult: mult,
+                    modal: true, call: function(newVal, newPos, newText) {
+                        if (scope[key]  !== undefined) scope[key]  = newVal;
+                        if (scope[pos]  !== undefined) scope[pos]  = newPos;
+                        if (scope[show] !== undefined) scope[show] = newText;
+
+                        if ($.isFun(scope[call])) {
+                            scope[call](newVal, newPos, newText);
+                        }
                     }
+                })
 
-                    // 每次打开的时候，都滚动到选中的项目处
-                    $(scroll.wrapper).render(function() {
-                        scroll.scrollToElement(".item.select");
-                    })
+                /* 同步更新数据 */
+                scope.$watch(data, function(newVal) {
+                    handle.render(newVal);
+                })
+
+                /* 有handle属性则不绑定点击方法 */
+                if (scope[ctrl] !== undefined) {
+                    scope[ctrl] = handle;
+                } else {
+                    $el.on("tap", function() { handle.show(); })
                 }
-            })
+
+                scope.$on("pageDestroy", function() {
+                    handle.destroy();   // 删除自身
+                })
+            }
         }
     })
 })();

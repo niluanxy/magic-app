@@ -1,7 +1,7 @@
 /* 摄像头相关硬件操作封装 */
 
 module.exports = (function() {
-    require("./style.scss");
+    require("./style.css");
 
     var _camera = $plug.camera = {},
         $load   = $.tip("", {type: "loading"}),

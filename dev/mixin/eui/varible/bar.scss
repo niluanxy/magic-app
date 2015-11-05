@@ -11,6 +11,8 @@ $bar-padding-landscape:           5px !default;
 $bar-inline-height:               $bar-height - $bar-padding-portrait*2 !default;   
 $bar-transparency:                1 !default;
 
+$bar-text-button-font:			  $font-size-base + 4px;
+
 $bar-default-bg:                  rgba($color-light, $bar-transparency) !default;
 $bar-default-text:                #444 !default;
 $bar-default-border:              #ddd !default;

@@ -1,4 +1,4 @@
-require("./style.scss");
+require("./style.css");
 
 module.exports = (function() {
     var Slider = function(el, options) {

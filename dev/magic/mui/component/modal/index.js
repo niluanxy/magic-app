@@ -1,4 +1,4 @@
-require("./style.scss");
+require("./style.css");
 
 module.exports = (function() {
     var Modal = function(element, option) {
@@ -8,9 +8,10 @@ module.exports = (function() {
     };
 
     Modal.DEFAULT = {
-        align: "bottom",
-        autoHide: true,
-        hasInsert: false
+        align     : "bottom",
+        autoHide  : true,
+        hasInsert : false,
+        background: true,
     }
 
     Modal.prototype.init = function() {
@@ -47,6 +48,10 @@ module.exports = (function() {
 
         if (that.el.hasClass("hideOut")) {
             that.isHide = true; // 设置隐藏状态
+        }
+
+        if (opt.background == false) {
+            that.el.addClass("clear");
         }
 
         return this;

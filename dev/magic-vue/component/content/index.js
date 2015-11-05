@@ -29,7 +29,12 @@ module.exports = (function() {
             if (handle && this[handle] !== undefined) {
                 this[handle] = $scroll;
             }
-            this.$dispatch("pageRender", $scroll);
+
+            /* 如果父元素是 mg-page 说明是主内容区域 */
+            if ($el.parent().tagName() == "mg-page") {
+                $$.__PAGE__.CONTENT = $scroll;
+                this.$dispatch("pageRender", $scroll);
+            }
 
             // 是否监控数据自动刷新内容
             repos   = $el.attr("repos");

@@ -25,6 +25,7 @@
 
 # DEV目录忽略设置
 /dev/magic/lib/
+/dev/magic/**/style.css
 /dev/magic-vue/lib/magic.js
 
 # GoodSync临时目录

@@ -1,3 +1,7 @@
+@import "lib/mixin";
+
+$numpad-height:                     44px !default;
+
 .numpad {
     display: flex !important;
     overflow: hidden;
@@ -11,14 +15,28 @@
 
         .item {
             flex: 1;
+            position: relative;
             user-select: none;
-            line-height: 44px;
-            min-height: 44px;
+            line-height: $numpad-height;
+            min-height: $numpad-height;
             display: inline-block;
 
             &[val="ok"] {
-                min-height: 88px;
-                line-height: 88px;
+                min-height: $numpad-height * 2;
+                line-height: $numpad-height * 2;
+            }
+
+            @include retina-border(all, $border-default-color, true);
+            @include retina-border-width(top, 0, true);
+            @include retina-border-width(left, 0, true);
+
+            &.active {
+                background-color: $border-default-color;
+            }
+
+            &.disabled {
+                opacity: 1;
+                background-color: #f5f5f5;
             }
         }
     }

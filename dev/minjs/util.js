@@ -17,6 +17,9 @@ module.exports = (function() {
         return true;
     }
 
+    var isFunction = util.isFun = function(call) {
+        return typeof call == "function";
+    }
 
     /**
      * 按照输入参数返回一个节流函数
@@ -422,8 +425,7 @@ module.exports = (function() {
      * @version     0.1     <2015-10-21>
      */
     util.class = function(cls, sub) {
-        if (typeof cls != "function" ||
-            typeof sub != "function") return sub;
+        if (!isFunction(cls) || !isFunction(sub)) return sub;
 
         var prot = util.inheart(cls.prototype), $su, scope, mclass;
 
@@ -451,7 +453,7 @@ module.exports = (function() {
         for(var key in cls.prototype) {
             var item = cls.prototype[key];
 
-            if (typeof item == "function") {
+            if (isFunction(item)) {
                 $su[key] = function() {
                     item.apply(scope, arguments);
                 }

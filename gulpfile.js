@@ -99,35 +99,45 @@ function task_dev_magic_js() {
 
     var defer = Q.defer();
 
-    webpack({
-            entry: DIR_CORE + "main.js",
-            output: {
-                filename: "magic.js"
-            },
-            resolve: {
-                alias: {
-                    util      : LIB_MINJS + "util.js",
-                    query     : LIB_MINJS + "selector.js",
-                    event     : LIB_MINJS + "event.js",
-                    domready  : LIB_MINJS + "ondomready.js",
-                    dom       : LIB_MINJS + "dom.js",
-                    extend    : LIB_MINJS + "extend.js",
-                    promise   : LIB_MINJS + "promise.js",
-                    jsonp     : LIB_MINJS + "jsonp.js",
-                    templayed : LIB_MINJS + "templayed.js",
-                    route     : LIB_MINJS + "route.js",
+    gulp.src(DIR_MAGIC+"**/style.scss")
+    .pipe(sass({
+        includePaths: [DIR_MAGIC]
+    }))
+    .pipe(autoprefixer())
+    .pipe(gulpif(release, minifycss()))
+    .pipe(gulp.dest(DIR_MAGIC))
+    .on("finish", function() {
+        webpack({
+                entry: DIR_CORE + "main.js",
+                output: {
+                    filename: "magic.js"
+                },
+                resolve: {
+                    alias: {
+                        util      : LIB_MINJS + "util.js",
+                        query     : LIB_MINJS + "selector.js",
+                        event     : LIB_MINJS + "event.js",
+                        domready  : LIB_MINJS + "ondomready.js",
+                        dom       : LIB_MINJS + "dom.js",
+                        extend    : LIB_MINJS + "extend.js",
+                        promise   : LIB_MINJS + "promise.js",
+                        jsonp     : LIB_MINJS + "jsonp.js",
+                        templayed : LIB_MINJS + "templayed.js",
+                        route     : LIB_MINJS + "route.js",
+                    }
+                },
+                module: {
+                    loaders: [
+                        { test: /\.html$/, loader: "html" },
+                        { test: /\.css$/, loader: "style!css" }
+                    ]
                 }
-            },
-            module: {
-                loaders: [
-                    { test: /\.html$/, loader: "html" },
-                    { test: /\.scss$/, loader: "style!css!sass!autoprefixer" }
-                ]
-            }
-        })
-    .pipe(gulp.dest(DIR_MAGIC_VUE+"lib/"))
-    .pipe(gulp.dest(DIR_APP + "pub/lib/"))
-    .on("finish", function() { defer.resolve(); });
+            })
+        .pipe(gulp.dest(DIR_MAGIC_VUE+"lib/"))
+        .pipe(gulp.dest(DIR_APP + "pub/lib/"))
+        .on("finish", function() { defer.resolve(); });
+    })
+        
 
     return defer.promise;
 }

@@ -30,6 +30,12 @@
     }
 }
 
+@mixin disabled($opacity: 0.4) {
+    cursor: default !important;
+    pointer-events: none;
+    opacity: $opacity;
+}
+
 
 // 文字对齐方式
 @mixin text-align($dir) {

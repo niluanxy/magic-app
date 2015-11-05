@@ -18,7 +18,8 @@
     }
 
     &.allact .item.active,
-    .item[href].active {
+    .item[href].active,
+    .item.canact.active {
         @include retina-border-width(bottom, 0);
 
         &:after {
@@ -80,8 +81,18 @@
             padding-right: 0;
         }
 
-        .icon {
+        .icon, .icon-right {
             color: $list-item-icon-color;
+
+            &:before {
+                font-size: $list-item-icon-right-font-size;
+                margin-top: $list-item-icon-fix;
+            }
+        }
+
+        .label-right {
+            max-width: 55%;
+            @include text-ellipsis();
         }
     }
     &.list-embed {
@@ -112,6 +123,10 @@
 
             input {
                 font-size: inherit;
+            }
+
+            &.item-embed {
+                padding-right: 0;
             }
         }
     }
@@ -244,11 +259,6 @@
     .item {
         &.icon-left {
             padding-left: $list-item-icon-padding;
-
-            .icon:before {
-                font-size: $list-item-icon-font-size;
-                padding-top: $list-item-icon-fix;
-            }
         }
     }
 
@@ -258,20 +268,18 @@
      *====================================================*/
     .item {
         &.icon-right .icon-right,
+        &.label-right .label-right,
         &.item-button-right .button {
             position: absolute;
             right: $list-item-padding;
             top:50%;
             transform: translate(0,-50%);
-
-            &:before {
-                color: $list-item-icon-right-color;
-            }
         }
     }
     &.list-embed .item,
     .item.item-embed {
         &.icon-right .icon-right,
+        &.icon-right .label-right,
         &.item-button-right .button {
             right: 0;
         }
@@ -291,6 +299,23 @@
         }
     }
 
+    /*====================================================
+     * label-right 相关代码
+     *====================================================*/
+    .item {
+        &.icon-right {
+            .label-right {
+                right: $list-item-padding + $list-item-label-right-padding;
+            }
+
+            &.item-embed .label-right {
+                right: $list-item-label-right-padding;
+                line-height: $list-item-line-height;
+            }
+        }
+    }
+
+
 
     /*====================================================
      * item-button-right 相关代码
@@ -308,10 +333,6 @@
                 &.button-clear {
                     padding: 0;
                     font-size: $list-item-font-size;
-
-                    &:before {
-                        line-height: inherit !important;
-                    }
                 }
             }
         }

@@ -2,9 +2,12 @@ module.exports = (function() {
     /*=================================================
      *  key 数据持久化相关方法
      *=================================================*/
-    $$.__key_null = "__KEY__NULL_v0.3.0";
+    $$.__key_null   = "__KEY__NULL_v0.3.0";
+    $$.__key_prefix = "";
 
     $$.key = function(key, val) {
+        key = $$.__key_prefix + key;
+
         var fix; // 修复读取值为null自动转为字符串
         if (val !== undefined) {
             fix = val==null?$$.__key_null:val;

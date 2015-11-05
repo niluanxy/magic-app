@@ -16,6 +16,10 @@ $opacity:                .6;
         position: absolute;
         background: #FFF;
     }
+
+    &.clear {
+        background: transparent;
+    }
     
     &.alignTop {
         .modal_body {

@@ -8,9 +8,8 @@ $(function() {
 
         __VUE__   : null,       // 全局VUE对象
         __VIEW__  : null,       // 全局MG-VIEW对象
-        __PAGE__  : null,       // 当前页面对象
+        __PAGE__  : {},       // 当前页面对象
         __CACHE__ : null,       // 全局页面缓存
-        __PARAMS__: null,       // 当前URL的参数值
 
         __STATE__ : null,         // 记录当前APP各种状态
     };
@@ -40,7 +39,7 @@ $(function() {
                 STAT.ROUTER_AFTER = false;
                 STAT.ROUTER_TYPE  = that.evetype;
 
-                mvue.__PARAMS__ = last.para;
+                mvue.__PAGE__.PARAMS = last.para;
             },
 
             /* 页面跳转成功后的回调方法 */
@@ -85,7 +84,7 @@ $(function() {
         pageData.replace = true;    // 统一设置属性为 replace
 
         // 修改对象的参数值，替换 000 为 空字符串
-        params = $.extend({}, mvue.__PARAMS__);
+        params = $.extend({}, mvue.__PAGE__.PARAMS);
         for (var key in params) {
             if (params[key] == "000") {
                 params[key] = "";
@@ -106,8 +105,8 @@ $(function() {
                 pageData.data[key] = init[key];
             }
 
-            if (mvue.__PAGE__) {
-                mvue.__PAGE__.$destroy(true);
+            if (mvue.__PAGE__.HANDLE) {
+                mvue.__PAGE__.HANDLE.$destroy(true);
             }
 
             mixins = {
@@ -132,8 +131,8 @@ $(function() {
                 pageData.mixins = [mixins];
             }
 
-            mvue.__PAGE__ = new Vue(pageData).$mount();
-            mvue.__VIEW__ && mvue.__PAGE__.$appendTo(mvue.__VIEW__);
+            mvue.__PAGE__.HANDLE = new Vue(pageData).$mount();
+            mvue.__VIEW__ && mvue.__PAGE__.HANDLE.$appendTo(mvue.__VIEW__);
         })
     };
 

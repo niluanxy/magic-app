@@ -1,4 +1,4 @@
-require("./style.scss");
+require("./style.css");
 
 module.exports = (function() {
     var Timer = function(option, time) {
@@ -12,7 +12,7 @@ module.exports = (function() {
     };
 
     Timer.DEFAULT = {
-        type  : "mobile",               // 现实模式，移动/桌面
+        type  : "mobile",               // 显示模式，移动/桌面
         show  : "YMD-hm",               // 需要显示的UI模块
         text  : "YYYY-MM-DD hh:mm",     // 选择框中提示文字的模板
         format: "YYYY-MM-DD hh:mm",     // 最终输出的内容的模板
@@ -50,6 +50,42 @@ module.exports = (function() {
         year = parseInt(year);  // 转为数字，方便处理
 
         return (year%4==0 && year%100!=0)||(year%100==0 && year%400==0);
+    }
+
+    /* 返回给定事件加上某天后的新的时间对象 */
+    Timer.dateAdd = function(date, days) {
+        if (typeof date == "number") {
+            date = new Date(date);
+        }
+
+        var time = date.getTime(), fix;
+        fix = days * 24 * 60 * 60 * 1000;
+
+        return new Date(time+fix);
+    }
+
+    /* 获取给定时间所在的周的第一天，从周一开始算 */
+    Timer.getWeek = function(date, all) {
+        if (typeof date == "number") {
+            date = new Date(date);
+        }
+
+        /* 强制设置小时为中午，避免 00:00 会记为前一天 */
+        date = $.time.format(date, "YYYY-MM-DD");
+        date = $.time.format(date + " 12:00"); 
+
+        var week = (6+date.getUTCDay())%7,
+            rets = [], start = Timer.dateAdd(date, -week);
+
+        if (all === true) {
+            for (var i=0; i<7; i++) {
+                rets.push(Timer.dateAdd(start, i));
+            }
+        } else {
+            rets.push(start);
+        }
+
+        return all === true ? rets : rets[0];
     }
 
     /* 通过传入年份和月份，返回该月的天数
@@ -197,6 +233,11 @@ module.exports = (function() {
 
     /* 时间格式化方法，传入字符串时则生成一个新时间对象 */
     Timer.format = function(time, format) {
+        if (typeof time == "number") {
+            time = new Date(time);
+        }
+        format = format || "YYYY-MM-DD hh:mm:ss";
+
         if (typeof time == "string") {
             var argv = time.replace(/[\-|\s|:|\/|\\]/g, ",");
             argv = argv.split(",");     // 转为数组格式
@@ -368,7 +409,7 @@ module.exports = (function() {
             that.update(Timer.type(type), val);     // 更新改变项值
             that.refresh(Timer.type(type));         // 刷新时间数据
 
-            if (typeof opt.call == "function") {
+            if ($.isFun(opt.call)) {
                 /* 执行时间选择完毕的回调 */
                 opt.call(that.val(), that.value, that);
             }
@@ -482,6 +523,7 @@ module.exports = (function() {
         return this;
     };
 
+    /* 返回当前时间对应格式的字符串 */
     Timer.prototype.val = function(format) {
         var fmt = format || this.options.format;
 
@@ -505,4 +547,16 @@ module.exports = (function() {
             return new Timer(time, option).init();
         }});
     };
+
+    $.time = {
+        isLeap   : Timer.isLeap,                // 判断是否闰年
+        getDays  : Timer.getDays,               // 根据传入的年和月，返回天数
+        operat   : Timer.operat,                // 通过运算符生产结果值
+        initVals : Timer.initVals,              // 通过过滤器生成指定的值
+        format   : Timer.format,                // 格式化时间为指定文本格式
+        prefix   : Timer.prefix,                // 获取时间的事件前缀
+        fixVals  : Timer.fixVals,               // 通过给定的最小最大值，筛选值列表
+        dateAdd  : Timer.dateAdd,               // 给定时间增加指定天数后的新时间
+        getWeek  : Timer.getWeek,               // 返回给定时间所在周的第一天或者全部
+    }
 })();

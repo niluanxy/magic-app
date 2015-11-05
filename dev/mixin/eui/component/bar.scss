@@ -134,12 +134,13 @@
         .text {
             width: 60%;
             height: 100%;
+            float: left;
             padding-right: $padding-base-horizontal;
         }
 
         .button {
             width: 40%;
-            font-size: $font-size-base;
+            font-size: $bar-text-button-font;
         }
     }
 

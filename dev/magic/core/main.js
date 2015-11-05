@@ -101,8 +101,23 @@ require("extend");      // 原生对象扩展
                 return this;
             },
 
+            tagName: function() {
+                var tagname = this[0] && this[0].tagName;
+
+                return tagname ? tagname.toLocaleLowerCase() : "";
+            },
+
             offset: function() {
                 return this[0] && _UTIL.offset(this[0]) || null;
+            },
+
+            /* 获取表单元素的值 */
+            val: function(val) {
+                if (val !== undefined) {
+                    if (this[0]) this[0].value = val;
+                } else {
+                    return this[0] && this[0].value || null;
+                }
             },
 
             /* 对象的属性操作的一些方法 */
@@ -371,6 +386,8 @@ require("extend");      // 原生对象扩展
 
                 return html;    // 返回渲染后的数据
             },
+
+            isFun: _UTIL.isFun,
 
             /* 返回一个节流执行的函数 */
             delayCall: _UTIL.delayCall,

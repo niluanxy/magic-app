@@ -1,4 +1,4 @@
-require("./style.scss");
+require("./style.css");
 
 module.exports = (function() {
     var Tip = function(text, options) {

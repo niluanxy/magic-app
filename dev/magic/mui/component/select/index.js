@@ -1,127 +1,201 @@
-require("./style.scss");
+require("./style.css");
 
 module.exports = (function() {
-    var Select = function(el, opt) {
-        this.el      = $(el);
-        this.rets    = {};
+    var Select = function(item, opt) {
+        this.el      = item;
+        this.rets    = {val: null, pos: null};
+        this.data    = null,
         this.handle  = null;
         this.scroll  = null;
         this.options = $.extend({}, Select.DEFAULT, opt, true);
     }
 
     Select.DEFAULT = {
-        init : null,    // 初始化的对象
-        call : null,    // 每次选择后回调
-        mult : false,   // 多选模式
-        modal: false    // 是否弹框模式
+        text : "text",          // 默认渲染的文字key
+        val  : "val",           // 默认渲染的值key
+
+        icon : "icon-right",    // 图标元素的class
+        item : "item",          // 子项目的class
+
+        init : null,            // 初始化的对象
+        call : null,            // 子项目每次点击后的回掉
+        mult : false,           // 多选模式
+        modal: false,           // 是否弹框模式
+
+
+        actived : "selected",   // 激活时添加的class
+        template: require("./template.html"),
+        selected: "ion-ios-checkmark",
+        unselect: "ion-ios-checkmark-outline",
     }
 
-    Select.prototype.init = function(init) {
-        var that = this, opt = that.options, item, rets;
+    Select.prototype.init = function() {
+        var that = this, opt = that.options, key;
 
-        rets = that.rets;           // 设置存放结果的对象
+        key = "_select_"+$.getRandom();
 
-        item = that.el[0].childNodes;
-        that.el.addClass("list select");   // 设置样式
-        for(var i=0; i<item.length; i++) {
-            if (item[i].nodeType !== 1) continue;
-
-            $(item[i]).addClass("item");
+        if (opt.text.match(/\{/)) {
+            opt.text = opt.text.replace(/\{/g, "{{");
+            opt.text = opt.text.replace(/\}/g, "}}");
+        } else {
+            opt.text = "{{"+opt.text+"}}";
+        }
+        
+        if (opt.val.match(/\{/)) {
+            opt.val = opt.val.replace(/\{/g, "{{");
+            opt.val = opt.val.replace(/\}/g, "}}");
+        } else {
+            opt.val = "{{"+opt.val+"}}";
         }
 
-        if (opt.modal /* 初始化滚动和弹框效果 */) {
-            that.el.wrapAll("<div class='item_body list'></div>")
-                   .removeClass("hide")
-                   .removeClass("list");
-            that.handle = that.el.modal({hasInsert: false});
-            that.scroll = that.el.scroll();
+        /* 如果传入的是DOM元素，则直接添加元素 */
+        if (that.el instanceof Element || $(that.el).length > 0) {
+            that.el = $(that.el);
+            that.el.addClass("select").attr("id", key);
+        } else {
+            var rdata = that.el;    // 初始化渲染用的列表
+
+            that.el = $('<div class="select list" id="'+key+'"></div>');
+            that.render(rdata);     // 渲染数据
+            that.el.attr("id", key);
+
+            that.el.appendTo("body");
+            that.el = $("#"+key)
+        }
+      
+        /* 尝试初始化modal模式 */
+        if (opt.modal) that.handle = that.el.modal({hasInsert: false});
+
+        /* 修正数据存放的对象类型 */
+        if (opt.mult) { that.rets.val = []; that.rets.pos = []; }
+        
+        if (opt.init) {
+            if (opt.mult) {
+                that.set(typeof opt.init == "array" ? opt.init : []);
+            } else {
+                that.set(opt.init);
+            }
+        } else {
+            that.set(opt.mult ? [] : -1);
         }
 
-        if (opt.mult) rets = {val:[], pos:[]};
-        that.set(opt.init !== undefined ? opt.init : null); // 初始化
 
         that.el.on("tap", function(e) {
-            var pos = $(e._target).index();
+            var pos, ret = that.rets;
 
-            if (pos != -1) {
-                if (opt.mult /* 多选模式 */) {
-                    if (rets.pos.findIn(pos)) {
-                        rets.pos.delBy(pos);
-                    } else {
-                        rets.pos.push(pos);
-                    }
-                } else {
-                    rets.pos = pos;
+            for(var i=0; i<e.path.length; i++) {
+                var $item = $(e.path[i]);
+
+                if ($item.hasClass(opt.item)) {
+                    pos = $item.index();
+                    break;  // 跳出后续检测
                 }
             }
-            
-            that.set(rets.pos, false);
-            if (typeof opt.call == "function") {
-                var val = that.rets.val,
-                    pos = that.rets.pos;
-                opt.call.call(that, val, pos);
-            }
 
-            if (!opt.mult) that.hide(); // 隐藏弹框
+            if (pos != undefined && pos >= -1) {
+                if (opt.mult /* 多选模式 */) {
+                    if (ret.pos.findIn(pos)) {
+                        ret.pos.delBy(pos);
+                    } else {
+                        ret.pos.push(pos);
+                    }
+                } else {
+                    ret.pos = pos;
+                }
+                
+                that.set(ret.pos, false);
+                that.exec();    // 执行回掉
+
+                if (!opt.mult) that.hide(); // 隐藏弹框
+            }
+                
         })
 
         return this;
     };
 
-    Select.prototype.set = function(sets, cval) {
-        var item, $icon, $item, val, 
-            cls, select, mult, opt, rets;
+    Select.prototype.exec = function() {
+        var that = this, opt = that.options;
 
-        opt  = this.options; 
-        mult = opt.mult;
-        item = this.el.query(".item");
-        // 如果是多选状态，则各自返回的数据都是一个数组
-        rets = mult ? {val:[], pos: []} : {};
-        sets = mult && !Array.isArray(sets) ? [] : sets;
-        cval = cval !== undefined ? cval :
-                    (sets == null ? true :
-                        (mult?isNaN(sets[0]):isNaN(sets))
-                    );
-
-        for(var i=0; i<item.length; i++) {
-            if (item[i].nodeType !== 1) continue;
-
-            $item = $(item[i]);
-            $icon = $item.find("[toggle]");
-            cls   = $icon.length?$.parseJSON($icon.attr("toggle")):{};
-
-            val = $item.attr("val");
-            select = false; // 当前选中假
-
-            if (mult /* 多选模式 */) {
-                if ((cval && sets.findIn(val)) ||
-                    sets.findIn(i)) {
-                    select = true;
-                }
-            } else {
-                if ((cval && val == sets) || i == sets) {
-                    select = true;
-                    sets = null;    // 后面不在选择
-                }
-            }
-
-            if (select /* 当前选中状态 */) {
-                if (mult /* 多选状态设置返回值 */) {
-                    rets.val.push(val);
-                    rets.pos.push(i);
-                } else {
-                    rets.val = val;
-                    rets.pos = i;
-                }
-            }
-
-            if ($icon.length > 0) {
-                $icon.switchClass(cls, select);
-            }
+        if ($.isFun(opt.call)) {
+            var val = that.rets.val,
+                pos = that.rets.pos;
+            opt.call.call(that, val, pos, that.text());
         }
 
-        this.rets = rets;   // 更新存储的值
-        return this;
+        return that;
+    }
+
+    /* select 对象渲染方法 */
+    Select.prototype.render = function(list, template, rhtml) {
+        var that = this, opt = that.options, tpl, render, html;
+
+        tpl = template ? template : opt.template;
+        tpl = tpl.replace(/\{\{text\}\}/g, opt.text);
+        tpl = tpl.replace(/\{\{val\}\}/g, opt.val);
+
+        render = { items: list, unselect: opt.unselect };
+
+        that.data = list;   // 保存下来渲染用的数据
+
+        html = $.tpl(tpl, render);
+
+        if (that.el && that.el.html && !rhtml) {
+            that.el.html(html);
+            that.rets.val = null;
+            that.rets.pos = null;
+
+            /* 更新滚动效果 */
+            that.el.removeClass("list")
+                   .wrapAll('<div class="list item_body"></div>');
+            that.scroll = that.el.scroll();
+            that.el.once("touchstart", function() {
+                that.scroll.refresh(); // 初始化滚动框
+            })
+        }
+
+        return html;
+    }
+
+    Select.prototype.set = function(sets, byVal) {
+        var that = this, opt = that.options, rets = that.rets, save,
+            childs, cls = {on: opt.selected, off: opt.unselect};
+
+        childs = that.el.query('.'+opt.item);
+        if (childs instanceof Element) {
+            childs = new Array(childs);
+        }
+        save = opt.mult ? {val: [], pos: []} : {}
+
+        for(var i=0; i<childs.length; i++) {
+            var $item = $(childs[i]), select = false, $icon,
+                val = $item.attr("val"), index = $item.index();
+
+            $icon = $item.find("."+opt.icon);
+
+            if (opt.mult) {
+                for(var j=0; j<sets.length; j++) {
+                    var check = sets[j];
+
+                    if ((byVal && check == val) || check == index) {
+                        select = true;
+                        save.val.push(val);
+                        save.pos.push(index);
+                    }
+                }
+            } else {
+                if ((byVal && sets == val) || sets == index) {
+                    select = true;
+                    save.val = val;
+                    save.pos = index;
+                }
+            }
+
+            $icon.switchClass(cls, select);
+            $item.toggleClass(opt.actived, select);
+        }
+
+        return that.rets = save;
     }
 
     Select.prototype.val = function() {
@@ -131,6 +205,12 @@ module.exports = (function() {
     Select.prototype.pos = function(index) {
         return this.rets.pos;
     };
+
+    Select.prototype.text = function(index) {
+        var that = this, opt = that.options;
+
+        return that.el.find("."+opt.actived).text();
+    }
 
     Select.prototype.show = function() {
         if (this.handle) {
@@ -181,6 +261,12 @@ module.exports = (function() {
                 opt.init = this.attr("init");
             }
             return new Select(this[0], opt).init(opt.init);
+        }})
+    };
+
+    if ($ && !$.select) {
+        $.extend({select: function(el, opt) {
+            return new Select(el, opt).init();
         }})
     };
 })();
