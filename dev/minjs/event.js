@@ -22,6 +22,19 @@ module.exports = (function() {
             this[key] = porp[key];
         }
 
+        /* 修复path对象，无则自己模拟一个出来 */
+        if (!(this.path instanceof Array)) {
+            var target = this.target, arr = [];
+
+            do {
+                arr.push(target);   // 当前存下来
+
+                target = target.parentNode;
+            } while(target)
+
+            this.path = arr;        // 设置对象
+        }
+
         this.isDefaultPrevented = false;
         this.isPropagationStopped = false;
         this.isImmediatePropagationStopped = false;
@@ -125,6 +138,9 @@ module.exports = (function() {
      * @param select    过滤器参数
      * @param call      绑定的要执行的回调函数
      * @param capture   是否绑定到传播阶段
+     *
+     * TODO: 优化性能，所有事件都委托在 document 对象上
+     * 
      */
     Event.bind = function (ele, types, select, call, capture) {
         var handle, events, eveName, evePre;
@@ -294,6 +310,7 @@ module.exports = (function() {
             Event.unbind(ele, type);
         }, select);
     }
+
 
     return Event;
 })();
