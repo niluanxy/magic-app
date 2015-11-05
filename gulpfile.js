@@ -62,6 +62,7 @@ function task_dev_mixin() {
 }
 gulp.task("dev-mixin", task_dev_mixin);
 
+
 /* minjs 相关任务方法 */
 function task_dev_minjs() {
     var defer = Q.defer();

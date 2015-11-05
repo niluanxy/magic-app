@@ -24,6 +24,9 @@ module.exports = (function() {
         max   : '',                     // 最大选择时间，默认为现在后五年
 
         call  : null,                   // 选择后回调，传递三个参数 (type, val, handle)
+
+        confirm : null,                 // 点击确定按钮后的回掉
+        cancel  : null                  // 点击取消按钮后的回掉
     }
 
     /* 时间类型的简写和全写互转 */
@@ -427,6 +430,41 @@ module.exports = (function() {
         that.el.append(html).appendTo("body");  // 插入到页面中
         that.modal = $.modal(that.el);
 
+        that.el.on("tap", ".button", function(e) {
+            e.stopPropagation();
+
+            var $target = $(e.target), ret;
+
+            if ($target.hasClass("cancel")) {
+                if ($.isFun(opt.cancel)) {
+                    ret = opt.cancel(that.val(), that.value, that);
+                }
+            } else if ($target.hasClass("ok")) {
+                if ($.isFun(opt.confirm)) {
+                    ret = opt.confirm(that.val(), that.value, that);
+                }
+            }
+
+            if (ret !== false) that.hide();
+        })
+
+        /* 第一次点击的时候初始化值 */
+        that.el.once("touchstart", function(e) {
+            var scroll = that.el.query(".time-item"),
+                find   = ".item:nth-child(1)";
+
+            if (scroll instanceof Element) {
+                scroll = new Array(scroll);
+            }
+
+            for(var i=0; i<scroll.length; i++) {
+                var $main  = $(scroll[i]),
+                    $first = $main.find(find);
+
+                that.update($main.attr("type"), $first.attr("val"));
+            }
+        })
+
         return this;
     };
 
@@ -453,24 +491,34 @@ module.exports = (function() {
 
     /* 手动更新某个时间值 */
     Timer.prototype.update = function(type, val) {
-        var fun = {
-            Y: "setFullYear",
-            M: "setMonth",
-            D: "setDate",
-            h: "setHours",
-            m: "setMinutes"
-        }
+        
 
-        if (fun[type] && val) {
+        var fun = {
+                Y: "setFullYear",
+                M: "setMonth",
+                D: "setDate",
+                h: "setHours",
+                m: "setMinutes"
+            }, full = {
+                year  : "setFullYear",
+                month : "setMonth",
+                day   : "setDate",
+                hour  : "setHours",
+                minute: "setMinutes"
+            }
+
+        if ((fun[type] || full[type]) && val) {
+            var call = fun[type] || full[type];
+
             /* 修复当前日期大于该月最大日期时，月份更改失败问题 */
-            if (type == "M") {
+            if (type == "M" || type == "month") {
                 var now = this.value,
                     max = Timer.getDays(now.getFullYear(), val);
 
                 if (max < now.getDate()) now.setDate(max);
             }
 
-            this.value[fun[type]](parseInt(val));
+            this.value[call](parseInt(val));
         }
 
         return this.value;  // 返回修改后的值

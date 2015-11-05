@@ -119,6 +119,24 @@ $.ready(function() {
         /* 移除初始化事件 */
         $document.off("touchstart.itap mousedown.itap");
 
+        /** 修复移动端点击穿透问题，远离如下
+         *
+         * 移动端的click都是touch之后，才会模拟触发。触发的顺序如下:
+         * 
+         * touchstart -> touchmove -> touchend ->
+         * mousedown  -> mousemove -> mouseenter -> click
+         * 
+         * 在重叠的区域里，被遮盖的元素绑定click，遮盖的元素绑定touch事件，
+         * 且touch后遮盖的元素会隐藏的话，就会造成穿透，因为click是在touch
+         * 之后延迟触发的，浏览器会误认为是在遮盖的元素上触发了click。
+         * 
+         */
+        // if (start == "touchstart") {
+        //     $document.on("click", function(e) {
+        //         e.preventDefault();
+        //     })
+        // }
+
         /* 重新添加对应事件 */
         $document.on(start, faststart);
         $document.on(move,  fastmove);
