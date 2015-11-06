@@ -27,6 +27,7 @@
 /dev/magic/lib/
 /dev/magic/**/style.css
 /dev/magic-vue/lib/magic.js
+/dev/magic-vue/lib/route.js
 
 # GoodSync临时目录
 _gsdata_
