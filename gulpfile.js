@@ -498,7 +498,7 @@ gulp.task("build.app", ["build.vue"], function(rel) {
     gulp.run("dev-app");
 })
 
-gulp.task("build", function(rel) {
+gulp.task("build", ["dev-app-css"], function(rel) {
     release = rel ? true : false;
 
     gulp.run("build.app");

@@ -6,15 +6,16 @@ module.exports = (function() {
     $$.__key_prefix = "";
 
     $$.key = function(key, val) {
-        key = $$.__key_prefix + key;
-
         var fix; // 修复读取值为null自动转为字符串
         if (val !== undefined) {
+            val = JSON.stringify(val);
             fix = val==null?$$.__key_null:val;
             localStorage.setItem(key, fix);
             return val; // 返回设置的值
         } else {
             fix = localStorage.getItem(key);
+            fix = JSON.parse(fix);
+
             return fix==$$.__key_null?null:fix;
         }
     };

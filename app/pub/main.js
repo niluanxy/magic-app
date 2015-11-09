@@ -27,5 +27,8 @@ $(function() {
 			console.log("should load user")
 	        require(["../page/user"], loadView);
 	    },
-	}).init(true);
+	}).init({
+		authBase: 2,					// 所有的页面都要登陆
+		authPage: "/user/auth",			// 需要验证的页面跳转的地址
+	},true);
 })

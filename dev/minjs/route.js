@@ -73,7 +73,7 @@ module.exports = (function() {
     	after    : null,				// 页面 成功跳转后 的回调方法
         always   : null,                // 每次点击，不论是否阻止默认跳转，都会执行的方法
     	recurse  : false,				// 路由递归触发方式，forward 正序，backward 反序，默认最后项
-        regexp   : ":[^/-]*",        // 参数匹配正则语句，用于匹配参数信息
+        regexp   : ":[^/-]*",           // 参数匹配正则语句，用于匹配参数信息
     }
 
     /* 执行给定对象的执行方法，forward 为 true 反向执行 */
@@ -108,6 +108,8 @@ module.exports = (function() {
         that.table = Route.prefix(that.table, opt.regexp);
         that._bind();            // 绑定全局事件
 
+        if (opt.authPage) opt.authPage = that.geturl(opt.authPage);
+
         if (repath || !that.fire())  {
             var to = opt.notpage || opt.home;
             that.go(to, true, false, true);
@@ -115,7 +117,6 @@ module.exports = (function() {
             var url = that.geturl();
             that.go(url, true, false, true);
         }
-        isFun(opt.always) && opt.always("init", null, that);
 
         return that;
     }
@@ -190,16 +191,15 @@ module.exports = (function() {
     }
 
     /* 手动触发指定页面的事件方法，match 参数必须给定 */
-    Route.prototype._trigger = function(match, before, on) {
+    Route.prototype._trigger = function(nowUrl, match, exbefore, exon) {
         if (!match) return false;   // 参数不足直接退出
 
-        var that = this, opt = that.options, last = that.last,
-            now = that.geturl(), rcall, update;
+        var that = this, opt = that.options, last = that.last, rcall, update;
 
-        if (isFun(opt.before)) rcall = opt.before(last.url, now, match, that);
+        if (isFun(opt.before)) rcall = opt.before(last.url, nowUrl, match, that);
 
         // 尝试调用 before后 的回调，如果返回 false，会中止后面页面的回调
-        if (isFun(before)) update = before(rcall);     
+        if (isFun(exbefore)) update = exbefore(rcall);     
 
         /* 如果 before 返回 false，回退到上个页面 */
         if (rcall !== false) {
@@ -211,11 +211,14 @@ module.exports = (function() {
             /* 如果 before 返回 false，中止本次跳转 */
             if (rcall !== false) rcall = that._exec(match, "on", last.match);
 
-            if (isFun(on)) update = on(rcall);         // 尝试调用 on后 的回调
+            if (isFun(exon)) update = exon(rcall);         // 尝试调用 on后 的回调
 
             /* 运行全局的 成功跳转的after 方法 */
-            update !== false && isFun(opt.after) && opt.after(last.url, now, match, that);
+            update !== false && isFun(opt.after) && opt.after(last.url, nowUrl, match, that);
         }
+
+        /* 不论是否跳转成功，一定会执行 always 方法 */
+        isFun(opt.always) && opt.always(last.url, nowUrl, match, that);
 
         update !== false && that.update(that.geturl(), match);
     }
@@ -225,7 +228,7 @@ module.exports = (function() {
         var that = this, opt = that.options, last = that.last, start, change;
 
         window.addEventListener("popstate", function(e) {
-            var state = history.state, call, now = that.geturl(),
+            var state = history.state, call, nowUrl = that.geturl(),
                 lstate = last.state, islast = that.check(state, "last");
 
             that.evetype = "popstate";
@@ -233,16 +236,13 @@ module.exports = (function() {
             if (state && state.clear === true && !islast) {
                 call = lstate.id > state.id ? "back" : "forward";
                 history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
-            } else if (now != last.url) {
-                that._trigger(that.fire(), function(rcall) {
+            } else if (nowUrl != last.url) {
+                that._trigger(nowUrl, that.fire(), function(rcall) {
                     if (rcall === false) {
                         // before 执行失败则回退到上个页面
                         that.replace(lstate, lstate.title, last.url);
                     }
                 })
-
-                /* 执行 always 方法 */
-                isFun(opt.always) && opt.always("popstate", e, that);
             }
 
             that.evetype = "";      // 重置状态
@@ -270,6 +270,8 @@ module.exports = (function() {
     /* 更新当前记录信息 */
     Route.prototype.update = function(url, match, state) {
         /* 更新当前路由的 last 记录信息 */
+        url = this.geturl(url);     // 修正格式
+
         this.last.url   = url   || this.geturl();
         this.last.match = match || this.fire();
         this.last.state = state || history.state;
@@ -296,16 +298,16 @@ module.exports = (function() {
     }
 
     /* 跳到指定的页面 */
-    Route.prototype.go = function(url, replace, clear, refresh) {
+    Route.prototype.go = function(toUrl, replace, clear, refresh) {
         var that = this, opt = that.options, call, last = that.last,
-            state = {}, end, rcall, match = that.fire(url), now;
+            state = {}, end, rcall, match = that.fire(toUrl), now;
 
         /* 修正URL的格式，便于比较和计算 */
-        url = that.geturl(url);     now = that.geturl();
+        toUrl = that.geturl(toUrl);     now = that.geturl();
 
         /* 要跳转的页面和当前页面不一样时才跳转 */
-        if (match && (refresh || url != now )) {
-            if (refresh && url === now) replace = true;
+        if (match && (refresh || toUrl != now )) {
+            if (refresh && toUrl === now) replace = true;
 
             /* 如果当前页面和上个页面一样，只不过参数不同，则转为替换模式 */
             if (opt.replace && last.match && last.match.length == match.length) {
@@ -331,7 +333,7 @@ module.exports = (function() {
             state.title = end && end.title ? end.title : ""; // 标题
             state.clear = clear || end.clear;          // 是否无记录模式
 
-            that._trigger(match, null, function(rcall) {
+            that._trigger(toUrl, match, null, function(rcall) {
                 /* 进行具体的页面跳转，记录状态等动作 */
                 if (rcall !== false) {
                     if (last && last.state && last.state.id < that.state.length) {
@@ -342,9 +344,9 @@ module.exports = (function() {
                     state.id = ++that.statpos;      // 记录当前路由的序列ID
 
                     that.state.push(extend({}, state, {
-                        match: match, url: url
+                        match: match, url: toUrl
                     }));
-                    history[call](state, state.title, url);
+                    history[call](state, state.title, toUrl);
                 }
 
                 return rcall;   // 返回 false，会阻止后续调用 update 方法

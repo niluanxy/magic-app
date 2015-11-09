@@ -14,6 +14,18 @@ $(function() {
         __STATE__ : null,         // 记录当前APP各种状态
     };
 
+
+    /**
+     * init option 参数说明
+     * 
+     * authBase     全局默认的权限值
+     * authPage     不满足权限值的时候跳转验证的页面
+     * authCall     用于验证的方法，可以不传
+     * authCheck    用于判断是否校验的阀值
+     * 
+     */
+
+
     // APP初始化方法
     mvue.init = function(option, repath) {
         $$.key("__MAGIC_RUNID", $.getRandom());
@@ -22,33 +34,92 @@ $(function() {
             view  = mvue.__VIEW__ = $("body").query("mg-view");
         
         mvue.__STATE__ = {
+            AUTH_BEFORE  : "",          // 验证失败的页面，用于回跳
+
             ROUTER_TYPE  : false,       // 路由事件触发加载方式
             ROUTER_AFTER : false,       // 路由事件执行状态
 
             PAGE_READY   : false,       // 页面加载状态
         }
 
-        var tables = $.extend.apply(this, config.tables);
+        var tables = $.extend.apply({}, config.tables);
 
-        mvue.location = new Router(tables, $.extend(option || {}, {
+        mvue.location = new Router(tables, $.extend({
             /* 页面跳转前的回调方法 */
-            before : function(last, now, match, that) {
-                var last = match[match.length-1],
-                    STAT = mvue.__STATE__;
+            before : function(lastUrl, nowUrl, match, that) {
+                var mnow  = match[match.length-1],
+                    STAT  = mvue.__STATE__, aret,
+                    opt   = that.options,
+                    apage = opt.authPage,
+                    atest = opt.authCheck;
 
                 STAT.ROUTER_AFTER = false;
                 STAT.ROUTER_TYPE  = that.evetype;
 
-                mvue.__PAGE__.PARAMS = last.para;
+                mvue.__PAGE__.PARAMS = mnow.para;
+
+                if (apage && nowUrl != apage) {
+                    var auth;   // 检测页面的Auth值，可继承父类
+
+                    for (var i=match.length-1; i>=0; i--) {
+                        if (match[i].item.auth !== undefined) {
+                            auth = match[i].auth;
+                            break;  // 跳出后续的检测
+                        }
+                    }
+
+                    if (auth === undefined) {
+                        auth = opt.authBase || 1;
+                    }
+
+                    if ($.isFun(opt.authCall)) {
+                        aret = opt.authCall(nowUrl, auth, atest, lastUrl, that);
+                    } else {
+                        aret = auth <= atest;
+                    }
+
+                    /* false 当前页面未通过验证 */
+                    if (aret === false) {
+                        STAT.AUTH_BEFORE = nowUrl;
+                        return false;   // 阻止后续程序执行
+                    }
+                }
             },
 
             /* 页面跳转成功后的回调方法 */
-            after : function(last, now, match, that) {
-                var STAT = mvue.__STATE__;
+            after : function(lastUrl, nowUrl, match, that) {
+                var STAT = mvue.__STATE__,
+                    auth = that.options.authPage;
 
                 STAT.ROUTER_AFTER = true;
+            },
+
+            always: function(lastUrl, nowUrl, match, that) {
+                var STAT = mvue.__STATE__,
+                    auth = that.options.authPage;
+
+                if (STAT.AUTH_BEFORE && auth != nowUrl) {
+                    that.go(auth, true);
+                }
+            },
+
+            authBase  : 1,
+            authCheck : 2,
+        }, option || {})).init(repath);
+
+        /* 返回到登陆页面的方法 */
+        mvue.location.authRepath = function(set) {
+            if (set !== undefined) {
+                set = mvue.location.geturl(set);
+                mvue.__STATE__.AUTH_BEFORE = set;
+            } else {
+                var before = mvue.__STATE__.AUTH_BEFORE,
+                    home   = mvue.location.options.home;
+
+                mvue.__STATE__.AUTH_BEFORE = "";
+                mvue.location.go(before || home, true);
             }
-        })).init(repath);
+        }
     }
 
 
@@ -101,6 +172,13 @@ $(function() {
         }
 
         defer.then(function(init) {
+            var rauth = mvue.__STATE__.AUTH_BEFORE,
+                pauth = $$.location.options.authPage;
+
+            if (rauth && $$.location.geturl() != pauth) {
+                return false;
+            }
+
             for (var key in init) {
                 pageData.data[key] = init[key];
             }
