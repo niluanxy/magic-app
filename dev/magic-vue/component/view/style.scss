@@ -34,3 +34,17 @@ mg-page {
         transform: translate3d(0, 0, 0);
     }
 }
+
+._load_ {
+    $back-size: 80px;
+
+    .tip {
+        display: block;
+        position: absolute;
+        top: 42%; left: 50%;
+        transform: translate(-50%, -50%);
+        background-size: $back-size $back-size;
+        width: $back-size;
+        height: $back-size;
+    }
+}

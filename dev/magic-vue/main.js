@@ -8,7 +8,7 @@ $(function() {
 
         __VUE__   : null,       // 全局VUE对象
         __VIEW__  : null,       // 全局MG-VIEW对象
-        __PAGE__  : {},       // 当前页面对象
+        __PAGE__  : {},         // 当前页面对象
         __CACHE__ : null,       // 全局页面缓存
 
         __STATE__ : null,         // 记录当前APP各种状态
@@ -57,6 +57,7 @@ $(function() {
                 STAT.ROUTER_TYPE  = that.evetype;
 
                 mvue.__PAGE__.PARAMS = mnow.para;
+                mvue.__PAGE__.ROUTER = match;
 
                 if (apage && nowUrl != apage) {
                     var auth;   // 检测页面的Auth值，可继承父类
@@ -92,6 +93,8 @@ $(function() {
                     auth = that.options.authPage;
 
                 STAT.ROUTER_AFTER = true;
+
+                vue.$broadcast("routeChange", nowUrl);
             },
 
             always: function(lastUrl, nowUrl, match, that) {
@@ -135,24 +138,44 @@ $(function() {
         mvue.__ROUTER__.on(url, option);
     }
 
+    // 创建正在加载中页面
+    function makeView(match) {
+        var last = match[match.length-1].item, html;
+
+        html = '<mg-page v-transition="push" class="_load_">'+
+                    '<div class="bar bar-header">'+
+                        '<mg-back></mg-back><h3 class="title">{{title}}</h3>'+
+                    '</div>'+
+                    '<div class="content has-header"><div class="tip"></div></div>'+
+                '</mg-page>';
+
+        html = $.tpl(html, {title: last.title});
+        if (last.back === false) {
+            html = html.replace("<mg-back></mg-back>", "");
+        }
+        if (last.head === false) {
+            var reg = new RegExp('<div class="bar bar-header">.*</h3></div>')
+            html = html.replace(reg, "").replace("has-header", "");
+        }
+
+        return html;
+    }
+
     // 加载页面方法
     window.loadView = function(page) {
         var pageData  = $.extend({}, page);
         pageData.data = $.extend(true, {}, page.data);
-
-        var tmp = pageData.template,
-            old, fix, defer, mixins, params;
-        fix = old = tmp.match(/\<mg\-page.*\>/i)[0];
-
-        // 尝试使用正则添加 v-transition 属性
-        if (old.search("v-transition") == -1) {
-            var trans = $$.__STATE__.ROUTER_TYPE == "back" ? "back" : "push";
-            fix = fix.replace("<mg-page", "<mg-page v-transition='" + trans + "'");
-        }
-
-        // 将修改更新到模板字符串上
-        pageData.template = pageData.template.replace(old, fix);
         pageData.replace = true;    // 统一设置属性为 replace
+
+        var tmp = pageData.template, PAGE = mvue.__PAGE__,
+            defer, mixins, params, load, ltime;
+
+
+        /* 预先模拟加载中的效果 */
+        load = {template: makeView(PAGE.ROUTER), replace: true};
+        new Vue(load).$mount().$appendTo(mvue.__VIEW__);
+        ltime = $.getTime();
+
 
         // 修改对象的参数值，替换 000 为 空字符串
         params = $.extend({}, mvue.__PAGE__.PARAMS);
@@ -183,8 +206,8 @@ $(function() {
                 pageData.data[key] = init[key];
             }
 
-            if (mvue.__PAGE__.HANDLE) {
-                mvue.__PAGE__.HANDLE.$destroy(true);
+            if (PAGE.HANDLE) {
+                PAGE.HANDLE.$destroy(true);
             }
 
             mixins = {
@@ -209,8 +232,14 @@ $(function() {
                 pageData.mixins = [mixins];
             }
 
-            mvue.__PAGE__.HANDLE = new Vue(pageData).$mount();
-            mvue.__VIEW__ && mvue.__PAGE__.HANDLE.$appendTo(mvue.__VIEW__);
+            PAGE.HANDLE = new Vue(pageData).$mount();
+
+
+            var fixTime = (ltime+600) - $.getTime();
+            setTimeout(function() {
+                mvue.__VIEW__ && PAGE.HANDLE.$appendTo(mvue.__VIEW__);
+                $(mvue.__VIEW__).find("._load_").remove();
+            }, fixTime > 0 ? fixTime : 0);
         })
     };
 

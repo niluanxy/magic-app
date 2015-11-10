@@ -27,7 +27,7 @@ module.exports = (function() {
     /*=================================================
      *  objParse 复杂数据解析方法
      *=================================================*/
-    $$.objParse = function(obj, str) {
+    $$.objParse = function(obj, str, exobj) {
         if (!obj || !str) return undefined;
         
         var key, len, arr, vobj = obj;
@@ -45,9 +45,12 @@ module.exports = (function() {
 
         key = arr[len];     // 校验对象是否合法
         if (!vobj || vobj[key] === undefined) {
-            return undefined
+            return undefined;
         } else {
-            return Object.defineProperty(new Object, "val", {
+            var set = exobj || new Object,
+                val = exobj ? arr[len] : "val";
+
+            return Object.defineProperty(set, val, {
                 get : function () {
                     return vobj[key];
                 },
@@ -56,7 +59,8 @@ module.exports = (function() {
                 }
             });
         }
-    },
+    };
+
 
     $$.update = function(scope, action, item, ext, find) {
         if (scope && action && scope[item] && ext !== undefined) {
