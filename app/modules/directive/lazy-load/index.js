@@ -10,13 +10,15 @@ module.exports = (function() {
 	};
 
 	Vue.directive("src", {
-		bind: function() {
-			var $el = $(this.el), load, scope = this.vm, src = this.raw;
-
+		bind: function(value) {
+			var $el = $(this.el), load, scope, src = this.raw;
+			
 			load = $el.attr("load") ? $el.attr("load") : img;
 			$el.attr("src", load);		// 初始化设置默认图片
 
-			this.vm.$on("pageRender", function(scroll) {
+			scope = $$.objParse(this.vm, src);
+
+			this.vm.$root.$on("pageRender", function(scroll) {
 				var eve = "touchmove._lazy_" + $.getRandom(),
 					$wrapper = $(scroll.wrapper);
 
@@ -26,7 +28,7 @@ module.exports = (function() {
 						tel = $el.offset().top;
 
 					if (checkShow(hei, fix, scroll.y, tel)) {
-						if (scope[src]) $el.attr("src", scope[src]);
+						if (scope) $el.attr("src", scope.val);
 						$wrapper.off(eve);	// 移除监控事件
 					}
 				}, 100));
