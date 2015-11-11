@@ -167,13 +167,21 @@ $(function() {
         pageData.data = $.extend(true, {}, page.data);
         pageData.replace = true;    // 统一设置属性为 replace
 
-        var tmp = pageData.template, PAGE = mvue.__PAGE__,
-            defer, mixins, params, load, ltime;
+        var tmp = pageData.template, PAGE = mvue.__PAGE__, lpage,
+            VIEW = mvue.__VIEW__, defer, mixins, params, load, ltime;
 
 
         /* 预先模拟加载中的效果 */
+        lpage = $(VIEW).query("._load_");
+        if (lpage && lpage.length) {
+            for(var i=0; i<lpage.length; i++) {
+                $(lpage[i]).remove();
+            }
+        } else if (lpage)  {
+            $(lpage).remove();
+        }
         load = {template: makeView(PAGE.ROUTER), replace: true};
-        new Vue(load).$mount().$appendTo(mvue.__VIEW__);
+        PAGE.LOAD = new Vue(load).$mount().$appendTo(VIEW);
         ltime = $.getTime();
 
 
@@ -234,11 +242,10 @@ $(function() {
 
             PAGE.HANDLE = new Vue(pageData).$mount();
 
-
             var fixTime = (ltime+600) - $.getTime();
             setTimeout(function() {
-                mvue.__VIEW__ && PAGE.HANDLE.$appendTo(mvue.__VIEW__);
-                $(mvue.__VIEW__).find("._load_").remove();
+                VIEW && PAGE.HANDLE.$appendTo(VIEW);
+                $(VIEW).find("._load_").remove();
             }, fixTime > 0 ? fixTime : 0);
         })
     };
