@@ -6,7 +6,8 @@
  */
 
 $.ready(function() {
-    var $document = $(document), tap = {}, delay = 300, fastmove, input;
+    var $document = $(document), tap = {canClick: false},
+        delay = 300, fastmove, input;
 
 
     function checkClass(item, test) {
@@ -37,7 +38,12 @@ $.ready(function() {
     /* 事件初始化监听 */
     function faststart(e) {
         var touchs = e.changedTouches;
-        if (touchs && touchs.length > 1) return true;
+        if (touchs && touchs.length > 1) {
+            tap.startX = null;      tap.startY = null;
+            tap.endX   = null;      tap.endY   = null;
+
+            return true;
+        }
 
         var handle, tagName, path = e.path;
 
@@ -49,7 +55,7 @@ $.ready(function() {
             tap.startX = e.pageX;
             tap.startY = e.pageY;
         }
-        tap.startT = $.getTime();
+        tap.startTime = $.getTime();
 
         /* 给按钮类的组件添加点击样式 */
         for (var i = 0; i<path.length; i++) {
@@ -89,9 +95,12 @@ $.ready(function() {
         var cx, cy, ct, $target = $(e.target),
             touch = e.changedTouches ? e.changedTouches[0] : e;
 
+        tap.endX = touch.pageX;
+        tap.endY = touch.pageY;
+
         cx = Math.abs(touch.pageX - tap.startX);
         cy = Math.abs(touch.pageY - tap.startY);
-        ct = $.getTime() - tap.startT;
+        ct = $.getTime() - tap.startTime;
 
         if (cx<5 && cy < 5 && ct < delay) {
             $target.trigger("tap");
@@ -104,44 +113,58 @@ $.ready(function() {
                 clearActive($item);
             }
         }, 220-ct >= 0 ? 220-ct : 0);
+
+
+        /* 手动触发点击事件 */
+        tap.canClick = true;
+        $target.trigger("click");
     }
 
-    /* 事件检测初始化 */
-    $document.on("touchstart.itap mousedown.itap", function(e) {
-        var touch = e.type.search("touch") > -1, kt = touch?0:1,
-            ename = touch ? "touch" : "mouse", start, move, end,
+
+
+    /** 
+     * 
+     * 事件初始化，同时修复移动端 点击穿透问题，原理如下:
+     *
+     * 移动端的click都是touch之后，才会模拟触发。触发的顺序如下:
+     * 
+     * touchstart -> touchmove -> touchend ->
+     * mousedown  -> mousemove -> mouseenter -> click
+     * 
+     * 在重叠的区域里，被遮盖的元素绑定click，遮盖的元素绑定touch事件，
+     * 且touch后遮盖的元素会隐藏的话，就会造成穿透，因为click是在touch
+     * 之后延迟触发的，浏览器会误认为是在遮盖的元素上触发了click。
+     * 
+     */
+    (function() {
+        var ename, start, move, end, kt,
             map = { s: ["start", "down"], e : ["end", "up"] };
 
+        kt = window.ontouchstart !== undefined ? 0 : 1;
+
+        ename = kt ? "mouse" : "touch";
         start = ename + map.s[kt];
         move  = ename + "move";
         end   = ename + map.e[kt];
 
-        /* 移除初始化事件 */
-        $document.off("touchstart.itap mousedown.itap");
-
-        /** 修复移动端点击穿透问题，远离如下
-         *
-         * 移动端的click都是touch之后，才会模拟触发。触发的顺序如下:
-         * 
-         * touchstart -> touchmove -> touchend ->
-         * mousedown  -> mousemove -> mouseenter -> click
-         * 
-         * 在重叠的区域里，被遮盖的元素绑定click，遮盖的元素绑定touch事件，
-         * 且touch后遮盖的元素会隐藏的话，就会造成穿透，因为click是在touch
-         * 之后延迟触发的，浏览器会误认为是在遮盖的元素上触发了click。
-         * 
-         */
-        // if (start == "touchstart") {
-        //     $document.on("click", function(e) {
-        //         e.preventDefault();
-        //     })
-        // }
-
-        /* 重新添加对应事件 */
         $document.on(start, faststart);
         $document.on(move,  fastmove);
         $document.on(end,   fastend);
 
-        faststart(e);   // 修复触发start事件
-    });
+        /* 修复鼠标点透问题 */
+        if (kt === 0 /* 只有支持 touch 事件时才绑定 */) {
+            $document.on("click", function(e) {
+                if (!tap.canClick &&
+                    tap.endY - tap.startY < 3 &&
+                    tap.endX - tap.startX < 3 &&
+                    e.timeStamp - tap.startTime < 200) {
+
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                }
+
+                tap.canClick = false;
+            }, true);
+        }
+    })(window, tap);
 });
