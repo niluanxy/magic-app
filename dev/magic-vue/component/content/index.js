@@ -37,7 +37,7 @@ module.exports = (function() {
             }
 
             // 是否监控数据自动刷新内容
-            repos   = $el.attr("repos");
+            repos = $el.attr("repos");
             if (this[refresh] != undefined) {
                 this.$watch(refresh, function(newVal) {
                     Vue.nextTick(function() {

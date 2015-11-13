@@ -34,6 +34,7 @@ $(function() {
             view  = mvue.__VIEW__ = $("body").query("mg-view");
         
         mvue.__STATE__ = {
+            AUTH_HASRUN  : false,       // 记录验证页面是否已调用
             AUTH_BEFORE  : "",          // 验证失败的页面，用于回跳
 
             ROUTER_TYPE  : false,       // 路由事件触发加载方式
@@ -64,7 +65,7 @@ $(function() {
 
                     for (var i=match.length-1; i>=0; i--) {
                         if (match[i].item.auth !== undefined) {
-                            auth = match[i].auth;
+                            auth = match[i].item.auth;
                             break;  // 跳出后续的检测
                         }
                     }
@@ -89,10 +90,7 @@ $(function() {
 
             /* 页面跳转成功后的回调方法 */
             after : function(lastUrl, nowUrl, match, that) {
-                var STAT = mvue.__STATE__,
-                    auth = that.options.authPage;
-
-                STAT.ROUTER_AFTER = true;
+                mvue.__STATE__.ROUTER_AFTER = true;
 
                 vue.$broadcast("routeChange", nowUrl);
             },
@@ -101,8 +99,12 @@ $(function() {
                 var STAT = mvue.__STATE__,
                     auth = that.options.authPage;
 
-                if (STAT.AUTH_BEFORE && auth != nowUrl) {
+                if (!STAT.AUTH_HASRUN && STAT.AUTH_BEFORE) {
+                    STAT.AUTH_HASRUN = true;
                     that.go(auth, true);
+                } else if (STAT.AUTH_HASRUN) {
+                    STAT.AUTH_BEFORE = "";
+                    STAT.AUTH_HASRUN = false;
                 }
             },
 
@@ -111,16 +113,24 @@ $(function() {
         }, option || {})).init(repath);
 
         /* 返回到登陆页面的方法 */
-        mvue.location.authRepath = function(set) {
-            if (set !== undefined) {
-                set = mvue.location.geturl(set);
-                mvue.__STATE__.AUTH_BEFORE = set;
-            } else {
-                var before = mvue.__STATE__.AUTH_BEFORE,
-                    home   = mvue.location.options.home;
+        mvue.location.authRepath = function(set, togo) {
+            var option   = mvue.location.options,
+                location = mvue.location,
+                STAT     = mvue.__STATE__;
 
-                mvue.__STATE__.AUTH_BEFORE = "";
-                mvue.location.go(before || home, true);
+            if (set !== undefined) {
+                set = location.geturl(set);
+                STAT.AUTH_BEFORE = set;
+
+                if (togo === true) {
+                    location.go(option.authPage, true);
+                    STAT.AUTH_HASRUN = true;
+                }
+            } else {
+                STAT.AUTH_BEFORE = "";
+                STAT.AUTH_HASRUN = false;
+                // location.go(STAT.AUTH_BEFORE || option.home, true);
+                location.go(option.home, true);
             }
         }
     }
@@ -139,17 +149,17 @@ $(function() {
     }
 
     // 创建正在加载中页面
-    function makeView(match) {
+    function makeView(match, url) {
         var last = match[match.length-1].item, html;
 
-        html = '<mg-page v-transition="push" class="_load_">'+
+        html = '<mg-page v-transition="push" class="_load_" url="{{url}}"">'+
                     '<div class="bar bar-header">'+
                         '<mg-back></mg-back><h3 class="title">{{title}}</h3>'+
                     '</div>'+
                     '<div class="content has-header"><div class="tip"></div></div>'+
                 '</mg-page>';
 
-        html = $.tpl(html, {title: last.title});
+        html = $.tpl(html, {title: last.title, url: url||''});
         if (last.back === false) {
             html = html.replace("<mg-back></mg-back>", "");
         }
@@ -161,26 +171,36 @@ $(function() {
         return html;
     }
 
+    mvue.clearLoad = function(url) {
+        var lpage = $(mvue.__VIEW__).query("._load_");
+
+        if (lpage instanceof Element) lpage = [lpage];
+
+        if (lpage && lpage.length) {
+            for(var i=0; i<lpage.length; i++) {
+                var $item = $(lpage[i]);
+
+                if (url && $item.attr("url") != url) {
+                    continue;
+                }
+
+                $item.remove();     // 删除元素
+            }
+        }
+    }
+
     // 加载页面方法
     window.loadView = function(page) {
-        var pageData  = $.extend({}, page);
+        var pageData = $.extend({}, page), PAGE = mvue.__PAGE__, load,
+            VIEW = mvue.__VIEW__, defer, mixins, params, ltime, nowurl;
+
+        /* 默认页面属性设置 */
         pageData.data = $.extend(true, {}, page.data);
         pageData.replace = true;    // 统一设置属性为 replace
 
-        var tmp = pageData.template, PAGE = mvue.__PAGE__, lpage,
-            VIEW = mvue.__VIEW__, defer, mixins, params, load, ltime;
-
-
         /* 预先模拟加载中的效果 */
-        lpage = $(VIEW).query("._load_");
-        if (lpage && lpage.length) {
-            for(var i=0; i<lpage.length; i++) {
-                $(lpage[i]).remove();
-            }
-        } else if (lpage)  {
-            $(lpage).remove();
-        }
-        load = {template: makeView(PAGE.ROUTER), replace: true};
+        mvue.clearLoad(); nowurl = mvue.location.geturl();
+        load = {template: makeView(PAGE.ROUTER, nowurl), replace: true};
         PAGE.LOAD = new Vue(load).$mount().$appendTo(VIEW);
         ltime = $.getTime();
 
@@ -196,7 +216,6 @@ $(function() {
 
         defer = $.defer();          // 决定何时渲染
         if (typeof pageData.resolve == "function") {
-
             pageData.resolve(params, defer);
         } else {
             defer.done({});         // 无加载方法直接进入渲染
@@ -205,10 +224,6 @@ $(function() {
         defer.then(function(init) {
             var rauth = mvue.__STATE__.AUTH_BEFORE,
                 pauth = $$.location.options.authPage;
-
-            if (rauth && $$.location.geturl() != pauth) {
-                return false;
-            }
 
             for (var key in init) {
                 pageData.data[key] = init[key];
@@ -222,15 +237,15 @@ $(function() {
                 beforeDestroy: function() {
                     $$.__STATE__.PAGE_READY = false;
 
-
                     this.$broadcast("pageDestroy");
+                    this.$emit("pageDestroyDirect");
                 },
 
                 ready: function() {
                     $$.__STATE__.PAGE_READY = true;
 
-
                     this.$broadcast("pageReady");
+                    this.$emit("pageReadyDirect");
                 }
             }
 
@@ -245,7 +260,8 @@ $(function() {
             var fixTime = (ltime+600) - $.getTime();
             setTimeout(function() {
                 VIEW && PAGE.HANDLE.$appendTo(VIEW);
-                $(VIEW).find("._load_").remove();
+
+                mvue.clearLoad();
             }, fixTime > 0 ? fixTime : 0);
         })
     };

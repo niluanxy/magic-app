@@ -77,7 +77,7 @@ module.exports = (function() {
                 	ctrl.show();
                 })
 
-                scope.$on("pageDestroy", function() {
+                scope.$root.$on("pageDestroyDirect", function() {
                     ctrl.destroy();   // 删除自身
                 })
             }

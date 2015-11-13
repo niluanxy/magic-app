@@ -166,7 +166,9 @@ module.exports = (function() {
         /* 计算结果加入到原数组中 */
         vals[0] && save.push(vals[0]);
         vals[1] && save.push(vals[1]);
-        save = save.concat(cal);
+        for(var i = 0; i < cal.length; i++) {
+            save.push(cal[i]);
+        }
 
         /* 先从小到大排序，然后剔除重复元素 */
         save.sort(function(a,b){return a>b?1:-1});
@@ -181,7 +183,7 @@ module.exports = (function() {
             }
         } while (save.length && pos < save.length);
 
-        return save[save.lengh];    // 返回最后的值
+        return save[save.length-1];    // 返回最后的值
     }
 
     /* 通过过滤器生成具体的选择值 */
@@ -224,7 +226,7 @@ module.exports = (function() {
         if (filter && !(type == "m" && ext)) {
             num = vals[0];  // 当前操作对象
             fil = filter.replace(/[\[|\]|\s]/g, '');
-            fil = fil ? fil.splice(',') : [];
+            fil = fil ? fil.split(',') : [];
 
             for(var i=0; i<fil.length; i++) {
                 num = Timer.operat(num, fil[i], vals);
@@ -579,7 +581,8 @@ module.exports = (function() {
     }
 
     Timer.prototype.destroy = function() {
-        this.el.remove();   // 删除自身
+        this.modal.destroy();   // modal删除
+        this.el.remove();       // 删除自身
     };
 
     /* 尝试绑定方法到 magic 框架的全局对象上 */
@@ -606,5 +609,7 @@ module.exports = (function() {
         fixVals  : Timer.fixVals,               // 通过给定的最小最大值，筛选值列表
         dateAdd  : Timer.dateAdd,               // 给定时间增加指定天数后的新时间
         getWeek  : Timer.getWeek,               // 返回给定时间所在周的第一天或者全部
+
+        operat   : Timer.operat,                // 通过表达式计算结果
     }
 })();

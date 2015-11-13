@@ -25,6 +25,18 @@ $.ready(function() {
         return false;
     }
 
+    function checkIn(parent, child) {
+        do {
+            if (child == parent) {
+                return true;
+            }
+
+            child = child && child.parentNode;
+        } while (child && child.parentNode);
+
+        return false;
+    }
+
     // 清除激活类
     function clearActive($target) {
         if (checkClass($target)) {
@@ -56,6 +68,7 @@ $.ready(function() {
             tap.startY = e.pageY;
         }
         tap.startTime = $.getTime();
+        tap.target    = e.target;
 
         /* 给按钮类的组件添加点击样式 */
         for (var i = 0; i<path.length; i++) {
@@ -104,6 +117,9 @@ $.ready(function() {
 
         if (cx<5 && cy < 5 && ct < delay) {
             $target.trigger("tap");
+
+            tap.canClick = true;
+            $target.trigger("click");
         }
 
         /* 如果点击时间太短，手动延迟动画移除时间 */
@@ -113,13 +129,7 @@ $.ready(function() {
                 clearActive($item);
             }
         }, 220-ct >= 0 ? 220-ct : 0);
-
-
-        /* 手动触发点击事件 */
-        tap.canClick = true;
-        $target.trigger("click");
     }
-
 
 
     /** 
@@ -154,16 +164,12 @@ $.ready(function() {
         /* 修复鼠标点透问题 */
         if (kt === 0 /* 只有支持 touch 事件时才绑定 */) {
             $document.on("click", function(e) {
-                if (!tap.canClick &&
-                    tap.endY - tap.startY < 3 &&
-                    tap.endX - tap.startX < 3 &&
-                    e.timeStamp - tap.startTime < 200) {
-
+                if (!tap.canClick && e.timeStamp - tap.startTime < 200) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
+                } else {
+                    tap.canClick = false;
                 }
-
-                tap.canClick = false;
             }, true);
         }
     })(window, tap);

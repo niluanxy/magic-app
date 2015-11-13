@@ -1995,9 +1995,9 @@ if ($ && $.fn && !$.fn.scroll) {
             bindToWrapper : true,
             scrollbars    : true,
             fadeScrollbars: true,
-            click         : true,
+            tap           : false,
+            click         : false,
             preventDefault: true,
-            probeType     : probe,
             refresh       : false,
         }, option);
 
@@ -2090,7 +2090,7 @@ if ($ && $.fn && !$.fn.scroll) {
             var $body = $el, last = 0,
                 bind  = option.refresh === "true" ? "on" : "once";
 
-            $el[bind]("touchstart", function() {
+            $(document)[bind]("touchstart", function() {
                 var height = $body.height();
                 if (height != last) {
                     handle.refresh();      // 强制刷新高度

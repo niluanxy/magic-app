@@ -22,6 +22,11 @@ module.exports = (function() {
             this[key] = porp[key];
         }
 
+        /* 修正target对象 */
+        if (!this.target && src.originalTarget) {
+            this.target = src.originalTarget
+        }
+
         /* 修复path对象，无则自己模拟一个出来 */
         if (!(this.path instanceof Array)) {
             var target = this.target, arr = [];
@@ -105,29 +110,32 @@ module.exports = (function() {
     function triggerCall(ele, calls, event, porp) {
         if (!ele || !calls || !event) return false;
 
-        event = event instanceof EventObj ? event :
-            new EventObj(event, porp);
-        if (!event.target) event.target = ele;
+        var eve = event instanceof EventObj ? event :
+                new EventObj(event, porp);
+
+        if (!eve.target) {
+            eve.target = event.target || event.originalTarget || ele;
+        } 
 
         /* 复制执行数组，修复once事件导致length异常问题 */
-        var data = event.originalData || [],
+        var data = eve.originalData || [],
             clone = calls.slice(0);
 
         if (!(data[0] instanceof EventObj)) {
-            data.unshift(event);   // 修正执行参数数组
+            data.unshift(eve);   // 修正执行参数数组
         }
 
         for(var i = 0; i < clone.length; i++) {
             var item = clone[i];     // 当前事件对象
 
-            if (item.name.search(event.type) === 0 &&
-                checkIn(event.target, item.select)) {
+            if (item.name.search(eve.type) === 0 &&
+                checkIn(eve.target, item.select)) {
 
                 data[0].originalType = item.name; 
                 item.call.apply(ele, data);
             }
 
-            if (event.isImmediatePropagationStopped) break;
+            if (eve.isImmediatePropagationStopped) break;
         }
     }
 
@@ -257,6 +265,7 @@ module.exports = (function() {
             creEvent = document.createEvent('Event');
             creEvent.initEvent(evePre, true, true);
             creEvent.originalData = data;
+            creEvent.originalTarget = ele;
 
             /* 如果当前元素绑定了句柄，且有事件空间，则手动冒泡 */
             if (handle && handle[evePre] && eveName.indexOf(".") > 0) {
@@ -264,7 +273,7 @@ module.exports = (function() {
                     newEvent = new EventObj(creEvent, {type: eveName});
 
                 /* 带命名空间的事件手动执行和模拟冒泡 */
-                while (runEle !== document) {
+                while (runEle && runEle !== document) {
                     handleNow = eveData[runEle.$_uuid];
                     handleNow = handleNow ? handleNow[evePre] : {};
                     triggerCall(runEle, handleNow.calls, newEvent)
