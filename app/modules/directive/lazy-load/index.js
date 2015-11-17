@@ -9,12 +9,11 @@ module.exports = (function() {
 		return (height-fix-move) > (-check);
 	};
 
-	function initLazy(scroll, $el, scope) {
+	function initLazy(scroll, $el, scope, eve) {
 		scroll = scroll ? scroll : $$.__PAGE__.CONTENT;
 		if (!scroll) return true;		// 参数不合法退出
 
-		var eve = "touchmove._lazy_" + $.getRandom(),
-			$wrapper = $(scroll.wrapper);
+		var $wrapper = $(scroll.wrapper);
 
 		/* 尝试设定头像的大小 */
 		if ($el.attr("resize") == "true") {
@@ -37,8 +36,12 @@ module.exports = (function() {
 
 	Vue.directive("src", {
 		bind: function(value) {
-			var $el = $(this.el), load, scope, src = this.raw, $root;
-			
+			var $el = $(this.el), load, scope,
+				src = this.raw, $root, eve, content;
+
+			eve = "touchmove._lazy_" + $.getRandom();
+			$el.data("_event_name", eve);
+
 			load = $el.attr("load") ? $el.attr("load") : img;
 			$el.attr("src", load);		// 初始化设置默认图片
 
@@ -46,12 +49,24 @@ module.exports = (function() {
 			$root = this.vm.$root;
 
 			$root.$on("pageRender", function(scroll) {
-				initLazy(scroll, $el, scope);
+				initLazy(scroll, $el, scope, eve);
 			});
 
-			if ($$.__PAGE__.CONTENT /* 后插入组件修复 */) {
-				initLazy($$.__PAGE__.CONTENT, $el, scope);
+
+			content = $$.__PAGE__.CONTENT;
+			if (content /* 后插入组件修复 */) {
+				initLazy(content, $el, scope, eve);
 			}
 		},
+
+		unbind: function() {
+			var eve = $(this.el).data("_event_name"), wrapper;
+
+			if ($$.__PAGE__.CONTENT /* 后插入组件修复 */) {
+				wrapper = $($$.__PAGE__.CONTENT.wrapper);
+				
+				wrapper.off(eve);	// 移除监控事件
+			}
+		}
 	})
 })();

@@ -163,30 +163,6 @@ var scroll = module.exports = (function (window, document, Math) {
             }
         });
 
-        me.tap = function (e, eventName) {
-            var ev = document.createEvent('Event');
-            ev.initEvent(eventName, true, true);
-            ev.pageX = e.pageX;
-            ev.pageY = e.pageY;
-            e.target.dispatchEvent(ev);
-        };
-
-        me.click = function (e) {
-            var target = e.target,
-                ev;
-
-            if ( !(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName) ) {
-                ev = document.createEvent('MouseEvents');
-                ev.initMouseEvent('click', true, true, e.view, 1,
-                    target.screenX, target.screenY, target.clientX, target.clientY,
-                    e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
-                    0, null);
-
-                ev._constructed = true;
-                target.dispatchEvent(ev);
-            }
-        };
-
         return me;
     })();
 
@@ -247,10 +223,6 @@ var scroll = module.exports = (function (window, document, Math) {
         this.options.bounceEasing = typeof this.options.bounceEasing == 'string' ? utils.ease[this.options.bounceEasing] || utils.ease.circular : this.options.bounceEasing;
 
         this.options.resizePolling = this.options.resizePolling === undefined ? 60 : this.options.resizePolling;
-
-        if ( this.options.tap === true ) {
-            this.options.tap = 'tap';
-        }
 
         if ( this.options.shrinkScrollbars == 'scale' ) {
             this.options.useTransition = false;
@@ -510,14 +482,6 @@ var scroll = module.exports = (function (window, document, Math) {
 
             // we scrolled less than 10 pixels
             if ( !this.moved ) {
-                if ( this.options.tap ) {
-                    utils.tap(e, this.options.tap);
-                }
-
-                if ( this.options.click ) {
-                    utils.click(e);
-                }
-
                 this._execEvent('scrollCancel');
                 return;
             }
@@ -1995,8 +1959,6 @@ if ($ && $.fn && !$.fn.scroll) {
             bindToWrapper : true,
             scrollbars    : true,
             fadeScrollbars: true,
-            tap           : false,
-            click         : false,
             preventDefault: true,
             refresh       : false,
         }, option);

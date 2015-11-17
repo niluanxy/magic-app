@@ -1,8 +1,8 @@
 $animationTime:         .3s;
-$opacity:               .65;
+$opacity:               0.8;
 $border-radius:         6px;
-$padding-top:           14px;
-$padding-left:          16px;
+$padding-top:           12px;
+$padding-left:          14px;
 $loading-size:          42px;
 
 .tip {
@@ -14,7 +14,10 @@ $loading-size:          42px;
         z-index: 1;
         color: #FFF;
         position: fixed;
-        white-space: nowrap;
+        line-height: 20px;
+        white-space: pre;
+        word-wrap: break-word;
+        max-width: 70%;
         text-align: center;
         background-color: rgba(0,0,0, $opacity);
         padding: $padding-top $padding-left;

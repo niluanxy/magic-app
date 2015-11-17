@@ -75,13 +75,6 @@ $.ready(function() {
             var $item = $(path[i]);
             tagName = $item[0].tagName;
 
-            /* 修复移动端input点击焦点不更新的问题 */
-            if ("INPUT TEXTAREA".search(tagName) >= 0) {
-                input = e.target;
-            } else {
-                input && input.blur();    // 刷新焦点
-            }
-
             if (checkClass($item)) {
                 handle = setTimeout((function($actobj) {
                     return function() {
@@ -105,7 +98,7 @@ $.ready(function() {
 
     /* 点击结束事件 */
     function fastend(e) {
-        var cx, cy, ct, $target = $(e.target),
+        var cx, cy, ct, $target = $(e.target), tagName,
             touch = e.changedTouches ? e.changedTouches[0] : e;
 
         tap.endX = touch.pageX;
@@ -118,7 +111,17 @@ $.ready(function() {
         if (cx<5 && cy < 5 && ct < delay) {
             $target.trigger("tap");
 
-            tap.canClick = true;
+            /* 修复移动端input点击焦点不更新的问题 */
+            tagName = e.target.tagName.toUpperCase();
+            if (e.target != input) {
+                input && input.blur();      // 刷新焦点
+            }
+
+            if ("INPUT TEXTAREA".search(tagName) >= 0) {
+                input = e.target;           // 更新绑定元素
+            }
+
+            tap.disClick = false;
             $target.trigger("click");
         }
 
@@ -164,11 +167,14 @@ $.ready(function() {
         /* 修复鼠标点透问题 */
         if (kt === 0 /* 只有支持 touch 事件时才绑定 */) {
             $document.on("click", function(e) {
-                if (!tap.canClick && e.timeStamp - tap.startTime < 200) {
+                if (!tap.disClick &&
+                    (e.timeStamp - tap.startTime) < 600 &&
+                    Math.abs(e.pageX-tap.endX) < 8 &&
+                    Math.abs(e.pageY-tap.endY) < 8 ) {
+
                     e.preventDefault();
                     e.stopImmediatePropagation();
-                } else {
-                    tap.canClick = false;
+                    tap.disClick = true;
                 }
             }, true);
         }
