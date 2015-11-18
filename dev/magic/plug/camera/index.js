@@ -7,14 +7,14 @@ module.exports = (function() {
         $load   = $.tip("", {type: "loading"}),
         modal, rview, $html, $view;
 
-    if ($plug.runtime == "phonegap") {
+    if ($plug.runtime == "cordova") {
         var camera  = navigator.camera,
         destype = camera.DestinationType,
         picsouce= camera.PictureSourceType,
         platform= $plug.platform;
     }
 
-    if ($plug.runtime != "phonegap" && $plug.runtime != "weixin") {
+    if ($plug.runtime != "cordova" && $plug.runtime != "weixin") {
         _camera.take = _camera.view = _camera.upload = _camera.hide =
             function (successCall, failCall) {
                 var showDefaultTip = true;

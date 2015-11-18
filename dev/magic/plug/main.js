@@ -7,6 +7,7 @@
             require("./camera");        // 图像操作
             require("./pay");           // 支付操作
             require("./file");          // 文件操作
+            require("./gps");           // GPS操作
 
             if (typeof call == "function") call();
         }
@@ -22,7 +23,7 @@
     if (window.cordova /* cordova环境 */) {
         $m.platform  = cordova.platformId;
         $m.osversion = cordova.platformVersion;
-        $m.runtime   = "phonegap";
+        $m.runtime   = "cordova";
     } else {
         var agent = window.navigator.userAgent.toLowerCase(), osver;
         if (agent.match(/MicroMessenger/i) /* 微信环境 */) {
@@ -99,7 +100,7 @@
         }
 
         /* 初始化加载相关具体方法和执行回调 */
-        if ($m.runtime == "phonegap") {
+        if ($m.runtime == "cordova") {
             $(document).on("deviceready", loadRequire(call));
         } else if ($m.runtime == "weixin" && weixin) {
             wx.ready(loadRequire(call));

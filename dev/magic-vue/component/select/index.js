@@ -19,7 +19,7 @@ module.exports = (function() {
                 if (scope[show] !== undefined) scope[show] = newText;
 
                 if ($.isFun(scope[call]) /* 运行对象回调方法 */) {
-                    call(newVal, newPos, newText);
+                    scope[call](newVal, newPos, newText);
                 }
             }
 
@@ -50,7 +50,7 @@ module.exports = (function() {
 
                 pos  = $el.attr("pos");
                 show = $el.attr("text");
-                tval =  $el.attr("key-val");
+                tval = $el.attr("key-val");
                 text = $el.attr("key-text");
                 mult = $el.attr("multiple");
                 call = $el.attr("call");

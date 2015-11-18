@@ -3,7 +3,7 @@
 module.exports = (function () {
     _file = $plug.file = {}, runtime = $plug.runtime;
 
-    if ($plug.runtime != "phonegap") {
+    if ($plug.runtime != "cordova") {
         _file.uploadImg = _file.uploadFile =
             function (successCall, failCall) {
                 var showDefaultTip = true;

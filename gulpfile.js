@@ -418,38 +418,27 @@ gulp.task("cordova-create", ["create_base"], function(demo) {
         .pipe(gulp.dest(DIR_CORDOVA+"resource/"))
 })
 
+
+/* 配置文件更新 */
+gulp.task("cordova-config", function() {
+    var path = DIR_CORDOVA + "platforms/android";
+
+    gulp.src(DIR_RESOURCE + "config.xml")
+        .pipe(gulp.dest(DIR_CORDOVA));
+})
+
 /* 添加android平台 */
-gulp.task("android_base", shell.task([
+gulp.task("cordova-android", ["cordova-config"], shell.task([
     "cordova platform add android"
 ], {errorMessage: errmsg, cwd: "cordova"}))
 
-gulp.task("cordova-res-android", function() {
-    var path = DIR_CORDOVA + "platforms/android";
-
-    gulp.src(DIR_RESOURCE + "android/**/*")
-            .pipe(gulp.dest(path));
-})
-
-gulp.task("cordova-android", ["android_base"], function() {
-    gulp.run("cordova-res-android");
-})
-
 
 /* 添加android平台 */
-gulp.task("ios_base", shell.task([
+gulp.task("cordova-ios", ["cordova-config"], shell.task([
     "cordova platform add ios"
 ], {errorMessage: errmsg, cwd: "cordova"}))
 
-gulp.task("cordova-res-ios", function() {
-    var path = DIR_CORDOVA + "platforms/ios";
 
-    gulp.src(DIR_RESOURCE + "ios/**/*")
-            .pipe(gulp.dest(path));
-})
-
-gulp.task("cordova-ios", ["ios_base"], function() {
-    gulp.run("cordova-res-ios");
-})
 
 /* android 只生成 apk 安装文件 */
 gulp.task("cordova-output-android", function() {
@@ -462,7 +451,7 @@ gulp.task("cordova-output-android", function() {
     })
 })
 
-gulp.task("cordova-build-android", ["cordova-res-android"], shell.task([
+gulp.task("cordova-build-android", shell.task([
     "gulp cordova",
     "cordova build android",
     "gulp cordova-output-android",
@@ -470,14 +459,14 @@ gulp.task("cordova-build-android", ["cordova-res-android"], shell.task([
 
 
 /* ios 生成 project 文件 */
-gulp.task("cordova-build-ios", ["cordova-res-ios"], shell.task([
+gulp.task("cordova-build-ios", shell.task([
     "gulp cordova",
     "cordova build ios"
 ], {errorMessage: errmsg, cwd: "cordova"}))
 
 
 /* 直接安装apk到手机上 */
-gulp.task("cordova-run-android", ["cordova-res-android"], shell.task([
+gulp.task("cordova-run-android", shell.task([
     "gulp cordova",
     "cordova run android"
 ], {errorMessage: errmsg, cwd: "cordova"}))
