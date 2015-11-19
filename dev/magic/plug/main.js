@@ -43,10 +43,12 @@
     }
 
     /* 组件初始化方法 */
-    $m.init = function(weixin, call) {
-        if ($m.runtime == "weixin" && weixin) {
+    $m.init = function(config, call) {
+        $m.config = config || {};
+
+        if ($m.runtime == "weixin" && $m.config.weixin) {
             var url = location.href.split('#')[0];
-            $.jsonp(weixin, {url:url}).then(function(rdata) {
+            $.jsonp($m.config.weixin, {url:url}).then(function(rdata) {
                 wx.config({
                     debug: false,
                     appId: rdata.appId,
