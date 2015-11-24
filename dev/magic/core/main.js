@@ -412,9 +412,44 @@ require("extend");      // 原生对象扩展
 
             /* promise 的支持 */
             defer: function() {
-                var defer = require("promise");
+                var promise = require("promise");
 
-                return new defer.Promise();
+                return new promise();
+            },
+
+            /* 函数懒执行方法，用于在初始化后才真正执行方法 */
+            callDefer: function(name, scope, defer, call) {
+                if (!name || !scope || !defer) return call;
+
+                var calls = [];     // 存放每次调用时的参数
+
+                defer.then(function() {
+                    for(var i=0; i<calls.length; i++) {
+                        call.apply(scope, calls[i]);
+                    }
+
+                    scope[name] = call; // 替换缓存函数
+                });
+
+                return function() {
+                    calls.push(arguments);
+                }
+            },
+
+            /* 检测到某个对象时候执行方法 */
+            checkRun: function(check, call, scope, timeout, time) {
+                var start = $.getTime(), handle;
+
+                scope = scope || window;    // 修复执行作用域
+
+                handle = setInterval(function() {
+                    if ((timeout && ($.getTime() - start) >= timeout) ||
+                        (scope && scope[check])) {
+
+                        call.apply(scope);
+                        clearInterval(handle);
+                    }
+                }, time || 100);
             },
 
             /* 一个简易的转换json的方法 */
