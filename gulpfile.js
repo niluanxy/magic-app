@@ -468,7 +468,8 @@ gulp.task("cordova-build-ios", shell.task([
 /* 直接安装apk到手机上 */
 gulp.task("cordova-run-android", shell.task([
     "gulp cordova",
-    "cordova run android"
+    "cordova run android",
+    "gulp cordova-output-android",
 ], {errorMessage: errmsg, cwd: "cordova"}))
 
 
@@ -551,4 +552,9 @@ gulp.task("clean.cordova", function() {
     del("www");
     del("plugins");
     del("config.xml");
+})
+
+gulp.task("del-cordova", function() {
+    del("cordova");
+    del("output");
 })

@@ -38,6 +38,28 @@ module.exports = (function () {
 
         _file.uploadFile = function () {
 
+        };
+
+        _file.apkInstall = function(url, file, successCall, failCall, progressCall) {
+            var transfer = new FileTransfer(),
+                savepath = "file:///storage/sdcard0/Download/"+file,
+                fileopen = cordova.plugins.fileOpener2,
+                opentype = "application/vnd.android.package-archive";
+
+            transfer.download(url, savepath, 
+            function(entry) {
+                if ($.isFun(successCall)) successCall(entry);
+
+                fileopen.open(entry.fullPath, opentype);
+            }, function(error) {
+                if ($.isFun(failCall)) failCall(error);
+            }, true);
+
+            if ($.isFun(progressCall)) {
+                transfer.onprogress = $.delayCall(function(progressEvent) {
+                    progressCall(progressEvent);
+                }, 100);
+            }
         }
     }
 })();
