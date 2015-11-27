@@ -1,0 +1,55 @@
+#home {
+	.scroll_body {
+		height: 100%;
+		margin-top: 0;
+		padding: 0;
+	}
+
+	.test {
+		margin-top: 20px;
+		height: 30px;
+
+		&.height {
+			height: 200px;
+		}
+
+		>* {
+			height: 100%;
+		}
+
+		&>*:nth-child(n) div {
+			display: block;
+			width: 100%;
+			height: 100%;
+			background-color: blue;
+		}
+
+		&>*:nth-child(2n) div {
+			display: block;
+			width: 100%;
+			height: 100%;
+			background-color: red;
+		}
+	}
+
+	.full {
+		height: 100%;
+		width: 100%;
+
+		.flex-item {
+			&:first-child {
+				height: 40px;
+				background-color: red;
+			}
+
+			&:last-child {
+				height: 40px;
+				background-color: yellow;
+			}
+		}
+
+		.flex-main {
+			background-color: blue;
+		}
+	}
+}

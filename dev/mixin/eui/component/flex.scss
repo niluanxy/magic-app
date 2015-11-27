@@ -1,0 +1,86 @@
+/* flex 布局组件 */
+
+@mixin flex-layout() {
+
+	.flex {
+		display: flex;
+	}
+
+	.inline-flex {
+		display: inline-flex;
+	}
+
+
+	.flex, .inline-flex {
+		flex-direction: row;
+
+		/* 元素对其方式 */
+		&.align-start {
+			justify-content: flex-start;
+		}
+
+		&.align-center {
+			justify-content: center;
+		}
+	
+		&.align-end {
+			justify-content: flex-end;
+		}
+
+
+		>*, .flex-item {
+			flex: 0 1 auto;
+		}
+
+		.flex-main {
+			flex-grow: 1;
+		}
+	}
+
+	/* 空余控件平分 */
+	.space-between {
+		justify-content: space-between;
+	}
+
+	.space-around {
+		justify-content: space-around;
+	}
+
+	.flex-col {
+		flex-direction: column;
+	}
+
+	.flex-row {
+		flex-wrap: nowrap;
+		flex-direction: row;
+	}
+
+	/* 栅格化相关代码 */
+	.flex-grid {
+		display: flex;
+
+		@for $space from 1 through $flex-grid-default {
+			/* 默认的横向栅格布局 */
+			>*, .flex-item {
+				flex: 1 1 auto;
+
+				&.grid-#{$space} {
+					width: percentage($space/$flex-grid-default) !important;
+				}
+			}
+				
+
+			/* 纵向栅格布局 */
+			&.flex-col {
+				>*, .flex-item {
+					flex: 1 1 auto;
+
+					&.grid-#{$space} {
+						width: auto !important;		// 恢复默认属性
+						height: percentage($space/$flex-grid-default) !important;
+					}
+				}
+			}
+		}
+	}
+}

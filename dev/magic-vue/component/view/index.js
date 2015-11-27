@@ -7,6 +7,14 @@ module.exports = (function() {
         ready: function() {
             var $el = $(this.$el);
             $el.addClass("mg-view");
+
+            if ($plug.platform == "ios" &&
+            	$plug.runtime  == "cordova") {
+
+            	$el.css("top", "20px");
+            }
+
+            $("body").addClass("run-ios");
         }
     });
 })();
