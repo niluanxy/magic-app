@@ -21,64 +21,78 @@
             background-image: linear-gradient(180deg, $border-color, $border-color 50%, transparent 50%);
         }
 
-        &.bar-header, &.bar-footer {
-            @include retina-border-color($border-color);
-        }
+        @include retina-border-color($border-color);
 
         .button {
             color: $color;
-        }
-
-        .input {
-            border-color: $border-color;
         }
     }
 }
 
 
 @mixin bar($styles: stable positive ) {
-    position: absolute;
+    position: relative;
     z-index: $z-index-bar;
-    right: 0; left: 0;
 
     overflow: hidden;
-
     color: $bar-default-text;
 
     text-align: center;
-    height: $bar-height;
-    padding: $bar-padding-portrait;
+    height: rem($bar-height);
     background-size: 0;
     background-color: $bar-default-bg;
+
+    display: flex;
+    @include flex-align-center;
 
     user-select: none;
     @include retina-border(bottom, $bar-default-border);
 
 
-    // Title inside of a bar is centered
     .title {
-        position: static;
-        font-size: $bar-title-font-size;
-        line-height: $bar-height - $bar-padding-portrait*2 - 1;
-
-        display: block;
+        max-width: 80%;
+        font-size: rem($bar-title-font-size);
         z-index: $z-index-bar-title;
-
-        user-select: none;
-
-        width: 100%;
-        height: 100%;
-
-        text-align: center;
-
+        
         @include text-ellipsis;
+    }
 
-        &.title-left {
-            text-align: left;
+    .button {
+        font-size: rem($bar-title-font-size);
+        line-height: rem($bar-button-height);
+        
+        z-index: $z-index-bar-button;
+        @include vertical-align-center;
+
+        min-height: rem($bar-button-height);
+        padding: 0 rem($bar-button-padding);
+
+        &:first-child, &:last-child {
+            position: absolute;
         }
 
-        &.title-right {
-            text-align: right;
+        &:first-child {
+            left: rem($bar-padding-portrait);
+        }
+
+        &:last-child {
+            right: rem($bar-padding-portrait);
+        }
+        
+        &:after {
+            height: rem($bar-height);
+            top: rem(-($button-padding / 2 + 1));
+        }
+    
+        &:before,
+        .icon:before {
+            font-size: rem($bar-button-icon-size);
+            line-height: rem($bar-button-height);
+        }
+        
+        &.button-clear:before {
+            padding: 0;
+            font-size: rem($bar-button-icon-clear-size);
         }
     }
 
@@ -99,7 +113,7 @@
             top: 0;
 
             & + .content {
-                top: $bar-height;
+                top: rem($bar-height);
             }
         }
 
@@ -110,10 +124,6 @@
 
             @include retina-border-width(top);
             @include retina-border-width(bottom, 0);
-
-            &.item-input-inset {
-                position: absolute;
-            }
         }
     }
 
@@ -121,8 +131,8 @@
         padding: $bar-padding-portrait;
 
         .button {
-            min-height: $bar-height - $bar-padding-portrait * 2 - 2;
-            line-height: $bar-height - $bar-padding-portrait * 2 - 2;
+            min-height: rem($bar-height - $bar-padding-portrait * 2 - 2);
+            line-height: rem($bar-height - $bar-padding-portrait * 2 - 2);
         }
     }
 
@@ -135,59 +145,12 @@
             width: 60%;
             height: 100%;
             float: left;
-            padding-right: $padding-base-horizontal;
+            padding-right: rem($padding-base-horizontal);
         }
 
         .button {
             width: 40%;
-            font-size: $bar-text-button-font;
-        }
-    }
-
-    input, .input {
-        padding: 0 $bar-title-font-size/2;
-        height: $bar-inline-height;
-        line-height: $bar-inline-height;
-        border-radius: $border-radius-base;
-        border: 1px solid $bar-default-border;
-    }
-
-    .button {
-        font-size: $bar-title-font-size;
-        font-weight: 400;
-        line-height: $bar-button-height;
-        
-        z-index: $z-index-bar-button;
-
-        min-height: $bar-button-height - 1;
-        padding: 0 $bar-button-padding;
-
-        &:first-child, &:last-child {
-            position: absolute;
-            top: $bar-padding-portrait;
-        }
-
-        &:first-child {
-            left: $bar-padding-portrait;
-        }
-
-        &:last-child {
-            right: $bar-padding-portrait;
-        }
-        
-        &:after {
-            height: $bar-height;
-        }
-    
-        &:before,
-        .icon:before {
-            font-size: $bar-button-icon-size;
-            line-height: $bar-button-height;
-        }
-        
-        &.button-clear:before {
-            padding: 0;
-            font-size: $bar-button-icon-clear-size;
+            font-size: rem($bar-text-button-font);
         }
     }
 }

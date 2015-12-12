@@ -56,12 +56,20 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
 
     @each $pos in $type {
         @if $pos == all {
-            &:#{$inset} {
+            @if $build-rem == true {
                 border-color: $color;
+            } @else {
+                &:#{$inset} {
+                    border-color: $color;
+                }
             }
         }@else {
-            &:#{$inset} {
+            @if $build-rem == true {
                 border-#{$pos}-color: $color;
+            } @else {
+                &:#{$inset} {
+                    border-#{$pos}-color: $color;
+                }
             }
         }
     }
@@ -73,12 +81,20 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
 
     @each $pos in $type {
         @if $pos == all {
-            &:#{$inset} {
+            @if $build-rem == true {
                 border-width: $size;
+            } @else {
+                &:#{$inset} {
+                    border-width: $size;
+                }
             }
         }@else {
-            &:#{$inset} {
+            @if $build-rem == true {
                 border-#{$pos}-width: $size;
+            } @else {
+                &:#{$inset} {
+                    border-#{$pos}-width: $size;
+                }
             }
         }
     }
@@ -92,23 +108,27 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
         @if $pos == all {
             border-radius: $size;
 
-            &:#{$inset} {
-                border-radius: $size;
+            @if $build-rem != 1 {
+                &:#{$inset} {
+                    border-radius: $size;
 
-                @media (-webkit-min-device-pixel-ratio: $retina-pixel-ratio),
-                (min-device-pixel-ratio: $retina-pixel-ratio) {
-                    border-radius: $size*2;
+                    @media (-webkit-min-device-pixel-ratio: $retina-pixel-ratio),
+                    (min-device-pixel-ratio: $retina-pixel-ratio) {
+                        border-radius: $size*2;
+                    }
                 }
             }
         }@else {
             border-radius: $size;
 
-            &:#{$inset} {
-                border-#{$pos}-radius: $size;
+            @if $build-rem != 1 {
+                &:#{$inset} {
+                    border-#{$pos}-radius: $size;
 
-                @media (-webkit-min-device-pixel-ratio: $retina-pixel-ratio),
-                (min-device-pixel-ratio: $retina-pixel-ratio) {
-                    border-#{$pos}-radius: $size*2;
+                    @media (-webkit-min-device-pixel-ratio: $retina-pixel-ratio),
+                    (min-device-pixel-ratio: $retina-pixel-ratio) {
+                        border-#{$pos}-radius: $size*2;
+                    }
                 }
             }
         }
@@ -117,23 +137,28 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
 
 // retina 屏幕下 视网膜屏幕边框 核心代码
 @mixin retina-border-content($color, $radio: $retina-pixel-ratio) {
-    z-index: 1;
-    content: " ";
-    position: absolute;
-    border-style: solid;
-    border-color: $color;
-    border-width: 0;
-    width: 100%;
-    height: 100%;
-    left: 0; top: 0;
-    pointer-events: none;
+    @if $build-rem == true {
+        border-color: $color;
+        border-style: solid;
+    } @else {
+        z-index: 1;
+        content: " ";
+        position: absolute;
+        border-style: solid;
+        border-color: $color;
+        border-width: 0;
+        width: 100%;
+        height: 100%;
+        left: 0; top: 0;
+        pointer-events: none;
 
-    @media (-webkit-min-device-pixel-ratio: $radio),
-            (min-device-pixel-ratio: $radio) {
+        @media (-webkit-min-device-pixel-ratio: $radio),
+                (min-device-pixel-ratio: $radio) {
 
-        left: -50%; top: -50%;
-        width: 200%; height: 200%;
-        transform: scale(.5, .5);
+            left: -50%; top: -50%;
+            width: 200%; height: 200%;
+            transform: scale(.5, .5);
+        }
     }
 }
 
@@ -145,9 +170,9 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
     
     $inset: before; @if $after == true { $inset: after; }// 
 
-    &:#{$inset} {
-        @include retina-border-content($color, $retina-pixel-ratio);
-
+    @include retina-border-content($color, $retina-pixel-ratio);
+    
+    @if $build-rem == true {
         @each $pos in $type {
             @if $pos == all {
                 border-width: 1px;
@@ -155,5 +180,34 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
                 border-#{$pos}-width: 1px;
             }
         }
+    } @else {
+        &:#{$inset} {
+            @each $pos in $type {
+                @if $pos == all {
+                    border-width: 1px;
+                }@else {
+                    border-#{$pos}-width: 1px;
+                }
+            }
+        }
     }
+}
+
+// css3 居中
+@mixin vertical-align-center() {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+@mixin trans-center() {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+// Flex布局相关属性设置
+@mixin flex-align-center() {
+    justify-content: space-around;
+    align-items: center;
 }

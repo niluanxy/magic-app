@@ -2,32 +2,4 @@ mg-slider, .slider {
     width: 100%;
     font-size: 0;
     overflow: hidden;
-
-    .slider_scroll {
-        font-size: 0em;
-        display: inline;
-        height: 100%;
-        white-space: nowrap;
-
-        &.hasInit {
-            display: block;
-        }
-    
-        .slider-item {
-            display: inline-block;
-        }
-    }
-
-    .slider-item {
-        display: none;
-        width: 100%;
-
-        &:first-child {
-            display: inline-block;
-        }
-
-        img {
-            width: 100%;
-        }
-    }
 }

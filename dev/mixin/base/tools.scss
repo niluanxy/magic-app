@@ -1,0 +1,33 @@
+/*====================================================
+ * 全局底层函数方法变量配置
+ *====================================================*/
+
+// 1 表示编译为 REM 单位
+$build-rem:						true !default;
+// 默认基本字体单位
+$build-rem-base:				20px !default;
+
+
+
+/*====================================================
+ * Px 转换 Rem 工具方法，$base 默认采取系统设置值
+ *====================================================*/
+@function rem($px, $base: $build-rem-base) {
+	@if $build-rem == true {
+		@return ($px / $base) * 1rem;
+	} @else {
+		@return $px;
+	}
+}
+
+
+// icon 图标基本属性
+@mixin icon-base {
+	font-family: $font-family-icon;
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+}

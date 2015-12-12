@@ -103,7 +103,7 @@
 
         /* 初始化加载相关具体方法和执行回调 */
         if ($m.runtime == "cordova") {
-            $(document).on("deviceready", loadRequire(call));
+            loadRequire(call)();
         } else if ($m.runtime == "weixin" && weixin) {
             wx.ready(loadRequire(call));
         } else {

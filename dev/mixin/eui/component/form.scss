@@ -5,7 +5,7 @@
 @mixin form() {
     @at-root {
         input, button, select, textarea {
-            font-size: $font-size-base;
+            font-size: rem($font-size-base);
             font-weight: normal;
             font-family: $font-family-base;
         }
@@ -13,10 +13,131 @@
         input {
             border: 0;
             padding: 0;
-            width: 100%;
-            height: $input-height-base;
-            line-height: $line-height-computed;
             vertical-align: middle;
+
+            &[type="text"] {
+                width: 100%;
+                height: rem($input-height-base);
+                line-height: rem($line-height-computed);
+            }
+
+            &[type="checkbox"], &[type="radio"] {
+                display: inline-block;
+            }
+
+            // 禁用原生样式，方便后面重置样式
+            &.checkbox, &.radio, &.toggle {
+                background-color: transparent;
+                text-align: center;
+                height: rem($input-inline-size);
+                width: rem($input-inline-size);
+                -webkit-appearance: none;
+            }
+
+            &.checkbox, &.radio {
+                color: $color-positive;
+                position: relative;
+                margin: rem($input-inline-fix);
+
+                &:before {
+                    position: absolute;
+                    z-index: 1;
+                    font-size: rem($input-icon-size);
+                    @include icon-base;
+                    @include trans-center;
+                }
+
+                &:after {
+                    content: " ";
+                    display: block;
+                    top: rem(- $input-inline-fix);
+                    left: rem(- $input-inline-fix);
+                    right: rem(- $input-inline-fix);
+                    bottom: rem(- $input-inline-fix);
+                    position: absolute;
+                }
+            }
+
+            &.checkbox {
+                &:before {
+                    content: $input-checkbox-empty;   
+                }
+
+                &:checked:before,
+                &.checked:before {
+                    content: $input-checkbox-select;
+                }
+            }
+
+            &.radio {
+                &:before {
+                    content: $input-radio-empty;
+                }
+
+                &:checked:before,
+                &.checked:before {
+                    content: $input-radio-select;
+                }
+            }
+
+            &.toggle {
+                width: rem($input-toggle-width);
+                height: rem($input-toggle-height);
+                border-radius: rem($input-toggle-height);
+                position: relative;
+                overflow: hidden;
+
+                &:before, &:after {
+                    content: " ";
+                    display: block;
+                    overflow: hidden;
+                    position: absolute;
+                }
+
+                &:before {
+                    z-index: 2;
+                    top: rem($input-toggle-border);
+                    left: rem($input-toggle-border);
+                    border-radius: 50%;
+                    width: rem($input-toggle-height - $input-toggle-border * 2);
+                    height: rem($input-toggle-height - $input-toggle-border * 2);
+                    background-color: $input-toggle-center;
+                    box-shadow: 0 rem($input-shadow-vpos)
+                                  rem($input-shadow-blur)
+                                  rgba(0, 0, 0, $input-shadow-opacity),
+
+                                0 rem($input-shadow-base) 
+                                  rem($input-shadow-base)
+                                  rgba(0, 0, 0, $input-shadow-opacity/2);
+
+                    transition: 0.3s cubic-bezier(0, 1.1, 1, 1.1);
+                    transition-property: background-color, transform;
+                }
+
+                &:after {
+                    z-index: 1;
+                    width: 100%;
+                    height: 100%;
+                    border: rem($input-toggle-border) solid $input-toggle-uncheck;
+                    border-radius: rem($input-toggle-height);
+                    background-color: $input-toggle-unback;
+
+                    transition: 0.3s cubic-bezier(0, 1.1, 1, 1.1);
+                    transition-property: background-color, border;
+                }
+                
+                &:checked,
+                &.checked {
+                    &:before {
+                        transform: translate3d(rem($input-toggle-move), 0, 0);
+                    }
+
+                    &:after {
+                        border-color: $input-toggle-back;
+                        background-color: $input-toggle-back;
+                    }
+                }
+            }
         }
 
         textarea {

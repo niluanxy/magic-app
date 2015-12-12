@@ -3,28 +3,64 @@
 // ========================================================
 
 @mixin slider() {
-    display: block;
+    width: 100%;
+    font-size: 0;
+    overflow: hidden;
+    position: relative;
+
+    .slider_scroll {
+        font-size: 0;
+        display: inline;
+        height: 100%;
+        position: relative;
+        white-space: nowrap;
+
+        &.hasInit {
+            display: block;
+        }
+    
+        .slider-item {
+            display: inline-block;
+        }
+    }
 
     .slider-item {
         display: none;
-        position: relative;
+        width: 100%;
 
-        .show {
+        &:first-child {
+            display: inline-block;
+        }
+
+        img {
             width: 100%;
-            display: block;
         }
 
         .desc {
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            color: #FFF;
-            position: absolute;
-            background: rgba(0,0,0,.6);
+            font-size: rem($slider-font-size);
         }
+    }
 
-        &.active {
-            display: block;
+    .slider-points {
+        z-index: 1;
+        text-align: center;
+        width: 100%;
+        bottom: 0;
+        height: rem($slider-points-height);
+        padding: rem(($slider-points-height - $slider-points-size) / 2) 0;
+        position: absolute;
+
+        .item {
+            margin: 0 rem($slider-points-margin);
+            background-color: rgba(0, 0, 0, $slider-points-opacity);
+            display: inline-block;
+            width: rem($slider-points-size);
+            height: rem($slider-points-size);
+            border-radius: 50%;
+
+            &.active {
+                background-color: $slider-points-active;
+            }
         }
     }
 }

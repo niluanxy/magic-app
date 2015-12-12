@@ -2052,7 +2052,7 @@ if ($ && $.fn && !$.fn.scroll) {
             var $body = $el, last = 0,
                 bind  = option.refresh === "true" ? "on" : "once";
 
-            $(document)[bind]("touchstart", function() {
+            $el.parent()[bind]("touchstart", function() {
                 var height = $body.height();
                 if (height != last) {
                     handle.refresh();      // 强制刷新高度

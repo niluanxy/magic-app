@@ -4,28 +4,30 @@
     <meta charset="UTF-8">
     <title>magic app</title>
 
-    <!--<script>-->
-        <!--(function() {-->
-            <!--var ratio = window.devicePixelRatio,-->
-                    <!--scale, html, meta, head = document.head;-->
+    <script type="text/javascript">
+        (function() {
+            var ratio = window.devicePixelRatio,
+                width = screen.width, dwidth,
+                scale = 1, html, meta, head = document.head;
 
-            <!--if (ratio !== undefined) {-->
-                <!--// scale =   ratio >= 3   ? 0.39 :-->
-                <!--//         ( ratio >= 1.5 ? 0.5 : 1)-->
-                <!--scale = 0.5;-->
-            <!--}-->
+            if (ratio !== undefined) {
+                scale  = 1/ratio;
+                dwidth = ratio * width;
+            } else {
+                scale  = 1;
+                dwidth = "device-width";
+            }
 
-            <!--meta = document.createElement("meta");-->
-            <!--meta.setAttribute("name", "viewport");-->
-            <!--content  = 'initial-scale=' + scale;-->
-            <!--content += ', maximum-scale='+scale;-->
-            <!--content += ', user-scalable=no, width=device-width';-->
-            <!--meta.setAttribute("content", content);-->
+            meta = document.createElement("meta");
+            meta.setAttribute("name", "viewport");
+            content  = 'initial-scale=' + scale;
+            content += ', maximum-scale='+scale;
+            content += ', user-scalable=no, width='+dwidth;
+            meta.setAttribute("content", content);
 
-            <!--head.appendChild(meta); // 插入到页面中-->
-        <!--})();-->
-    <!--</script>-->
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+            head.appendChild(meta); // 插入到页面中
+        })();
+    </script>
     <meta name="apple-mobile-web-app-title" content="weishop">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-touch-fullscreen" content="yes" />
@@ -33,28 +35,41 @@
 
     
     <link rel="stylesheet" href="page/main.css">
+    <link rel="stylesheet" href="pub/lib/ionicons.min.css">
 
-    <script type="text/javascript" src="pub/lib/vue.min.js"></script>
-    <script type="text/javascript" src="page/main.js"></script>
+    <script type="text/javascript" src="pub/lib/magic.js"></script>
+    <script type="text/javascript" src="pub/lib/rem.js"></script>
 </head>
 <body>
-    <mg-view></mg-view>
+    <div class="bar bar-positive">
+        <a class="button button-clear">后退</a>
+        <h3 class="title">这里是一个标题</h3>
+        <a class="button button-clear">测试</a>
+    </div>
 
-<!--     <script>
-        /* REM 自适应代码，以 IP6 为设计图 */
-        (function (doc, win) {
-          var docEl = doc.documentElement,
-            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
-            recalc = function () {
-              var clientWidth = docEl.clientWidth;
-              if (!clientWidth) return;
-              docEl.style.fontSize = 20 * (clientWidth / 375) + 'px';
-            };
+    <div class="slider" id="slider">
+        <div class="slider-item">
+            <img src="http://img.wan.renren.com/images/2012/1219/thumb_940__1355915628909.jpg" alt="">
+        </div>
 
-          if (!doc.addEventListener) return;
-          win.addEventListener(resizeEvt, recalc, false);
-          doc.addEventListener('DOMContentLoaded', recalc, false);
-        })(document, window);
-    </script> -->
+        <div class="slider-item">
+            <img src="http://cdn.duitang.com/uploads/item/201202/12/20120212184013_rykjE.thumb.700_0.jpg" alt="">
+        </div>
+
+        <div class="slider-item">
+            <img src="http://imgsrc.baidu.com/baike/pic/item/fd428c45046833678694731e.jpg" alt="">
+        </div>
+    </div>
+
+    <div class="tabs tabs-positive tabs-icon-top tabs-footer">
+        <div class="tab-item"><i class="icon ion-bag"></i>aaa</div>
+        <div class="tab-item"><i class="icon ion-bag"></i>bbb</div>
+        <div class="tab-item"><i class="icon ion-bag"></i>ccc</div>
+        <div class="tab-item"><i class="icon ion-bag"></i>ddd</div>
+    </div>
+
+    <script>
+        $("#slider").slider();
+    </script>
 </body>
 </html>

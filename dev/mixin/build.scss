@@ -1,19 +1,10 @@
 @charset "utf-8";
-/*********************************************************************
- * 载入依赖的CSS样式生成库
- *********************************************************************/
-@import "../lib/mixin.scss";
 
 /*********************************************************************
  * reset 浏览器重置样式输出
  *********************************************************************/
 @include reset();
-@include tools();
 
-html, body {
-    width: 100%;
-    height: 100%;
-}
 
 /*********************************************************************
  * coreui 核心UI组件样式输出
@@ -25,6 +16,8 @@ html, body {
 .list       { @include list(); }
 .slider     { @include slider(); }
 
-@include form();
-@include flex-layout();		// flex   布局组件样式
+@include form();			// form   表单组件元素
+@include tools();			// tools  常用工具样式类
+@include text();			// text   文字样式代码
 @include layout();      	// layout 布局组件样式代码
+@include flex-layout();		// flex   布局组件样式

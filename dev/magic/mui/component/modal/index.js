@@ -59,10 +59,10 @@ module.exports = (function() {
 
     Modal.prototype.show = function(anim) {
         var scroll = this.el.data("ui_scroll");
-        if (scroll) scroll.scrollTo(0, 0);
 
         this.isHide = false;
         this.el.removeClass("hideOut").addClass("showIn");
+        if (scroll) scroll.scrollTo(0, 0);
         
         return this;
     };

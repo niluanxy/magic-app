@@ -6,7 +6,7 @@
  */
 
 $.ready(function() {
-    var $document = $(document), tap = {canClick: false},
+    var $document = $(document), tap = {},
         delay = 300, fastmove, input;
 
 
@@ -24,6 +24,11 @@ $.ready(function() {
 
         return false;
     }
+
+    /* 修复input 焦点问题 */
+    $document.on("focus", function(e) {
+        input = e.target;
+    }, true)
 
     function checkIn(parent, child) {
         do {
@@ -117,8 +122,22 @@ $.ready(function() {
                 input && input.blur();      // 刷新焦点
             }
 
-            if ("INPUT TEXTAREA".search(tagName) >= 0) {
+            if ("INPUT TEXTAREA".split(" ").indexOf(tagName) >= 0) {
                 input = e.target;           // 更新绑定元素
+
+                var type = $target.attr("type");
+
+                type = type ? type.toUpperCase() : type;
+
+                if (type && "RADIO CHECKBOX".split(" ").indexOf(type) >= 0) {
+                    if (input.checked == true) {
+                        $target.removeClass("checked");
+                    } else {
+                        if (type == "CHECKBOX") {
+                            $target.addClass("checked");
+                        }
+                    }
+                }
             }
 
             tap.disClick = false;
@@ -168,13 +187,28 @@ $.ready(function() {
         if (kt === 0 /* 只有支持 touch 事件时才绑定 */) {
             $document.on("click", function(e) {
                 if (!tap.disClick &&
-                    (e.timeStamp - tap.startTime) < 600 &&
-                    Math.abs(e.pageX-tap.endX) < 8 &&
-                    Math.abs(e.pageY-tap.endY) < 8 ) {
+                    (e.timeStamp - tap.startTime) < 300) {
 
+                    /* 临时修复 自定义 click 事件无法触发 input 默认点击效果 BUG */
+                    if (e.target.tagName.toUpperCase() == "INPUT") {
+                        var tar  = e.target,
+                            type = $(tar).attr("type");
+
+                        type = type ? type.toUpperCase() : type;    
+
+                        if (type && "RADIO CHECKBOX".split(" ").indexOf(type) >= 0) {
+                            if (tar.checked === false) {
+                                tar.checked = true;
+                            } else if (type == "CHECKBOX") {
+                                tar.checked = false;
+                            }
+                        }
+                    }
+
+                    tap.disClick = true;
+                } else {
                     e.preventDefault();
                     e.stopImmediatePropagation();
-                    tap.disClick = true;
                 }
             }, true);
         }

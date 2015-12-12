@@ -8,7 +8,7 @@
     overflow: hidden;
     color: $list-item-default-text;
     position: relative;
-    margin-bottom: $list-margin-bottom;
+    margin-bottom: rem($list-margin-bottom);
     background-color: $list-item-default-bg;
     @include retina-border(top bottom, $list-item-default-border);
 
@@ -20,25 +20,31 @@
     &.allact .item.active,
     .item[href].active,
     .item.canact.active {
-        @include retina-border-width(bottom, 0);
-
-        &:after {
-            content: " ";
-            position: absolute;
-            z-index: -1;
-            top: 0;
-            height: 100%;
-            left: -50%;
-            width: 200%;
+        @if ($build-rem == true) {
             background-color: $list-item-default-active-bg;
+        } @else {
+            @include retina-border-width(bottom, 0);
+            
+            &:after {
+                content: " ";
+                position: absolute;
+                z-index: -1;
+                top: 0;
+                height: 100%;
+                left: -50%;
+                width: 200%;
+                background-color: $list-item-default-active-bg;
+            }
         }
     }
 
     .item.clear.active {
-        @include retina-border-width(bottom, 1px);
-
-        &:after {
-            display: none;
+        @if ($build-rem != true) {
+            @include retina-border-width(bottom, 1px);
+            
+            &:after {
+                display: none;
+            }
         }
     }
 
@@ -47,35 +53,34 @@
         position: relative;
         z-index: $z-index-item;
 
-        line-height: $list-item-line-height;
-        min-height: $list-item-padding*2 + $list-item-line-height;
+        line-height: rem($list-item-line-height);
+        min-height: rem($list-item-padding*2 + $list-item-line-height);
 
-        font-size: $list-item-font-size;
-        padding: $list-item-padding;
+        font-size: rem($list-item-font-size);
+        padding: rem($list-item-padding);
         @include retina-border(bottom, $list-item-default-border);
 
         &:last-child {
-            border-bottom-width: 0;
             @include retina-border-width(bottom, 0);
         }
 
         &.item-inline {
-            padding: $list-item-padding/3 $list-item-padding;
-            min-height: $list-item-padding/3 + $list-item-line-height;
+            padding: rem($list-item-padding/3) rem($list-item-padding);
+            min-height: rem($list-item-padding/3 + $list-item-line-height);
             border-bottom-width: 0;
         }
 
         &.inline-first {
-            margin-top: $list-item-padding/3*1.5;
+            margin-top: rem($list-item-padding/3*1.5);
         }
 
         &.inline-last {
-            margin-bottom: $list-item-padding/3*1.5;
+            margin-bottom: rem($list-item-padding/3*1.5);
         }
 
         &.item-embed {
-            margin-left: $list-item-padding;
-            margin-right: $list-item-padding;
+            margin-left: rem($list-item-padding);
+            margin-right: rem($list-item-padding);
 
             padding-left: 0;
             padding-right: 0;
@@ -85,8 +90,8 @@
             color: $list-item-icon-color;
 
             &:before {
-                font-size: $list-item-icon-right-font-size;
-                margin-top: $list-item-icon-fix;
+                font-size: rem($list-item-icon-right-font-size);
+                margin-top: rem($list-item-icon-fix);
             }
         }
 
@@ -96,20 +101,20 @@
         }
     }
     &.list-embed {
-        padding: 0 $list-item-padding;
+        padding: 0 rem($list-item-padding);
 
         .item {
-            padding: $list-item-padding 0;
+            padding: rem($list-item-padding) 0;
 
             &.item-inline {
-                padding: $list-item-padding/3 0;
+                padding: rem($list-item-padding/3) 0;
             }
         }
     }
     &.list-embed-left {
         .item {
             padding-left: 0;
-            margin-left: $list-item-padding;
+            margin-left: rem($list-item-padding);
         }
     }
 
@@ -119,7 +124,7 @@
      *====================================================*/
     .item {
         &.item-input {
-            padding: $list-item-inset-top-padding $list-item-padding;
+            padding: rem($list-item-inset-top-padding) rem($list-item-padding);
 
             input {
                 font-size: inherit;
@@ -141,9 +146,9 @@
             .avator {
                 border-radius: $list-border-radius;
                 position: absolute;
-                top: $list-item-padding;
-                left: $list-item-padding;
-                bottom: $list-item-padding;
+                top: rem($list-item-padding);
+                left: rem($list-item-padding);
+                bottom: rem($list-item-padding);
 
                 img {
                     width: 100%;
@@ -156,40 +161,40 @@
                 position: relative;
 
                 &:first-of-type {
-                    top: -$list-item-avator-fix;
+                    top: rem(-$list-item-avator-fix);
                 }
 
                 &:last-of-type {
-                    bottom: -$list-item-avator-fix;
+                    bottom: rem(-$list-item-avator-fix);
                 }
             }
         }
 
         &.item-avator {
-            min-height: $list-item-padding*2 + $list-item-avator;
-            padding-left: $list-item-padding*2 + $list-item-avator;
+            min-height: rem($list-item-padding*2 + $list-item-avator);
+            padding-left: rem($list-item-padding*2 + $list-item-avator);
 
             .avator {
-                width: $list-item-avator;
-                height: $list-item-avator;
+                width: rem($list-item-avator);
+                height: rem($list-item-avator);
             }
 
             .line {
-                line-height: $list-item-avator/2;
+                line-height: rem($list-item-avator/2);
             }
         }
 
         &.item-avator-large {
-            min-height: $list-item-padding*2 + $list-item-avator-large;
-            padding-left: $list-item-padding*2 + $list-item-avator-large;
+            min-height: rem($list-item-padding*2 + $list-item-avator-large);
+            padding-left: rem($list-item-padding*2 + $list-item-avator-large);
 
             .avator {
-                width: $list-item-avator-large;
-                height: $list-item-avator-large;
+                width: rem($list-item-avator-large);
+                height: rem($list-item-avator-large);
             }
 
             .line {
-                line-height: $list-item-avator-large/3;
+                line-height: rem($list-item-avator-large/3);
             }
         }
     }
@@ -204,11 +209,11 @@
         }
 
         &.item-avator {
-            padding-left: $list-item-padding + $list-item-avator;
+            padding-left: rem($list-item-padding + $list-item-avator);
         }
 
         &.item-avator-large {
-            padding-left: $list-item-padding + $list-item-avator-large;
+            padding-left: rem($list-item-padding + $list-item-avator-large);
         }
     }
 
@@ -221,7 +226,7 @@
         &.icon-left .icon,
         &.icon-left .icon-small {
             position: absolute;
-            left: $list-item-padding;
+            left: rem($list-item-padding);
             top:50%;
             transform: translate(0,-50%);
         } 
@@ -242,13 +247,13 @@
      *====================================================*/
     .item {
         &.label-left {
-            padding-left: $list-item-inset-left-padding;
+            padding-left: rem($list-item-inset-left-padding);
 
             .label {
                 display: block;
-                width: $list-item-inset-left-padding - $list-item-padding;
-                min-height: $list-item-line-height;
-                line-height: $list-item-line-height;
+                width: rem($list-item-inset-left-padding - $list-item-padding);
+                min-height: rem($list-item-line-height);
+                line-height: rem($list-item-line-height);
             }
         }
     }
@@ -259,7 +264,7 @@
      *====================================================*/
     .item {
         &.icon-left {
-            padding-left: $list-item-icon-padding;
+            padding-left: rem($list-item-icon-padding);
         }
     }
 
@@ -272,7 +277,7 @@
         &.label-right .label-right,
         &.item-button-right .button {
             position: absolute;
-            right: $list-item-padding;
+            right: rem($list-item-padding);
             top:50%;
             transform: translate(0,-50%);
         }
@@ -292,10 +297,10 @@
      *====================================================*/
     .item {
         &.icon-right {
-            padding-right: $list-item-icon-right-padding;
+            padding-right: rem($list-item-icon-right-padding);
 
             .icon-right:before {
-                font-size: $list-item-icon-right-font-size;
+                font-size: rem($list-item-icon-right-font-size);
             }
         }
     }
@@ -306,12 +311,12 @@
     .item {
         &.icon-right {
             .label-right {
-                right: $list-item-padding + $list-item-label-right-padding;
+                right: rem($list-item-padding + $list-item-label-right-padding);
             }
 
             &.item-embed .label-right {
-                right: $list-item-label-right-padding;
-                line-height: $list-item-line-height;
+                right: rem($list-item-label-right-padding);
+                line-height: rem($list-item-line-height);
             }
         }
     }
@@ -323,17 +328,17 @@
      *====================================================*/
     .item {
         &.item-button-right {
-            padding-right: $list-item-inset-left-padding;
+            padding-right: rem($list-item-inset-left-padding);
 
             .button {
-                font-size: $list-item-button-font-size;
-                padding: 0 $list-item-button-padding;
-                line-height: $list-item-button-height;
-                min-height: $list-item-button-height;
+                font-size: rem($list-item-button-font-size);
+                padding: 0 rem($list-item-button-padding);
+                line-height: rem($list-item-button-height);
+                min-height: rem($list-item-button-height);
 
                 &.button-clear {
                     padding: 0;
-                    font-size: $list-item-font-size;
+                    font-size: rem($list-item-font-size);
                 }
             }
         }

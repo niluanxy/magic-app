@@ -3,15 +3,14 @@
 $numpad-height:                     44px !default;
 
 .numpad {
-    display: flex !important;
-    overflow: hidden;
-    text-align: center;
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: block;
+    position: relative;
+    width: 100%;
+    height: $numpad-height * 4;
 
     .numbers, .actions {
-        display: flex;
-        flex-wrap: wrap;
+        display: block;
+        text-align: center;
 
         .item {
             flex: 1;
@@ -19,9 +18,11 @@ $numpad-height:                     44px !default;
             user-select: none;
             line-height: $numpad-height;
             min-height: $numpad-height;
+            height: $numpad-height;
             display: inline-block;
 
             &[val="ok"] {
+                height: $numpad-height * 2;
                 min-height: $numpad-height * 2;
                 line-height: $numpad-height * 2;
             }
@@ -42,16 +43,23 @@ $numpad-height:                     44px !default;
     }
 
     .numbers {
-        flex: 3;
-        flex-direction: row;
+        width: 75%;
+        overflow: hidden;
 
         .item {
-            min-width: 33%;
+            min-width: 33.33333%;
+            float: left;
         }
     }
 
     .actions {
-        flex: 1;
-        flex-direction: column;
+        width: 25%;
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        .item {
+            display: block;
+        }
     }
 }

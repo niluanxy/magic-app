@@ -7,7 +7,7 @@ module.exports = (function () {
     /* GPS相关配置 */
     getOption = {
         enableHighAccuracy: true,   //是否使用高精度定位
-        timeout: 3000,              //超过3秒后停止定位
+        timeout: 2000,              //超过2秒后停止定位
         maximumAge: 0,              //定位结果缓存0毫秒
     };
 
@@ -15,7 +15,7 @@ module.exports = (function () {
     if ($m.config.amap) {
         /* 插件初始化好以后返回回掉 */
         $.checkRun("AMap", function() {
-            if (AMap && AMap.plugin) {
+            if (window.AMap && window.AMap.plugin) {
                 AMap.plugin('AMap.Geolocation', function() {
                     Geolocation = new AMap.Geolocation(getOption);
                 });

@@ -3,15 +3,25 @@
 module.exports = (function() {
     require("./style.css");
 
-    var _camera = $plug.camera = {},
-        $load   = $.tip("", {type: "loading"}),
-        modal, rview, $html, $view;
-
-    if ($plug.runtime == "cordova") {
-        var camera  = navigator.camera,
+    function initVars() {
+        camera  = navigator.camera,
         destype = camera.DestinationType,
         picsouce= camera.PictureSourceType,
         platform= $plug.platform;
+    }
+
+    var _camera = $plug.camera = {},
+        $load   = $.tip("", {type: "loading"}),
+        modal, rview, $html, $view, camera, destype,
+        picsouce, platform;
+
+
+    if ($plug.runtime == "cordova" && navigator.camera) {
+        initVars();
+    } else {
+        $(document).on("deviceready", function() {
+            initVars();
+        })
     }
 
     if ($plug.runtime != "cordova" && $plug.runtime != "weixin") {

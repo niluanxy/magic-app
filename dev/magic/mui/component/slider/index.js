@@ -1,5 +1,3 @@
-require("./style.css");
-
 module.exports = (function() {
     var Slider = function(el, options) {
         this.el         = $(el);
@@ -25,12 +23,30 @@ module.exports = (function() {
     }
 
     Slider.prototype.init = function() {
-        var that = this, opt = that.options, childs, $first, scroll;
+        var that = this, opt = that.options, childs, $first, scroll, $point;
 
         that.el.wrapAll("<div class='slider_scroll'></div>");
+        $point = that.el.find(".slider-points");
+
         scroll = that.el.children();
         childs = scroll.query(".slider-item");
         $first = $(childs[0] || childs);
+ 
+        if ($point.length > 0) {
+            $point.appendTo(that.el);
+        } else {
+            var html = '<div class="slider-points">';
+
+            for(var i=0; i<childs.length; i++) {
+                if (i == 0) {
+                    html += '<i class="item active"></i>';
+                } else {
+                    html += '<i class="item"></i>';
+                }
+            }
+
+            that.el.append(html+"</div>");
+        }
 
         that.__render = $first.render(function() {
             that.pageWidth = $first.width();
@@ -102,6 +118,15 @@ module.exports = (function() {
         return this;
     }
 
+    /* 更新当前指示器 */
+    Slider.prototype.updatePoint = function() {
+        var index = this.pageIndex + 1,
+            point = this.el.find(".slider-points");
+
+        point.find(".item.active").removeClass('active');
+        point.find(".item:nth-child("+index+")").addClass("active");
+    }
+
     /* 重新启动定时器，尝试切换到给定的页面 */
     Slider.prototype.resume = function(pagex) {
         if (this.pageWidth > 0) {
@@ -115,6 +140,7 @@ module.exports = (function() {
             }
 
             pagex && that.go(pagex);        // 尝试切换到给定页面
+            that.updatePoint();             // 更新指示器状态
         }
 
         return this;
@@ -173,6 +199,8 @@ module.exports = (function() {
             this.handle.goToPage(pagex, 0);     // 滚动到对应页面
             this.pageIndex = pagex;             // 更新当前索引
             !isnow && this.exec("enter");       // 当前页面进入回调
+
+            this.updatePoint();                 // 更新指示器状态
         }
 
         return this;

@@ -28,7 +28,7 @@
 }
 
 @mixin tabs($styles: stable positive) {
-    line-height: $tabs-height;
+    line-height: rem($tabs-height);
 
     z-index: $z-index-tabs;
 
@@ -38,7 +38,7 @@
     position: relative;
 
     width: 100%;
-    height: $tabs-height;
+    height: rem($tabs-height);
 
     text-align: center;
     background-size: 0;
@@ -51,7 +51,7 @@
         flex: 1;
         opacity: 1;
         position: relative;
-        font-size: $tabs-text-font-size;
+        font-size: rem($tabs-text-font-size);
         text-decoration: none;
         @include text-ellipsis();
 
@@ -80,16 +80,16 @@
 
     .icon {
         display: block;
-        font-size: $tabs-icon-size;
-        height: $tabs-icon-size;
+        font-size: rem($tabs-icon-size);
+        height: rem($tabs-icon-size);
     }
 
     &.tabs-icon-top,
     &.tabs-icon {
         .tab-item {
-            padding-top: $tabs-padding;
-            font-size: $tabs-text-font-size-side-icon;
-            line-height: $tabs-text-font-size;
+            padding-top: rem($tabs-padding);
+            font-size: rem($tabs-text-font-size-side-icon);
+            line-height: rem($tabs-text-font-size);
         }
     }
 
@@ -97,7 +97,7 @@
         .icon {
             height: 100%;
             line-height: inherit;
-            font-size: $tabs-icon-size-only;
+            font-size: rem($tabs-icon-size-only);
         }
     }
 
@@ -128,7 +128,7 @@
             transform: translate(-50%, 0);
             content: ' ';
             width: $tabs-striped-width;
-            height: $tabs-striped-height;
+            height: rem($tabs-striped-height);
             background-color: $tabs-default-text;
         }
     }

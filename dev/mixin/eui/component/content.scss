@@ -12,14 +12,14 @@
     padding-top:1px;
 
     &.padding > *:first-child {
-        padding: $content-padding;
+        padding: rem($content-padding);
     }
 
     &.has-header {
-        top: $bar-height;
+        top: rem($bar-height);
     }
     &.has-footer {
-        bottom: $bar-height;
+        bottom: rem($bar-height);
     }
 
     >*:first-child {
@@ -27,7 +27,7 @@
     }
 
     &.refreshUp {
-        padding-top: $content-pull-height;
+        padding-top: rem($content-pull-height);
     }
 
     .scroll_pullDown, .scroll_pullUp {
@@ -38,8 +38,8 @@
         padding: 0 15%;
         text-align: center;
         overflow: hidden;
-        height: $content-pull-height;
-        line-height: $content-pull-height;
+        height: rem($content-pull-height);
+        line-height: rem($content-pull-height);
         background-color: $content-pull-back;
 
         .icon {
@@ -48,11 +48,11 @@
     }
 
     .scroll_pullDown {
-        top: -$content-pull-height;
+        top: rem(-$content-pull-height);
     }
 
     .scroll_pullUp {
-        bottom: -$content-pull-height;
+        bottom: rem(-$content-pull-height);
     }
 }
 

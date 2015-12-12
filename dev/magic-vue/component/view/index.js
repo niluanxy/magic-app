@@ -12,9 +12,8 @@ module.exports = (function() {
             	$plug.runtime  == "cordova") {
 
             	$el.css("top", "20px");
+                $("body").addClass("run-ios");
             }
-
-            $("body").addClass("run-ios");
         }
     });
 })();

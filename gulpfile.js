@@ -32,10 +32,10 @@ var cordova = false;    // APP打包是否为cordova输出
 function task_dev_mixin() {
     var defer = Q.defer(), path = DIR_APP+"pub/css/lib/";
 
-    gulp.src([DIR_MIXIN+"core/*.scss",
-        DIR_MIXIN+"eui/varible/_z-index.scss",
-        DIR_MIXIN+"eui/varible/_color.scss",
-        DIR_MIXIN+"eui/varible/_base.scss",
+    gulp.src([DIR_MIXIN+"base/tools.scss",
+        DIR_MIXIN+"base/color.scss",
+        DIR_MIXIN+"base/*.scss",
+        DIR_MIXIN+"core/*.scss",
         DIR_MIXIN+"eui/varible/button.scss",
         DIR_MIXIN+"eui/varible/*.scss"])
     .pipe(concat("mixin_core.scss"))
@@ -473,6 +473,13 @@ gulp.task("cordova-run-android", shell.task([
 ], {errorMessage: errmsg, cwd: "cordova"}))
 
 
+gulp.task("watch-magic-js", function() {
+    task_dev_magic_js().then(function() {
+        task_dev_app_pub();
+    })
+})
+
+
 /* 监控刷新调试 */
 gulp.task("serve", function() {
     browserSync({
@@ -486,10 +493,10 @@ gulp.task("serve", function() {
     gulp.watch(["dev/minjs/*.js"], ["dev-minjs"])
 
     /* magic 动态刷新任务 */
-    gulp.watch(["dev/magic/core/*.scss", "dev/magic/lib/mixin.scss"], ["dev-magic-css"])
+    gulp.watch(["dev/magic/core/*.scss", "dev/magic/lib/mixin.scss"], ["dev-magic-css", reload])
     gulp.watch(["dev/magic/**/*.js", "dev/magic/**/*.scss",
                 "dev/magic/**/*.html", "!dev/magic/core/*.scss", "!dev/magic/lib/mixin.scss"],
-                ["dev-magic-js"])
+                ["watch-magic-js"])
 
     /* magic-vue 动态刷新任务 */
     gulp.watch(["dev/magic-vue/**/*"], ["dev-magic-vue"])

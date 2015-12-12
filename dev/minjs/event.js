@@ -31,11 +31,11 @@ module.exports = (function() {
         if (!(this.path instanceof Array)) {
             var target = this.target, arr = [];
 
-            do {
+            while (target && target.parentNode) {
                 arr.push(target);   // 当前存下来
 
                 target = target.parentNode;
-            } while(target)
+            }
 
             this.path = arr;        // 设置对象
         }

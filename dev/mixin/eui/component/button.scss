@@ -12,10 +12,6 @@
             border-color: $active-border-color;
             background-color: $active-bg-color;
             box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
-
-            &.button-clear {
-                color: rgba($border-color, $button-active-opacity) !important;
-            }
         }
 
         &.button-clear {
@@ -32,31 +28,29 @@
     }
 }
 @mixin button($styles: stable positive energized assertive) {
-    font-size: $button-font-size;
-    line-height: $button-height - $button-border-width * 2;
+    font-size: rem($button-font-size);
+    line-height: rem($button-height - $button-border-width * 2);
 
     position: relative;
 
     display: inline-block;
 
-    min-height: $button-height;
-    padding: 0 $button-padding;
+    min-height: rem($button-height);
+    padding: 0 rem($button-padding);
 
     cursor: pointer;
     text-align: center;
-    vertical-align: top;
-    white-space:nowrap;
-    text-overflow: ellipsis;
+    vertical-align: bottom;
+
+    white-space: nowrap;
     text-decoration: none;
 
     -webkit-user-drag: none;
     user-select: none;
 
     color: $button-default-text;
-    border-width: $button-border-width;
-    border-style: solid;
-    border-color: $button-default-border;
-    border-radius: $button-border-radius;
+    border: $button-border-width solid $button-default-border;
+    border-radius: rem($button-border-radius);
     background-color: $button-default-bg;
 
     &.active,
@@ -69,27 +63,22 @@
     // 添加一个隐藏的区域，增大按钮的点击面积
     &:after {
         position: absolute;
-        top: -($button-padding / 2);
-        right: -($button-padding / 2);
-        bottom: -($button-padding / 2);
-        left: -($button-padding / 2);
+        top: rem(-($button-padding / 2));
+        right: rem(-($button-padding / 2));
+        bottom: rem(-($button-padding / 2));
+        left: rem(-($button-padding / 2));
 
         content: ' ';
     }
 
     &:before {
-        font-size: $button-icon-size;
-        pointer-events: none;
-        line-height: inherit;
+        font-size: rem($button-icon-size);
+        margin-right: $button-icon-padding;
         float: left;
+        display: inline-block;
+        line-height: rem($button-height - $button-border-width * 2) !important;
     }
     
-
-    // 图标设置
-    &.icon-left:before {
-        margin-right: $button-icon-padding;
-        margin-left: 0;
-    }
 
     &.icon-right:before {
         margin-left: $button-icon-padding;
@@ -114,10 +103,6 @@
             @include button-style($style, $button-assertive-bg, $button-assertive-border,
             $button-assertive-active-bg, $button-assertive-active-border, $button-assertive-text);
         }
-        @if $style == orange {
-            @include button-style($style, $button-orange-bg, $button-orange-border,
-            $button-orange-active-bg, $button-orange-active-border, $button-orange-text);
-        }
     }
     
     @at-root {
@@ -125,38 +110,36 @@
             display: block;
 
             width: 100%;
-            min-height: $button-block-height;
-            line-height: $button-block-height - $button-border-width * 2;
-            margin-bottom: $margin-base;
+            min-height: rem($button-block-height);
+            line-height: rem($button-block-height - $button-border-width * 2);
+            margin-bottom: rem($margin-base);
         }
 
         .button-small {
-            font-size: $button-small-font-size;
-            line-height: $button-small-height - $button-border-width * 2;
+            font-size: rem($button-small-font-size);
+            line-height: rem($button-small-height - $button-border-width * 2);
 
-            min-width: $button-small-height;
-            min-height: $button-small-height + 2;
-            padding: 2px $button-small-padding 1px;
+            min-width: rem($button-small-height);
+            min-height: rem($button-small-height);
+            padding: rem(2px) rem($button-small-padding);
 
-            &.icon-left:before,
-            &.icon-right:before {
-                font-size: $button-small-font-size;
-                line-height: $button-small-height - $button-border-width * 2;
+            &:before {
+                font-size: rem($button-small-font-size);
+                line-height: rem($button-small-height - $button-border-width * 2) !important;
             }
         }
 
         .button-large {
-            font-size: $button-large-font-size;
-            line-height: $button-large-height - $button-border-width * 2;
+            font-size: rem($button-large-font-size);
+            line-height: rem($button-large-height - $button-border-width * 2);
 
-            min-width: ($button-large-padding * 3) + $button-large-font-size;
-            min-height: $button-large-height + 5;
-            padding: 0 $button-large-padding;
+            min-width: rem(($button-large-padding * 3) + $button-large-font-size);
+            min-height: rem($button-large-height + 5);
+            padding: 0 rem($button-large-padding);
 
-            &.icon-left:before,
             &.icon-right:before {
-                font-size: $button-large-font-size;
-                line-height: $button-large-height - $button-border-width * 2;
+                font-size: rem($button-large-font-size);
+                line-height: rem($button-large-height - $button-border-width * 2);
             }
         }
 
@@ -166,9 +149,9 @@
         }
 
         .button-clear, .button-link {
-            padding: 0 $button-clear-padding;
+            padding: 0 rem($button-clear-padding);
 
-            color: $button-link-text;
+            color: $button-default-text;
             border-width: 0;
             background: none !important;
             box-shadow: none !important;
@@ -177,7 +160,7 @@
 
             &.active,
             &.activated {
-                color: rgba($button-link-text, $button-clear-active);
+                opacity: $button-clear-active;
             }
         }
 
