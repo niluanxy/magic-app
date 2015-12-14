@@ -70,20 +70,24 @@ module.exports = (function() {
                 snapSpeed: 600,
                 scrollbars: false
             });
-            that.resume(0);     // 初始化播放
+
+            that.handle.on("scrollEnd", function() {
+                // 只有暂停以后才会执行重置方法
+                if (!that.timeHandle) {
+                    var pagex = Math.abs(that.handle.x);
+
+                    // 更新当前 slide 停止的页面索引
+                    that.pageIndex = parseInt(pagex/that.pageWidth);
+
+                    that.resume();      // 恢复播放
+                }
+            })
+
+            that.resume();      // 初始化播放
         })
 
         that.el.on("touchstart", function() {
             that.pause();       // 暂停播放
-        })
-
-        that.el.on("touchend", function() {
-            var pagex = Math.abs(that.handle.x);
-
-            // 更新当前 slide 停止的页面索引
-            that.pageIndex = parseInt(pagex/that.pageWidth);
-
-            that.resume();      // 恢复播放
         })
 
         return this;
@@ -120,7 +124,8 @@ module.exports = (function() {
 
     /* 更新当前指示器 */
     Slider.prototype.updatePoint = function() {
-        var index = this.pageIndex + 1,
+        var pagex = this.pageIndex,
+            index = pagex <= 0 ? 1 : pagex + 1,
             point = this.el.find(".slider-points");
 
         point.find(".item.active").removeClass('active');
@@ -139,8 +144,11 @@ module.exports = (function() {
                 }, opt.time)
             }
 
-            pagex && that.go(pagex);        // 尝试切换到给定页面
-            that.updatePoint();             // 更新指示器状态
+            if (pagex !== undefined) {
+                that.go(pagex);             // 尝试切换到给定页面
+            } else {
+                that.updatePoint();         // 更新指示器状态
+            }
         }
 
         return this;
@@ -151,6 +159,7 @@ module.exports = (function() {
         var that = this;
 
         clearInterval(that.timeHandle);
+        that.timeHandle = null;
         if (time && !isNaN(time)) {
             setTimeout(function() {
                 that.resume();
@@ -163,10 +172,12 @@ module.exports = (function() {
 
     /* 跳到下一个页面 */
     Slider.prototype.next = function() {
+        var pagex = this.pageIndex;
+
         if (!this.timeHandle) {
-            this.resume(this.pageIndex+1);
+            this.resume(pagex+1);
         } else {
-            this.go(this.pageIndex+1);
+            this.go(pagex == -1 ? 1 : pagex + 1);
         }
 
         return this;
