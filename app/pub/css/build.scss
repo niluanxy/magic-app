@@ -22,7 +22,6 @@ html, body {
 .slider     { @include slider(); }
 
 @include form();
-@include layout();      	// layout 布局组件样式代码
 @include flex-layout();		// flex   布局组件样式
 
 .expand {

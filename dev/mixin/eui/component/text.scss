@@ -4,7 +4,7 @@
 
 @mixin text() {
 	body {
-		font-size: $text-size-default;
+		font-size: rem($text-size-default);
 		font-family: $font-family-sans-serif;
 		-webkit-font-smoothing: antialiased;
   		-moz-osx-font-smoothing: grayscale;
@@ -17,7 +17,7 @@
 
 	.text-mark {
 		color: $text-mark-color;
-		font-size: $text-mark-font;
+		font-size: rem($text-mark-font);
 	}
 
 	.text-money {
@@ -25,11 +25,11 @@
 		color: $text-money-color;
 	}
 
-	.text-strong {
-		font-size: $text-size-large;
+	.text-large {
+		font-size: rem($text-size-large);
 	}
 
 	.text-small {
-		font-size: $text-size-small;
+		font-size: rem($text-size-small);
 	}
 }

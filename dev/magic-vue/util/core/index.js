@@ -5,20 +5,40 @@ module.exports = (function() {
     $$.__key_null   = "__KEY__NULL_v0.3.0";
     $$.__key_prefix = "";
 
-    $$.key = function(key, val) {
-        var fix; // 修复读取值为null自动转为字符串
-        if (val !== undefined) {
-            val = JSON.stringify(val);
-            fix = val==null?$$.__key_null:val;
-            localStorage.setItem(key, fix);
-            return val; // 返回设置的值
-        } else {
-            fix = localStorage.getItem(key);
-            fix = JSON.parse(fix);
+    $$.key = (function() {
+        if (window.$J && $J.call) {
+            var _FUN = "MgNative.key";
 
-            return fix==$$.__key_null?null:fix;
+            return function(key, val) {
+                var args = {key: key};
+
+                if (val !== undefined) {
+                    args.val = val;
+
+                    $J.call(_FUN, args);
+                    return val;
+                } else {
+                    return $J.call(_FUN, args);
+                }
+            }
+        } else {
+            return function(key, val) {
+                var fix; // 修复读取值为null自动转为字符串
+                if (val !== undefined) {
+                    val = JSON.stringify(val);
+                    fix = val==null?$$.__key_null:val;
+                    localStorage.setItem(key, fix);
+                    return val; // 返回设置的值
+                } else {
+                    fix = localStorage.getItem(key);
+                    fix = JSON.parse(fix);
+
+                    return fix==$$.__key_null?null:fix;
+                }
+            };
         }
-    };
+    })();
+    
 
     $$.keyRemove = function(key) {
         localStorage.removeItem(key);

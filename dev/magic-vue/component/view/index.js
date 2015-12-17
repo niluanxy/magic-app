@@ -8,8 +8,8 @@ module.exports = (function() {
             var $el = $(this.$el);
             $el.addClass("mg-view");
 
-            if ($plug.platform == "ios" &&
-            	$plug.runtime  == "cordova") {
+            if ($.platform == "ios" &&
+            	$.runtime  == "cordova") {
 
             	$el.css("top", "20px");
                 $("body").addClass("run-ios");

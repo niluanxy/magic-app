@@ -1,15 +1,24 @@
 require("extend");      // 原生对象扩展
 
-(function(window, undefined) {
+(function(w, doc, undefined) {
     var Magic = (function() {
         /* 一个简单的实例对象初始化方法 */
         var magic = function(select) {
                 return new magic.fn._init(select);
             },
+            ua     = navigator.userAgent,
             _UTIL  = require("util"),
             _DOM   = require("dom"),
             _EVENT = require("event"),
             _TPL   = require("templayed");
+
+        // platform 相关检测
+        
+        magic.platform = /iP(hone|od|ad)/g.test(ua) ? "ios" :
+                          /Android/g.test(ua) ? "android" : "other";
+        magic.runtime  = w.$J ? "mgnative" :
+                         w.cordova ? "cordova" :
+                         /MicroMessenger/ig.test(ua) ? "weixin" : "web";
 
         magic.fn = magic.prototype = {
             constructor: Magic,
@@ -48,7 +57,7 @@ require("extend");      // 原生对象扩展
                     // 如果是DOM对象，返回包装的对象
                     this[0] = select;
                     this.length = 1;
-                } else if (select === document || select === window) {
+                } else if (select === doc || select === w) {
                     this[0] = select;
                     this.length = 1;
                 } else if (select instanceof Magic) {
@@ -440,7 +449,7 @@ require("extend");      // 原生对象扩展
             checkRun: function(check, call, scope, timeout, time) {
                 var start = $.getTime(), handle;
 
-                scope = scope || window;    // 修复执行作用域
+                scope = scope || w;    // 修复执行作用域
 
                 handle = setInterval(function() {
                     if ((timeout && ($.getTime() - start) >= timeout) ||
@@ -507,9 +516,9 @@ require("extend");      // 原生对象扩展
         return magic;   // 返回最后的对象
     })();
 
-    window.$ = Magic;
-})(window);
+    w.$ = Magic;
+})(window, document);
 
 require("../mui/muicore.js");       // 加载核心UI组件
-require("../plug/main.js");         // 加载硬件扩展方法
+// require("../plug/main.js");         // 加载硬件扩展方法
 require("../lib/minjs/route.js");   // 路由对象

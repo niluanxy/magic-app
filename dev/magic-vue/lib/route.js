@@ -366,6 +366,15 @@ module.exports = (function() {
         history.forward();
     }
 
+    // MgNative 环境下重写方法
+    if (window.$J && $J.router) {
+        Route.prototype.back = function() {
+            $J.router.back();
+
+            return this;
+        }
+    }
+
     /* 获取当前URL信息 */
     Route.prototype.geturl = function(url) {
         var that = this, opt = that.options, ret = "";

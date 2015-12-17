@@ -37,24 +37,29 @@
     overflow: hidden;
     color: $bar-default-text;
 
+    padding: rem($bar-padding-portrait);
     text-align: center;
     height: rem($bar-height);
     background-size: 0;
     background-color: $bar-default-bg;
 
     display: flex;
-    @include flex-align-center;
 
     user-select: none;
     @include retina-border(bottom, $bar-default-border);
 
-
     .title {
+        padding: 0 rem($bar-button-padding);
         max-width: 80%;
+        margin: auto;
         font-size: rem($bar-title-font-size);
         z-index: $z-index-bar-title;
         
         @include text-ellipsis;
+        
+        &.title-left {
+            margin-left: 0;
+        }
     }
 
     .button {

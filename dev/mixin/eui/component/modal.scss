@@ -1,0 +1,33 @@
+// modal 弹框组件
+ 
+
+@mixin modal() {
+	display: flex;
+	position: fixed;
+	flex-direction: column;
+	z-index: $z-index-modal;
+
+	&.full {
+		width: 100%;
+		height: 100%;
+	}
+	
+	.header {
+		overflow: hidden;
+		position: relative;
+
+		.close {
+			@include icon-base;
+            
+            content: $icon-font-close;
+		}
+	}
+
+	.body {
+		flex: 1;
+	}
+
+	.footer {
+		
+	}
+}

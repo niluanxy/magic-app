@@ -12,10 +12,7 @@
     }
 
     .hide {
-        visibility: hidden !important;
-        position: absolute !important;
-        top: -9999;
-        left: -9999;
+        display: none !important;
     } 
 
     .float-left {
@@ -90,6 +87,6 @@
     }
 
     .padding {
-        padding: $content-padding;
+        padding: rem($content-padding);
     }
 }

@@ -16,8 +16,8 @@
 .list       { @include list(); }
 .slider     { @include slider(); }
 
+
 @include form();			// form   表单组件元素
-@include tools();			// tools  常用工具样式类
 @include text();			// text   文字样式代码
-@include layout();      	// layout 布局组件样式代码
+@include tools();			// tools  常用工具样式类
 @include flex-layout();		// flex   布局组件样式

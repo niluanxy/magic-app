@@ -60,23 +60,23 @@
 
             &.checkbox {
                 &:before {
-                    content: $input-checkbox-empty;   
+                    content: $icon-font-checkbox-empty;   
                 }
 
                 &:checked:before,
                 &.checked:before {
-                    content: $input-checkbox-select;
+                    content: $icon-font-checkbox-select;
                 }
             }
 
             &.radio {
                 &:before {
-                    content: $input-radio-empty;
+                    content: $icon-font-radio-empty;
                 }
 
                 &:checked:before,
                 &.checked:before {
-                    content: $input-radio-select;
+                    content: $icon-font-radio-select;
                 }
             }
 
