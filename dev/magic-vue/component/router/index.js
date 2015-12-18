@@ -20,10 +20,12 @@ module.exports = (function() {
 			if (router.check(state, "first")) {
 				var last = router.last.state;
 
-				if ($$.__STATE__.ROUTER_AFTER) {
-					$el.remove();
-				} else if (state && last && state.id != last.id) {
-					$el.remove();
+				if (!$J || !$J.router) {
+					if ($$.__STATE__.ROUTER_AFTER) {
+						$el.remove();
+					} else if (state && last && state.id != last.id) {
+						$el.remove();
+					}
 				}
 			}
         }

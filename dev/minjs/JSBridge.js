@@ -24,7 +24,7 @@
     } else if (isAndroidDevice && w.JSBridge) {
         w.JSBridge.version = "1.0.0";
     } else {
-        return;     // 两个条件都判断失败，则非 MgNative 环境
+        return w.$J = undefined;     // 两个条件都判断失败，则非 MgNative 环境
     }
 
     function _getIFrameSrc(param) {
@@ -132,6 +132,11 @@
         return false;
     }
 
+    // 修复HTML跳转URL格式
+    function fixUrl(url) {
+        return url.replace(/^\#/g, '');
+    }
+
     if (w.JSBridge) {
         // 拦截浏览器默认跳转动作
         doc[BIND]("touchstart", function(e) {
@@ -157,8 +162,7 @@
 
                 // URL不同时跳转到新页面
                 if (href !== location.hash) {
-                    href = href.replace(/^\#/, '');
-                    $J.router.go(href); 
+                    $J.router.go(fixUrl(href)); 
                 }
             }
         }, true);
@@ -176,7 +180,7 @@
 
                 go : function(url, params) {
                     callAPI("Router.go", obj = {
-                        target: "html://"+url,
+                        target: "html://"+fixUrl(url),
                         params: params || ""
                     });
                 },
@@ -190,7 +194,7 @@
 
                 replace : function(url, params) {
                     callAPI("Router.replace", {
-                        target: "html://"+url,
+                        target: "html://"+fixUrl(url),
                         params: params || ""
                     })
                 },
@@ -200,8 +204,22 @@
                         target: "native://"+url,
                         params: params || ""
                     })
-                }
-            }
+                },
+            },
+
+            loginRepath: function(url, params) {
+                callAPI("Router.loginRepath", {
+                    target: "html://"+fixUrl(url),
+                    params: params || ""
+                })
+            },
+
+            loginRepathNative: function(url, params) {
+                callAPI("Router.loginRepath", {
+                    target: "native://"+url,
+                    params: params || ""
+                })
+            },
         }
     }
 })(window, document);

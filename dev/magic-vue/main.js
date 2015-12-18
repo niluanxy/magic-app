@@ -1,6 +1,8 @@
 require("./lib/magic.js");
 
 $(function() {
+    if (!window.$J) window.$J = undefined;
+
     var mvue, config = {tables: []}, Router = require("./lib/route.js");
 
     window.$$ = mvue = {
@@ -101,7 +103,13 @@ $(function() {
 
                 if (!STAT.AUTH_HASRUN && STAT.AUTH_BEFORE) {
                     STAT.AUTH_HASRUN = true;
-                    that.go(auth, true);
+
+                    // !!! MgNative 下调用原生跳转
+                    if ($J && $J.router) {
+                        $J.loginRepath(STAT.AUTH_BEFORE);
+                    } else {
+                        that.go(auth, true);
+                    }
                 } else if (STAT.AUTH_HASRUN) {
                     STAT.AUTH_BEFORE = "";
                     STAT.AUTH_HASRUN = false;
@@ -123,13 +131,19 @@ $(function() {
                 STAT.AUTH_BEFORE = set;
 
                 if (togo === true) {
-                    location.go(option.authPage, true);
+                    // !!! MgNative 下调用原生跳转
+                    if ($J && $J.router) {
+                        $J.loginRepath(STAT.AUTH_BEFORE);
+                    } else {
+                        location.go(option.authPage, true);
+                    }
                     STAT.AUTH_HASRUN = true;
                 }
             } else {
                 STAT.AUTH_BEFORE = "";
                 STAT.AUTH_HASRUN = false;
                 // location.go(STAT.AUTH_BEFORE || option.home, true);
+                
                 location.go(option.home, true);
             }
         }
@@ -152,8 +166,13 @@ $(function() {
     function makeView(match, url) {
         var last = match[match.length-1].item, html;
 
-        html = '<mg-page v-transition="push" class="_load_" url="{{url}}"">'+
-                    '<div class="bar bar-header">'+
+        if ($J && $J.router) {
+            html = '<mg-page class="_load_" url="{{url}}"">'
+        } else {
+            html = '<mg-page v-transition="push" class="_load_" url="{{url}}"">'
+        }
+
+        html +=     '<div class="bar bar-header">'+
                         '<mg-back></mg-back><h3 class="title">{{title}}</h3>'+
                     '</div>'+
                     '<div class="content has-header"><div class="tip"></div></div>'+

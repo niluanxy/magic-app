@@ -1,6 +1,8 @@
 require("extend");      // 原生对象扩展
 
 (function(w, doc, undefined) {
+    if (!w.$J) w.$J = undefined;
+
     var Magic = (function() {
         /* 一个简单的实例对象初始化方法 */
         var magic = function(select) {
@@ -520,5 +522,5 @@ require("extend");      // 原生对象扩展
 })(window, document);
 
 require("../mui/muicore.js");       // 加载核心UI组件
-// require("../plug/main.js");         // 加载硬件扩展方法
+require("../plug/main.js");         // 加载硬件扩展方法
 require("../lib/minjs/route.js");   // 路由对象
