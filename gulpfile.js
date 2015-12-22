@@ -6,6 +6,7 @@ var gulp         = require('gulp-param')(require('gulp'), process.argv),
     gulpif       = require("gulp-if"),
     sass         = require("gulp-sass"),
     replace      = require("gulp-replace"),
+    px2rem       = require("gulp-px2rem"),
     hashint      = require("hash-int"),
     autoprefixer = require("gulp-autoprefixer"),
     minifycss    = require("gulp-minify-css"),
@@ -25,6 +26,16 @@ var DIR_APP       = __dirname + "/app/",
     DIR_MAGIC_VUE = __dirname + "/dev/magic-vue/",
     DIR_CORDOVA   = __dirname + "/cordova/";
     DIR_RESOURCE  = __dirname + "/resource/";
+
+var px2remOptions = {
+        rootValue: 20,
+        unitPrecision: 5,
+        propertyBlackList: [],
+        propertyWhiteList: [],
+        replace: true,
+        mediaQuery: false,
+        minPx: 1
+    };
 
 var release = false;    // 是否为发布输出，发布输出会压缩优化
 var cordova = false;    // APP打包是否为cordova输出
@@ -84,8 +95,11 @@ function task_dev_magic_css() {
     var defer = Q.defer();
 
     gulp.src(DIR_MAGIC+"core/main.scss")
-    .pipe(sass())
+    .pipe(sass({
+            includePaths: [DIR_MAGIC]
+        }))
     .pipe(autoprefixer())
+    .pipe(px2rem(px2remOptions))
     .pipe(rename("magic.css"))
     .pipe(gulp.dest(DIR_APP+"pub/lib/"))
     .on("finish", function() { defer.resolve(); });
@@ -105,6 +119,7 @@ function task_dev_magic_js() {
         includePaths: [DIR_MAGIC]
     }))
     .pipe(autoprefixer())
+    .pipe(px2rem(px2remOptions))
     .pipe(gulpif(release, minifycss()))
     .pipe(gulp.dest(DIR_MAGIC))
     .on("finish", function() {
@@ -262,6 +277,7 @@ function task_dev_app_css() {
                     gulp.src(DIR_APP+"pub/main.scss")
                     .pipe(sass())
                     .pipe(autoprefixer())
+                    .pipe(px2rem(px2remOptions))
                     .pipe(gulpif(release, minifycss()))
                     .pipe(gulp.dest(fpath+"page/"))
                     .on("finish", function() {
@@ -310,6 +326,7 @@ function task_dev_app_js() {
             includePaths: [DIR_APP, DIR_APP+"modules/"]
         }))
         .pipe(autoprefixer())
+        .pipe(px2rem(px2remOptions))
         .pipe(gulpif(release, minifycss()))
         .pipe(gulp.dest(DIR_APP))
         .on("finish", function() {

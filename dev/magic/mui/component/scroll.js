@@ -1,10 +1,10 @@
 /*! iScroll v5.1.3 ~ (c) 2008-2014 Matteo Spinelli ~ http://cubiq.org/license */
 var scroll = module.exports = (function (window, document, Math) {
-    var rAF = window.requestAnimationFrame	||
-        window.webkitRequestAnimationFrame	||
-        window.mozRequestAnimationFrame		||
-        window.oRequestAnimationFrame		||
-        window.msRequestAnimationFrame		||
+    var rAF = window.requestAnimationFrame  ||
+        window.webkitRequestAnimationFrame  ||
+        window.mozRequestAnimationFrame     ||
+        window.oRequestAnimationFrame       ||
+        window.msRequestAnimationFrame      ||
         function (callback) { window.setTimeout(callback, 1000 / 60); };
 
     var utils = (function () {
@@ -123,7 +123,7 @@ var scroll = module.exports = (function (window, document, Math) {
                 }
             },
             circular: {
-                style: 'cubic-bezier(0.1, 0.57, 0.1, 1)',	// Not properly "circular" but this looks better, it should be (0.075, 0.82, 0.165, 1)
+                style: 'cubic-bezier(0.1, 0.57, 0.1, 1)',   // Not properly "circular" but this looks better, it should be (0.075, 0.82, 0.165, 1)
                 fn: function (k) {
                     return Math.sqrt( 1 - ( --k * k ) );
                 }
@@ -169,7 +169,7 @@ var scroll = module.exports = (function (window, document, Math) {
     function IScroll (el, options) {
         this.wrapper = typeof el == 'string' ? document.querySelector(el) : el;
         this.scroller = this.wrapper.children[0];
-        this.scrollerStyle = this.scroller.style;		// cache style for better performance
+        this.scrollerStyle = this.scroller.style;       // cache style for better performance
 
         this.options = {
 
@@ -231,7 +231,7 @@ var scroll = module.exports = (function (window, document, Math) {
         this.options.invertWheelDirection = this.options.invertWheelDirection ? -1 : 1;
 
         if ( this.options.probeType == 3 ) {
-            this.options.useTransition = false;	}
+            this.options.useTransition = false; }
 
 // INSERT POINT: NORMALIZATION
 
@@ -314,10 +314,10 @@ var scroll = module.exports = (function (window, document, Math) {
             var point = e.touches ? e.touches[0] : e,
                 pos;
 
-            this.initiated	= utils.eventType[e.type];
-            this.moved		= false;
-            this.distX		= 0;
-            this.distY		= 0;
+            this.initiated  = utils.eventType[e.type];
+            this.moved      = false;
+            this.distX      = 0;
+            this.distY      = 0;
             this.directionX = 0;
             this.directionY = 0;
             this.directionLocked = 0;
@@ -351,24 +351,24 @@ var scroll = module.exports = (function (window, document, Math) {
                 return;
             }
 
-            if ( this.options.preventDefault ) {	// increases performance on Android? TODO: check!
+            if ( this.options.preventDefault ) {    // increases performance on Android? TODO: check!
                 e.preventDefault();
             }
 
-            var point		= e.touches ? e.touches[0] : e,
-                deltaX		= point.pageX - this.pointX,
-                deltaY		= point.pageY - this.pointY,
-                timestamp	= utils.getTime(),
+            var point       = e.touches ? e.touches[0] : e,
+                deltaX      = point.pageX - this.pointX,
+                deltaY      = point.pageY - this.pointY,
+                timestamp   = utils.getTime(),
                 newX, newY,
                 absDistX, absDistY;
 
-            this.pointX		= point.pageX;
-            this.pointY		= point.pageY;
+            this.pointX     = point.pageX;
+            this.pointY     = point.pageY;
 
-            this.distX		+= deltaX;
-            this.distY		+= deltaY;
-            absDistX		= Math.abs(this.distX);
-            absDistY		= Math.abs(this.distY);
+            this.distX      += deltaX;
+            this.distY      += deltaY;
+            absDistX        = Math.abs(this.distX);
+            absDistY        = Math.abs(this.distY);
 
             // We need to move at least 10 pixels for the scrolling to initiate
             if ( timestamp - this.endTime > 300 && (absDistX < 10 && absDistY < 10) ) {
@@ -378,11 +378,11 @@ var scroll = module.exports = (function (window, document, Math) {
             // If you are scrolling in one direction lock the other
             if ( !this.directionLocked && !this.options.freeScroll ) {
                 if ( absDistX > absDistY + this.options.directionLockThreshold ) {
-                    this.directionLocked = 'h';		// lock horizontally
+                    this.directionLocked = 'h';     // lock horizontally
                 } else if ( absDistY >= absDistX + this.options.directionLockThreshold ) {
-                    this.directionLocked = 'v';		// lock vertically
+                    this.directionLocked = 'v';     // lock vertically
                 } else {
-                    this.directionLocked = 'n';		// no lock
+                    this.directionLocked = 'n';     // no lock
                 }
             }
 
@@ -478,7 +478,7 @@ var scroll = module.exports = (function (window, document, Math) {
                 return;
             }
 
-            this.scrollTo(newX, newY);	// ensures that the last position is rounded
+            this.scrollTo(newX, newY);  // ensures that the last position is rounded
 
             // we scrolled less than 10 pixels
             if ( !this.moved ) {
@@ -579,23 +579,23 @@ var scroll = module.exports = (function (window, document, Math) {
         },
 
         refresh: function () {
-            var rf = this.wrapper.offsetHeight;		// Force reflow
+            var rf = this.wrapper.offsetHeight;     // Force reflow
 
-            this.wrapperWidth	= this.wrapper.clientWidth;
-            this.wrapperHeight	= this.wrapper.clientHeight;
+            this.wrapperWidth   = this.wrapper.clientWidth;
+            this.wrapperHeight  = this.wrapper.clientHeight;
 
             /* REPLACE START: refresh */
 
-            this.scrollerWidth	= this.scroller.offsetWidth;
-            this.scrollerHeight	= this.scroller.offsetHeight;
+            this.scrollerWidth  = this.scroller.offsetWidth;
+            this.scrollerHeight = this.scroller.offsetHeight;
 
-            this.maxScrollX		= this.wrapperWidth - this.scrollerWidth;
-            this.maxScrollY		= this.wrapperHeight - this.scrollerHeight;
+            this.maxScrollX     = this.wrapperWidth - this.scrollerWidth;
+            this.maxScrollY     = this.wrapperHeight - this.scrollerHeight;
 
             /* REPLACE END: refresh */
 
-            this.hasHorizontalScroll	= this.options.scrollX && this.maxScrollX < 0;
-            this.hasVerticalScroll		= this.options.scrollY && this.maxScrollY < 0;
+            this.hasHorizontalScroll    = this.options.scrollX && this.maxScrollX < 0;
+            this.hasVerticalScroll      = this.options.scrollY && this.maxScrollY < 0;
 
             if ( !this.hasHorizontalScroll ) {
                 this.maxScrollX = 0;
@@ -654,7 +654,11 @@ var scroll = module.exports = (function (window, document, Math) {
             }
 
             for ( ; i < l; i++ ) {
-                this._events[type][i].apply(this, [].slice.call(arguments, 1));
+                var fun = this._events[type][i];
+
+                if (typeof fun == "function") {
+                    fun.apply(this, [].slice.call(arguments, 1));
+                }
             }
         },
 
@@ -1331,7 +1335,7 @@ var scroll = module.exports = (function (window, document, Math) {
                 return;
             }
 
-            var snap = this.options.snap,	// we are using this alot, better to cache it
+            var snap = this.options.snap,   // we are using this alot, better to cache it
                 newX = snap ? this.currentPage.pageX : this.x,
                 newY = snap ? this.currentPage.pageY : this.y,
                 now = utils.getTime(),
@@ -1652,10 +1656,10 @@ var scroll = module.exports = (function (window, document, Math) {
 
             this.initiated = true;
             this.moved = false;
-            this.lastPointX	= point.pageX;
-            this.lastPointY	= point.pageY;
+            this.lastPointX = point.pageX;
+            this.lastPointY = point.pageY;
 
-            this.startTime	= utils.getTime();
+            this.startTime  = utils.getTime();
 
             if ( !this.options.disableTouch ) {
                 utils.addEvent(window, 'touchmove', this);
@@ -1792,7 +1796,7 @@ var scroll = module.exports = (function (window, document, Math) {
                 }
             }
 
-            var r = this.wrapper.offsetHeight;	// force refresh
+            var r = this.wrapper.offsetHeight;  // force refresh
 
             if ( this.options.listenX ) {
                 this.wrapperWidth = this.wrapper.clientWidth;
@@ -1955,13 +1959,27 @@ if ($ && $.fn && !$.fn.scroll) {
         probe = (option && (typeof option.pullRefreshUp == "function" ||
         typeof option.pullRefreshDown == "function")) ? 3 : null;
 
-        option = $.extend({
-            bindToWrapper : true,
-            scrollbars    : true,
-            fadeScrollbars: true,
-            preventDefault: true,
-            refresh       : false,
-        }, option);
+        if (option && option.mode == "desktop") {
+            option = $.extend({
+                bindToWrapper : true,
+                scrollbars    : true,
+                mouseWheel    : true,
+                fadeScrollbars: false,
+                preventDefault: false,
+                probeType     : 2,
+                disableMouse  : true,
+                refresh       : false,
+            }, option);
+        } else {
+            option = $.extend({
+                bindToWrapper : true,
+                scrollbars    : true,
+                fadeScrollbars: true,
+                preventDefault: true,
+                probeType     : 2,
+                refresh       : false,
+            }, option);
+        }
 
         handle = new scroll(this[0], option);
 

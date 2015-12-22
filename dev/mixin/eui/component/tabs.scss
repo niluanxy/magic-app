@@ -44,6 +44,7 @@
     background-size: 0;
     background-color: $tabs-default-bg;
 
+    border-width: 0;
     @include retina-border(top, $bar-default-border);
 
     .tab-item {

@@ -15,7 +15,8 @@
             padding: 0;
             vertical-align: middle;
 
-            &[type="text"] {
+            &[type="text"],
+            &[type="password"] {
                 width: 100%;
                 height: rem($input-height-base);
                 line-height: rem($line-height-computed);

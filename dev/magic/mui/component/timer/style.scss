@@ -1,3 +1,5 @@
+@import "lib/mixin.scss";
+
 .timer {
     overflow: hidden;
     background-color: #fff;
@@ -26,19 +28,25 @@
                 position: absolute;
                 height: 44px;
                 width: 100%;
-                top: -1px; left: 0;
+                top: 0; left: 0;
                 border: 1px solid #007aff;
                 border-width: 1px 0;
             }
 
             .list {
                 margin: 0;
+                border-width: 0;
+
                 &:before {
                     display: none;
                 }
 
-                .item:before {
-                    display: none;
+                .item {
+                    border-width: 0;
+
+                    &:before {
+                        display: none;
+                    }
                 }
             }
         }

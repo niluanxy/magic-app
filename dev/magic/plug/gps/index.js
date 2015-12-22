@@ -145,7 +145,7 @@ module.exports = (function () {
         }
 
         return _gps.getPosition(success, error);   // 修复调用
-    }); _gps.getPosition();     // 初始化执行一次，加快后续执行
+    });
 
     
 

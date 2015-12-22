@@ -44,8 +44,9 @@
     background-color: $bar-default-bg;
 
     display: flex;
-
+    width: 100%;
     user-select: none;
+    border-width: 0;
     @include retina-border(bottom, $bar-default-border);
 
     .title {
@@ -124,6 +125,7 @@
 
         .bar-footer {
             bottom: 0;
+            position: absolute;
 
             background-position: top;
 
