@@ -1,5 +1,3 @@
-require("./style.css");
-
 module.exports = (function() {
     var Modal = function(element, option) {
         this.el      = $(element);

@@ -1,0 +1,21 @@
+// ========================================================
+// popup 弹出窗默认变量
+// ========================================================
+
+
+$popup-radius: 							13px !default;
+$popup-padding:							16px !default;
+$popup-font-large:						16px !default;
+
+$popup-back-blur:						10px !default;
+$popup-back-color:						#000 !default;
+$popup-back-opacity:					.3 !default;
+
+$popup-wrapper-width:					80% !default;
+$popup-wrapper-max:						80% !default;
+$popup-wrapper-back:					#f8f8f8 !default;
+
+$popup-body-line-height:				22px !default;
+
+$popup-buttons-height:					44px !default;
+$popup-buttons-active-bg:				$button-stable-active-bg !default;

@@ -1,33 +1,47 @@
 // modal 弹框组件
- 
+
 
 @mixin modal() {
 	display: flex;
-	position: fixed;
-	flex-direction: column;
+	position: absolute;
+	top: 0; left: 0;
+	bottom: 0; right: 0;
+	justify-content: center;
+	align-items: flex-end;
 	z-index: $z-index-modal;
-
-	&.full {
-		width: 100%;
-		height: 100%;
-	}
 	
-	.header {
+	&:after {
+		height: 100%;
+		width: 100%;
+		content: " ";
+		display: block;
+		z-index: 1;
+		top: 0; left: 0;
+		background-color: $popup-back-color;
+		opacity: $popup-back-opacity;
+		position: absolute;
+	}
+
+	.wrapper {
+		width: 100%;
+		z-index: 10;
 		overflow: hidden;
-		position: relative;
+		background-color: #fff;
 
-		.close {
-			@include icon-base;
-            
-            content: $icon-font-close;
+		&.full {
+			height: 100%;
 		}
-	}
 
-	.body {
-		flex: 1;
-	}
+		&.align-top {
+			align-self: flex-start;
+		}
 
-	.footer {
-		
+		&.align-center {
+			align-self: center;
+		}
+
+		&.align-bottom {
+			align-self: flex-end;
+		}
 	}
 }

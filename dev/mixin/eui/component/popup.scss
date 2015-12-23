@@ -1,0 +1,76 @@
+// popup 弹框组件
+
+
+@mixin popup() {
+	display: flex;
+	position: absolute;
+	top: 0; left: 0;
+	bottom: 0; right: 0;
+	justify-content: center;
+	align-items: center;
+	z-index: $z-index-modal;
+	
+	&:after {
+		height: 100%;
+		width: 100%;
+		content: " ";
+		display: block;
+		z-index: 1;
+		top: 0; left: 0;
+		background-color: $popup-back-color;
+		opacity: $popup-back-opacity;
+		position: absolute;
+	}
+
+	.wrapper {
+		width: $popup-wrapper-width;
+		z-index: 10;
+		display: flex;
+		flex-direction: column;
+		border-radius: rem($popup-radius);
+		text-align: center;
+		overflow: hidden;
+		background-color: $popup-wrapper-back;
+
+		.head {
+			font-size: rem($popup-font-large);
+			font-weight: 700;
+			padding: rem($popup-padding + 4) rem($popup-padding) 0 rem($popup-padding);
+			padding-bottom: 0;
+
+			& + .body {
+				padding-top: rem($popup-padding - 4);
+			}
+		}
+
+		.body {
+			padding: rem($popup-padding - 2) rem($popup-padding);
+			line-height: rem($popup-body-line-height);
+		}
+
+		.buttons {
+			height: rem($popup-buttons-height);
+			display: flex;
+			@include retina-border(top);
+
+			.button {
+				flex: 1;
+				font-size: rem($popup-font-large);
+				border-radius: 0;
+				line-height: rem($popup-buttons-height);
+				border-width: 0;
+				border-left-width: 1px;
+				color: $button-positive-border;
+
+				&:first-child {
+					border-left-width: 0;
+				}
+
+				&.active {
+					box-shadow: none;
+					background-color: $popup-buttons-active-bg;
+				}
+			}
+		}
+	}
+}
