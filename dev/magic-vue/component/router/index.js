@@ -1,6 +1,6 @@
 module.exports = (function() {
     $$.component("mg-back", {
-        template: "<content></content>",
+        template: "<slot></slot>",
         ready: function() {
             var that = this, $el = $(this.$el), state = history.state,
             	call = $el.attr("call"), router = $$.location;

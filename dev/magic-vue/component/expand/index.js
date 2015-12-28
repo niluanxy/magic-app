@@ -1,6 +1,6 @@
 module.exports = (function() {
     $$.component("mg-expand", {
-        template: "<content></content>",
+        template: "<slot></slot>",
         ready: function() {
             var that = this, $el = $(this.$el), central;
 

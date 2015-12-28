@@ -1,6 +1,6 @@
 module.exports = (function() {
     $$.component("mg-confirm", {
-        template: "<div class='confirm modal_body'><content></content></div>",
+        template: "<div class='confirm modal_body'><slot></slot></div>",
         ready: function() {
             var $el = $(this.$el), handle, show, $confirm; 
 

@@ -1,31 +1,34 @@
 require("./lib/magic.vue.js");
 
 $(function() {
+	var init = $$.initView, load = $$.loadView;
+
+	/**
+	 * 同步组件加载示例代码
+	 * 
+	 * load("sync-page", require("page/sync-page"));
+	 */
+
 	$$.route({
-		"/home": function() {
-			console.log("should load home")
-	        require(["../page/home"], loadView);
-	    },
+		"/home": load("home", function(defer) {
+			require(["page/home"], init(defer));
+		}),
 
-		"/list": function() {
-			console.log("should load list")
-	        require(["../page/list"], loadView);
-	    },
+		"/list": load("list", function(defer) {
+			require(["page/list"], init(defer));
+		}),
 
-	    "/shop/:shopid": function(para) {
-			console.log("should load shop")
-			console.log(para)
-	        require(["../page/shop"], loadView);
-	    },
+	    "/shop/:shopid": load("shop", function(defer) {
+	    	require(["page/shop"], init(defer));
+	    }),
 
-		"/cart": function() {
-			console.log("should load cart")
-	        require(["../page/cart"], loadView);
-	    },
+		"/cart": load("cart", function(defer) {
+	    	require(["page/cart"], init(defer));
+	    }),
 
-	    "/user": function() {
+	    "/user/home": function() {
 			console.log("should load user")
-	        require(["../page/user"], loadView);
+	        require(["page/user"], loadView);
 	    },
 	}).init({
 		authBase: 2,					// 所有的页面都要登陆

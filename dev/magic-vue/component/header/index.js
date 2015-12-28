@@ -1,6 +1,6 @@
 module.exports = (function() {
     $$.component("mg-header", {
-        template: "<content></content>",
+    	template: "<slot></slot>",
         ready: function() {
             $(this.$el).addClass("bar bar-header");
         }

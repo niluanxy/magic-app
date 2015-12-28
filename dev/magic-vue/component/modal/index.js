@@ -1,6 +1,6 @@
 module.exports = (function() {
     $$.component("mg-modal", {
-        template: "<content></content>",
+        template: "<slot></slot>",
         ready: function() {
             var $el = $(this.$el), handle = $el.attr("handle"), page, clen;
 

@@ -1,6 +1,6 @@
 module.exports = (function() {
     $$.component("mg-select", {
-        template: "<content></content>",
+        template: "<slot></slot>",
         ready: function() {
             var scope = this, $el = $(this.$el), bind,
                 opt = {}, val, pos, show, call, handle;

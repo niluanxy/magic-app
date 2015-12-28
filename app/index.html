@@ -60,53 +60,10 @@
     <link rel="stylesheet" href="page/main.css">
     <link rel="stylesheet" href="pub/lib/ionicons.min.css">
 
-    <script type="text/javascript" src="pub/lib/magic.js"></script>
+    <script type="text/javascript" src="pub/lib/vue.min.js"></script>
+    <script type="text/javascript" src="page/main.js"></script>
 </head>
 <body>
-    <div class="bar bar-positive">
-        <a class="button button-clear">后退</a>
-        <h3 class="title">这里是一个标题</h3>
-        <a class="button button-clear">测试</a>
-    </div>
-
-    <div class="slider" id="slider">
-        <div class="slider-item">
-            <img src="http://img.wan.renren.com/images/2012/1219/thumb_940__1355915628909.jpg" alt="">
-        </div>
-
-        <div class="slider-item">
-            <img src="http://cdn.duitang.com/uploads/item/201202/12/20120212184013_rykjE.thumb.700_0.jpg" alt="">
-        </div>
-
-        <div class="slider-item">
-            <img src="http://imgsrc.baidu.com/baike/pic/item/fd428c45046833678694731e.jpg" alt="">
-        </div>
-    </div>
-
-    <div class="tabs tabs-positive tabs-icon-top tabs-footer">
-        <div class="tab-item"><i class="icon ion-bag"></i>aaa</div>
-        <div class="tab-item"><i class="icon ion-bag"></i>bbb</div>
-        <div class="tab-item"><i class="icon ion-bag"></i>ccc</div>
-        <div class="tab-item"><i class="icon ion-bag"></i>ddd</div>
-    </div>
-
-    <div class="popup">
-        <div class="wrapper">
-            <div class="head">退出确认</div>
-
-            <div class="body">
-                Are you confirm exit app? You will lost all message when you exit!
-            </div>
-
-            <div class="buttons">
-                <button class="button">确定</button>
-                <button class="button">取消</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        $("#slider").slider();
-    </script>
+    <mg-view></mg-view>
 </body>
 </html>

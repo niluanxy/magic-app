@@ -17,7 +17,7 @@ module.exports = (function() {
     }
 
     $$.component("mg-nav-tabs", {
-        template: "<content></content>",
+        template: "<slot></slot>",
         ready: function() {
             var $el = $(this.$el), tabs, $item, $child;
 

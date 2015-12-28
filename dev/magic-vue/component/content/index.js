@@ -2,7 +2,7 @@ require("./style.scss");
 
 module.exports = (function() {
     $$.component("mg-content", {
-        template: "<div class='scroll_body'><content></content></div>",
+        template: "<div class='scroll_body'><slot></slot></div>",
         ready: function() {
             var $el = $(this.$el), $scroll, childs,
                 handle, refresh, opt = {}, repos;   // 定义操作对象
@@ -50,7 +50,7 @@ module.exports = (function() {
     });
 
     $$.component("mg-scroll", {
-        template: "<div><content></content></div>",
+        template: "<div><slot></slot></div>",
         ready: function() {
             var $el = $(this.$el), $scroll, handle,
                 refresh, repos, opt = {};   // 定义操作对象

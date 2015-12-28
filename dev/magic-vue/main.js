@@ -208,6 +208,97 @@ $(function() {
         }
     }
 
+    // 转换 000 字符为 空 值
+    function _transParams(params) {
+        for (var key in params) {
+            if (params[key] == "000") {
+                params[key] = "";
+            }
+        }
+
+        return params;
+    }
+
+    mvue.initView = function(resolve) {
+        return function(page) {
+            var old = page.data, init = page.resolve, mixins;
+
+            // 采用新的方式，组件的 data 必须为函数
+            if (typeof old !== "function") {
+                page.data = function() { return old; }
+            }
+
+            // 公用方法注册，利用 VUE 的 mixin 选项实现
+            mixins = {
+                ready: function() {
+                    mvue.__STATE__.PAGE_READY = true;
+
+                    this.$broadcast("pageReady");
+                    this.$emit("pageReadyDirect");
+                },
+
+                beforeDestroy: function() {
+                    mvue.__STATE__.PAGE_READY = false;
+
+                    this.$broadcast("pageDestroy");
+                    this.$emit("pageDestroyDirect");
+                },
+            }
+
+            // 如果 resolve 为函数，则创建初始化相关方法和事件
+            if (typeof init == "function") {
+                mixins.created = function() {
+                    var _params = $.extend({}, mvue.__PAGE__.PARAMS),
+                        _defer  = $.defer(), that = this;
+
+                    _params = _transParams(_params);
+
+                    // 注册 数据更新事件，用于手动触发刷新动作
+                    that.$on("refreshData", function(params) {
+                        init.call(that, params || _params, _defer);
+                    })
+
+                    // 注册 数据接受事件，用于手动初始化数据
+                    that.$on("reciveData", function(initData) {
+                        if (typeof initData == "object") {
+                            for(var key in initData) {
+                                that.$set(key, initData[key]);
+                            }
+                        }
+                    });
+
+                    // 通过前面注册的事件，将数据更新到对象实例上
+                    _defer.then(function(initData) {
+                        that.$emit("reciveData", initData);
+                    });
+
+                    that.$emit("refreshData");  // 手动触发一下更新
+                }
+            }
+
+            // 添加基础的方法
+            if (typeof page.mixins == "array") {
+                page.mixins.push(mixins);
+            } else {
+                page.mixins = [mixins];
+            }
+
+            resolve(page);  // 实例初始化页面组件对象
+        }
+    }
+
+    mvue.loadView = function(name, initFix) {
+        mvue.component("ma-"+name, initFix);
+
+        // 如果 initFix 值为一个 函数 ，说明为一个异步组件，用于Page层级
+        if (typeof initFix == "function") {
+            return function() {
+                new Vue({template: "<ma-"+name+"></ma-"+name+">"})
+                    .$mount().$appendTo(mvue.__VIEW__);
+            }
+        }
+    }
+
     // 加载页面方法
     window.loadView = function(page) {
         var pageData = $.extend({}, page), PAGE = mvue.__PAGE__, load,
@@ -218,20 +309,15 @@ $(function() {
         pageData.replace = true;    // 统一设置属性为 replace
 
         /* 预先模拟加载中的效果 */
-        mvue.clearLoad(); nowurl = mvue.location.geturl();
-        load = {template: makeView(PAGE.ROUTER, nowurl), replace: true};
-        PAGE.LOAD = new Vue(load).$mount().$appendTo(VIEW);
-        ltime = $.getTime();
+        // mvue.clearLoad(); nowurl = mvue.location.geturl();
+        // load = {template: makeView(PAGE.ROUTER, nowurl), replace: true};
+        // PAGE.LOAD = new Vue(load).$mount().$appendTo(VIEW);
+        // ltime = $.getTime();
 
 
         // 修改对象的参数值，替换 000 为 空字符串
         params = $.extend({}, mvue.__PAGE__.PARAMS);
-        for (var key in params) {
-            if (params[key] == "000") {
-                params[key] = "";
-            }
-        }
-        pageData.data.params = params;
+        pageData.data.params = _transParams(params);
 
         defer = $.defer();          // 决定何时渲染
         if (typeof pageData.resolve == "function") {
@@ -275,13 +361,14 @@ $(function() {
             }
 
             PAGE.HANDLE = new Vue(pageData).$mount();
+            VIEW && PAGE.HANDLE.$appendTo(VIEW);
 
-            var fixTime = (ltime+600) - $.getTime();
-            setTimeout(function() {
-                VIEW && PAGE.HANDLE.$appendTo(VIEW);
+            // var fixTime = (ltime+600) - $.getTime();
+            // setTimeout(function() {
+            //     VIEW && PAGE.HANDLE.$appendTo(VIEW);
 
-                mvue.clearLoad();
-            }, fixTime > 0 ? fixTime : 0);
+            //     mvue.clearLoad();
+            // }, fixTime > 0 ? fixTime : 0);
         })
     };
 

@@ -2,8 +2,23 @@ require("./style.css");
 
 module.exports = {
     template: require("./template.html"),
+    
     data: {
-        modal: null
+        modal: null,
+        title: "home test",  
+    },
+
+    resolve: function(params, defer) {
+        var that = this;
+
+        console.log(that)
+        setTimeout(function() {
+            console.log("has run setTimeout")
+            console.log(that)
+            console.log(params)
+            that.title = "test resolve";
+
+        }, 1000);
     },
 
     methods: {
@@ -20,5 +35,5 @@ module.exports = {
                 finish.done();
             }, 600)
         },
-    },
+    }
 }

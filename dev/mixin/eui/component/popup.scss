@@ -2,7 +2,7 @@
 
 
 @mixin popup() {
-	display: flex;
+	display: none;
 	position: absolute;
 	top: 0; left: 0;
 	bottom: 0; right: 0;
@@ -16,10 +16,37 @@
 		content: " ";
 		display: block;
 		z-index: 1;
+		opacity: 0;
 		top: 0; left: 0;
 		background-color: $popup-back-color;
 		opacity: $popup-back-opacity;
 		position: absolute;
+	}
+
+	&.zoomIn, &.zoomOut {
+		display: flex;
+	}
+
+	&.zoomIn {
+		&:after {
+			@include animate(fadeIn, .25s);
+		}
+
+		.wrapper {
+			@include animate(zoomIn, .25s);
+		}
+	}
+
+	&.zoomOut {
+		&:after {
+			opacity: 0;
+			@include animate(fadeOut, .45s);
+		}
+
+		.wrapper {
+			opacity: 0;
+			@include animate(zoomOut, .45s);
+		}
 	}
 
 	.wrapper {

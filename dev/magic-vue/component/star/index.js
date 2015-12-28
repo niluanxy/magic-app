@@ -3,7 +3,7 @@ require("./style.scss");
 module.exports = (function() {
     /* star 星级组件 */
     $$.component("mg-star", {
-        template: "<content></content>",
+        template: "<slot></slot>",
         ready: function() {
             var $el = $(this.$el), val, full, half,
                 blank, tfull, thalf, tblank, html = "";

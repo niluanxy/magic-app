@@ -7,7 +7,7 @@ module.exports = (function() {
     }
 
     Vue.component("mg-iframe", {
-        template: "<content></content>",
+        template: "<slot></slot>",
         ready: function() {
             var $el    = $(this.$el),
                 src    = $el.attr("src"),

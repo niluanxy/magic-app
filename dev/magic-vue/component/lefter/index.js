@@ -1,6 +1,6 @@
 module.exports = (function() {
     $$.component("mg-lefter", {
-        template: "<content></content>",
+        template: "<slot></slot>",
         ready: function() {
             var $el = $(this.$el), val, that = this, txt, end;
 
