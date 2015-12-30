@@ -5,20 +5,14 @@ module.exports = {
     
     data: {
         modal: null,
-        title: "home test",  
+        title: "首页的信息",  
     },
 
-    resolve: function(params, defer) {
-        var that = this;
-
-        console.log(that)
+    resolve: function(para, defer) {
         setTimeout(function() {
-            console.log("has run setTimeout")
-            console.log(that)
-            console.log(params)
-            that.title = "test resolve";
-
-        }, 1000);
+            console.log("has load")
+            defer.resolve()
+        }, 130);
     },
 
     methods: {

@@ -10,26 +10,45 @@ $(function() {
 	 */
 
 	$$.route({
-		"/home": load("home", function(defer) {
-			require(["page/home"], init(defer));
-		}),
+		"/home": {
+			title: "首页的信息",
+			on: load("home", function(defer) {
+				require(["page/home"], init(defer));
+			})
+		},
 
-		"/list": load("list", function(defer) {
-			require(["page/list"], init(defer));
-		}),
+		// "/home": {
+		// 	title: "首页的信息",
+		// 	on: load("home", require("page/home"))
+		// },
 
-	    "/shop/:shopid": load("shop", function(defer) {
-	    	require(["page/shop"], init(defer));
-	    }),
+		"/list": {
+			title: "列表页",
+			on: load("list", function(defer) {
+				require(["page/list"], init(defer));
+			})
+		},
 
-		"/cart": load("cart", function(defer) {
-	    	require(["page/cart"], init(defer));
-	    }),
-
-	    "/user/home": function() {
-			console.log("should load user")
-	        require(["page/user"], loadView);
+	    "/shop/:shopid": {
+	    	title: "商品页",
+	    	on: load("shop", function(defer) {
+		    	require(["page/shop"], init(defer));
+		    })
 	    },
+
+		"/cart": {
+			title: "购物车",
+			on: load("cart", function(defer) {
+		    	require(["page/cart"], init(defer));
+		    })
+		},
+
+	    "/user/home": {
+	    	title: "用户首页",
+	    	on: load("user", function(defer) {
+		    	require(["page/user"], init(defer));
+		    })
+		},
 	}).init({
 		authBase: 2,					// 所有的页面都要登陆
 		authPage: "/user/auth",			// 需要验证的页面跳转的地址

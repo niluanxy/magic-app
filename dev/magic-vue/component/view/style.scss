@@ -3,10 +3,8 @@ mg-page, mg-view, .mg-view, .mg-page {
     position: absolute;
     top: 0; bottom: 0;
     left: 0; right: 0;
-    overflow: hidden;
-}
-
-mg-page {
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     transition: all .6s ease;
     
@@ -14,37 +12,51 @@ mg-page {
         transition-duration: 0s;
     }
 
-    &.push-enter {
+    &.leave {
         opacity: 0;
-        transform: translate3d(100px, 0, 0);
     }
 
-    &.push-leave {
+    &.push-new {
+        z-index: 100;
         opacity: 0;
-        transform: translate3d(-100px, 0, 0);
+        transform: translate3d(100%, 0, 0);
+
+        &.enter {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
     }
 
-    &.back-enter {
+    &.pop-new {
+        z-index: 100;
         opacity: 0;
-        transform: translate3d(-100px, 0, 0);
-    }
-    
-    &.back-leave {
-        opacity: 0;
-        transform: translate3d(0, 0, 0);
-    }
-}
+        transform: translate3d(-100%, 0, 0);
 
-._load_ {
-    $back-size: 80px;
+        &.enter {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+    }
 
-    .tip {
-        display: block;
-        position: absolute;
-        top: 42%; left: 50%;
-        transform: translate(-50%, -50%);
-        background-size: $back-size $back-size;
-        width: $back-size;
-        height: $back-size;
+    ._load_ {
+        z-index: 100;
+        left: 100%;
+        background-color: #fff;
+        transition: all .4s ease-in;
+
+        &.push-enter {
+            left: 0;
+            opacity: 1;
+        }
+
+        .tip {
+            display: block;
+            position: absolute;
+            top: 42%; left: 50%;
+            transform: translate(-50%, -50%);
+            background-size: 10% 10%;
+            width: 10%;
+            height: 10%;
+        }
     }
 }

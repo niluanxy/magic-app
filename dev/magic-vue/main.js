@@ -3,17 +3,26 @@ require("./lib/magic.js");
 $(function() {
     if (!window.$J) window.$J = undefined;
 
-    var mvue, config = {tables: []}, Router = require("./lib/route.js");
-
+    var mvue, config = {tables: []}, _option = {}
+        Router = require("./lib/route.js");
+        
     window.$$ = mvue = {
-        location  : null,       // 全局ROUTER对象
+        location   : null,       // 全局ROUTER对象
 
-        __VUE__   : null,       // 全局VUE对象
-        __VIEW__  : null,       // 全局MG-VIEW对象
-        __PAGE__  : {},         // 当前页面对象
-        __CACHE__ : null,       // 全局页面缓存
+        __VUE__    : null,       // 全局VUE对象
+        __VIEW__   : null,       // 全局MG-VIEW对象
+        __PAGE__   : {
+                        ROUTER : null,
+                        PARAMS : {},
+                        HANDLE : null,
+                        CONTENT: null,
+                        BEFORE : null,
+                     },
+        __CACHE__  : null,       // 全局页面缓存
 
-        __STATE__ : null,         // 记录当前APP各种状态
+        __LOAD__   : {},         // 加载动画相关参数
+
+        __STATE__  : null,       // 记录当前APP各种状态
     };
 
 
@@ -27,13 +36,15 @@ $(function() {
      * 
      */
 
-
     // APP初始化方法
     mvue.init = function(option, repath) {
+        _option = option;   // 保存下初始化设置的选项
+
         $$.key("__MAGIC_RUNID", $.getRandom());
 
         var vue   = mvue.__VUE__  = new Vue({ el: "body" }),
-            view  = mvue.__VIEW__ = $("body").query("mg-view");
+            view  = mvue.__VIEW__ = $("body").query("mg-view"),
+            $view = $(mvue.__VIEW__), PAGE = mvue.__PAGE__;
         
         mvue.__STATE__ = {
             AUTH_HASRUN  : false,       // 记录验证页面是否已调用
@@ -52,6 +63,7 @@ $(function() {
             before : function(lastUrl, nowUrl, match, that) {
                 var mnow  = match[match.length-1],
                     STAT  = mvue.__STATE__, aret,
+                    LOAD  = mvue.__LOAD__,
                     opt   = that.options,
                     apage = opt.authPage,
                     atest = opt.authCheck;
@@ -59,8 +71,15 @@ $(function() {
                 STAT.ROUTER_AFTER = false;
                 STAT.ROUTER_TYPE  = that.evetype;
 
-                mvue.__PAGE__.PARAMS = mnow.para;
-                mvue.__PAGE__.ROUTER = match;
+                // 初始化加载动画相关信息
+                console.log("before: "+$.getTime());
+                LOAD.START = $.getTime();
+                if (opt.loading !== false) {
+                    makeLoading(that, match, nowUrl);
+                }
+
+                PAGE.PARAMS = mnow.para;
+                PAGE.ROUTER = match;
 
                 if (apage && nowUrl != apage) {
                     var auth;   // 检测页面的Auth值，可继承父类
@@ -142,10 +161,24 @@ $(function() {
             } else {
                 STAT.AUTH_BEFORE = "";
                 STAT.AUTH_HASRUN = false;
-                // location.go(STAT.AUTH_BEFORE || option.home, true);
                 
                 location.go(option.home, true);
             }
+        }
+
+        // 重新修改原来的 back 和 go 方法
+        var oback = mvue.location.back;
+        mvue.location.back = function() {
+            console.log("xiugai")
+            mvue.__LOAD__.BACK = true;
+            oback.call(mvue.location, arguments);
+        }
+
+        var onew  = mvue.location.go;
+        mvue.location.go = function() {
+            console.log("xiugai")
+            mvue.__LOAD__.BACK = false;
+            onew.call(mvue.location, arguments);
         }
     }
 
@@ -162,51 +195,6 @@ $(function() {
         mvue.__ROUTER__.on(url, option);
     }
 
-    // 创建正在加载中页面
-    function makeView(match, url) {
-        var last = match[match.length-1].item, html;
-
-        if ($J && $J.router) {
-            html = '<mg-page class="_load_" url="{{url}}"">'
-        } else {
-            html = '<mg-page v-transition="push" class="_load_" url="{{url}}"">'
-        }
-
-        html +=     '<div class="bar bar-header">'+
-                        '<mg-back></mg-back><h3 class="title">{{title}}</h3>'+
-                    '</div>'+
-                    '<div class="content has-header"><div class="tip"></div></div>'+
-                '</mg-page>';
-
-        html = $.tpl(html, {title: last.title, url: url||''});
-        if (last.back === false) {
-            html = html.replace("<mg-back></mg-back>", "");
-        }
-        if (last.head === false) {
-            var reg = new RegExp('<div class="bar bar-header">.*</h3></div>')
-            html = html.replace(reg, "").replace("has-header", "");
-        }
-
-        return html;
-    }
-
-    mvue.clearLoad = function(url) {
-        var lpage = $(mvue.__VIEW__).query("._load_");
-
-        if (lpage instanceof Element) lpage = [lpage];
-
-        if (lpage && lpage.length) {
-            for(var i=0; i<lpage.length; i++) {
-                var $item = $(lpage[i]);
-
-                if (url && $item.attr("url") != url) {
-                    continue;
-                }
-
-                $item.remove();     // 删除元素
-            }
-        }
-    }
 
     // 转换 000 字符为 空 值
     function _transParams(params) {
@@ -219,158 +207,241 @@ $(function() {
         return params;
     }
 
-    mvue.initView = function(resolve) {
-        return function(page) {
-            var old = page.data, init = page.resolve, mixins;
+    function _createLoadHtml(router, match, url) {
+        var last = match[match.length-1].item, html;
+            
+        html = '<mg-page class="_load_">'
 
-            // 采用新的方式，组件的 data 必须为函数
-            if (typeof old !== "function") {
-                page.data = function() { return old; }
+        // 判断是否创建 header 部分
+        if (last.head != false && _option.loadHead != false) {
+            html   += '<div class="bar bar-header">';
+
+            // 判断是否需要创建 back 按钮
+            var state = history.state || {},
+                slast = router.last.state;
+            if (last.back != false && 
+               (slast && slast.id != state.id)) {
+                html += '<mg-back></mg-back>';
             }
 
-            // 公用方法注册，利用 VUE 的 mixin 选项实现
-            mixins = {
-                ready: function() {
-                    mvue.__STATE__.PAGE_READY = true;
+            html   += '<h3 class="title">{{title}}</h3></div>';
+        }
 
-                    this.$broadcast("pageReady");
-                    this.$emit("pageReadyDirect");
-                },
+        html +=     '<div class="content has-header"><div class="tip"></div></div>'+
+                '</mg-page>';
 
-                beforeDestroy: function() {
-                    mvue.__STATE__.PAGE_READY = false;
+        html = $.tpl(html, { title: last.title, url  : url||'' });
 
-                    this.$broadcast("pageDestroy");
-                    this.$emit("pageDestroyDirect");
-                },
-            }
+        return html;
+    }
 
-            // 如果 resolve 为函数，则创建初始化相关方法和事件
-            if (typeof init == "function") {
-                mixins.created = function() {
-                    var _params = $.extend({}, mvue.__PAGE__.PARAMS),
-                        _defer  = $.defer(), that = this;
+    // 创建临时的加载中页面效果
+    function makeLoading(router, match) {
+        var $view = $(mvue.__VIEW__), LOAD = mvue.__LOAD__;
+        
+        $view.append(_createLoadHtml(router, match));
 
-                    _params = _transParams(_params);
-
-                    // 注册 数据更新事件，用于手动触发刷新动作
-                    that.$on("refreshData", function(params) {
-                        init.call(that, params || _params, _defer);
-                    })
-
-                    // 注册 数据接受事件，用于手动初始化数据
-                    that.$on("reciveData", function(initData) {
-                        if (typeof initData == "object") {
-                            for(var key in initData) {
-                                that.$set(key, initData[key]);
-                            }
-                        }
-                    });
-
-                    // 通过前面注册的事件，将数据更新到对象实例上
-                    _defer.then(function(initData) {
-                        that.$emit("reciveData", initData);
-                    });
-
-                    that.$emit("refreshData");  // 手动触发一下更新
+        LOAD.$DOM = $view.find('._load_');
+        LOAD.HANDLE = setTimeout((function() {
+            if (LOAD.BACK === true) {
+                return function() {
+                    if (!mvue.__STATE__.AUTH_BEFORE) {
+                        LOAD.$DOM.addClass('pop-new');
+                    }
+                }
+            } else {
+                return function() {
+                    if (!mvue.__STATE__.AUTH_BEFORE) {
+                        LOAD.$DOM.addClass('push-new');
+                    }
                 }
             }
+        })(), 200);
+    }
 
-            // 添加基础的方法
-            if (typeof page.mixins == "array") {
-                page.mixins.push(mixins);
-            } else {
-                page.mixins = [mixins];
+    // 绑定动画效果
+    function bindAnimate(new, old, call) {
+
+    }
+
+    // 清除加载中页面
+    function clearLoading(el, delay) {
+        var LOAD = mvue.__LOAD__;
+
+        setTimeout(function() {
+            clearTimeout(LOAD.HANDLE);
+            LOAD.$DOM.remove();
+
+            el && $(el).removeClass("hide");
+        }, delay || 0);
+    }
+
+    // 创建一个 LOAD 完成处理函数
+    function _createLoad() {
+        var defer = $.defer(), PAGE = mvue.__PAGE__;
+
+        defer.then(function(handle) {
+            var now = $.getTime(), LOAD = mvue.__LOAD__,
+                $el = $(handle.$el), $before;
+
+            if (PAGE.BEFORE && PAGE.BEFORE[0]) {
+                $before = $(PAGE.BEFORE[0].$el);
             }
 
-            resolve(page);  // 实例初始化页面组件对象
+            if ((now - LOAD.START) > 300) {
+                LOAD.$DOM.once("transitionend", function(e) {
+                    console.log('trans end')
+                    clearLoading($el, 80);
+                })
+            } else {
+                console.log("can show page")
+                clearLoading($el)
+
+                if (LOAD.BACK === true) {
+
+                } else {
+
+                }
+                $before.addClass("leave");
+
+                $el.removeClass("hide").addClass("push-new")
+                .once("transitionend", function() {
+                    $el.removeClass("push-new enter");
+                    $before.removeClass("leave").addClass("hide");
+                })
+
+                // 必须延时绑定 CLASS 否则无法触发动画
+                setTimeout(function() {
+                    $el.addClass("enter");
+                });
+            }
+        })
+
+        return defer;   // 返回创建好的承诺对象
+    }
+
+    // 根据传入的 PAGE 对象参数不同，创建不同的 READY 函数
+    function _createReady(page) {
+        var PAGE = mvue.__PAGE__, STAT = mvue.__STATE__,
+            init = page.resolve;
+
+        if (typeof init == "function") {
+            return function() {
+               console.log("pready: "+$.getTime());
+                var that = this, _params = $.extend({}, PAGE.PARAMS),
+                    _defer  = $.defer(), loadDefer = _createLoad();
+
+                _params = _transParams(_params);    // 修正参数列表
+
+                // 注册 数据更新事件，用于手动触发刷新动作
+                that.$on("refreshData", function(params) {
+                    init.call(that, params || _params, _defer);
+                })
+
+                // 注册 数据接受事件，用于手动初始化数据
+                that.$on("reciveData", function(initData) {
+                    if (typeof initData == "object") {
+                        for(var key in initData) {
+                            that.$set(key, initData[key]);
+                        }
+                    }
+                });
+
+                that.$emit("refreshData");  // 手动触发一下更新
+
+                // 通过前面注册的事件，将数据更新到对象实例上
+                _defer.then(function(initData) {
+                    that.$emit("reciveData", initData);
+                    loadDefer.resolve(that);
+                });
+            }
+        } else {
+            return function() {
+                       console.log("pready: "+$.getTime());
+                STAT.PAGE_READY = true;
+
+                this.$broadcast("pageReady");
+                this.$emit("pageReadyDirect");
+
+                _createLoad().resolve(this);
+            }
+        }
+    }
+
+    function _commonPage(page) {
+        var old = page.data, mixins;
+
+        // 采用新的方式，组件的 data 必须为函数
+        if (typeof old !== "function") {
+            page.data = function() { return old; }
+        }
+
+        // 公用方法注册，利用 VUE 的 mixin 选项实现
+        mixins = {
+            ready: _createReady(page),
+
+            beforeDestroy: function() {
+                mvue.__STATE__.PAGE_READY = false;
+
+                this.$broadcast("pageDestroy");
+                this.$emit("pageDestroyDirect");
+            },
+        }
+
+        // 添加基础的方法
+        if (typeof page.mixins == "array") {
+            page.mixins.push(mixins);
+        } else {
+            page.mixins = [mixins];
+        }
+
+        return page;    // 返回修改后的page对象
+    }
+
+    mvue.initView = function(resolve) {
+        return function(page) {
+            // 实例初始化页面组件对象
+            resolve(_commonPage(page));
         }
     }
 
     mvue.loadView = function(name, initFix) {
-        mvue.component("ma-"+name, initFix);
+        var cname = "ma-"+name;
+
+        if (typeof initFix == "object") {
+            initFix.replace = true;
+            initFix.inherit = true;
+
+            initFix = _commonPage(initFix);
+        }
+
+        mvue.component(cname, initFix);
 
         // 如果 initFix 值为一个 函数 ，说明为一个异步组件，用于Page层级
-        if (typeof initFix == "function") {
-            return function() {
-                new Vue({template: "<ma-"+name+"></ma-"+name+">"})
-                    .$mount().$appendTo(mvue.__VIEW__);
+        return function() {
+            var PAGE = mvue.__PAGE__, LOAD = mvue.__LOAD__,
+                before = PAGE.BEFORE, handle = PAGE.HANDLE;
+
+            if (LOAD.BACK === true &&
+                (before && before[0] && before[0].$options.name == cname)) {
+
+                PAGE.BEFORE = handle;
+                PAGE.HANDLE = before;
+            } else {
+                var tmp = '<'+cname+' class="hide"></'+cname+'>',
+                    $insert = new Vue({ template: tmp }).$mount();
+
+                if (before && before[0]) {
+                    before[0].$destroy(true);
+                }
+
+                PAGE.BEFORE = PAGE.HANDLE || null;
+                PAGE.HANDLE = $insert.$children;
+                
+                $insert.$appendTo(mvue.__VIEW__);
             }
         }
     }
-
-    // 加载页面方法
-    window.loadView = function(page) {
-        var pageData = $.extend({}, page), PAGE = mvue.__PAGE__, load,
-            VIEW = mvue.__VIEW__, defer, mixins, params, ltime, nowurl;
-
-        /* 默认页面属性设置 */
-        pageData.data = $.extend(true, {}, page.data);
-        pageData.replace = true;    // 统一设置属性为 replace
-
-        /* 预先模拟加载中的效果 */
-        // mvue.clearLoad(); nowurl = mvue.location.geturl();
-        // load = {template: makeView(PAGE.ROUTER, nowurl), replace: true};
-        // PAGE.LOAD = new Vue(load).$mount().$appendTo(VIEW);
-        // ltime = $.getTime();
-
-
-        // 修改对象的参数值，替换 000 为 空字符串
-        params = $.extend({}, mvue.__PAGE__.PARAMS);
-        pageData.data.params = _transParams(params);
-
-        defer = $.defer();          // 决定何时渲染
-        if (typeof pageData.resolve == "function") {
-            pageData.resolve(params, defer);
-        } else {
-            defer.done({});         // 无加载方法直接进入渲染
-        }
-
-        defer.then(function(init) {
-            var rauth = mvue.__STATE__.AUTH_BEFORE,
-                pauth = $$.location.options.authPage;
-
-            for (var key in init) {
-                pageData.data[key] = init[key];
-            }
-
-            if (PAGE.HANDLE) {
-                PAGE.HANDLE.$destroy(true);
-            }
-
-            mixins = {
-                beforeDestroy: function() {
-                    $$.__STATE__.PAGE_READY = false;
-
-                    this.$broadcast("pageDestroy");
-                    this.$emit("pageDestroyDirect");
-                },
-
-                ready: function() {
-                    $$.__STATE__.PAGE_READY = true;
-
-                    this.$broadcast("pageReady");
-                    this.$emit("pageReadyDirect");
-                }
-            }
-
-            if (typeof pageData.mixins == "array") {
-                pageData.mixins.push(mixins);
-            } else {
-                pageData.mixins = [mixins];
-            }
-
-            PAGE.HANDLE = new Vue(pageData).$mount();
-            VIEW && PAGE.HANDLE.$appendTo(VIEW);
-
-            // var fixTime = (ltime+600) - $.getTime();
-            // setTimeout(function() {
-            //     VIEW && PAGE.HANDLE.$appendTo(VIEW);
-
-            //     mvue.clearLoad();
-            // }, fixTime > 0 ? fixTime : 0);
-        })
-    };
 
     mvue.component = function(ids, opt) {
         if (opt /* 参数默认值全局设置 */) {
