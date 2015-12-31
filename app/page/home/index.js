@@ -12,7 +12,7 @@ module.exports = {
         setTimeout(function() {
             console.log("has load")
             defer.resolve()
-        }, 130);
+        }, 330);
     },
 
     methods: {

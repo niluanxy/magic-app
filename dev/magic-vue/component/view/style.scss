@@ -8,15 +8,15 @@ mg-page, mg-view, .mg-view, .mg-page {
     overflow: hidden;
     transition: all .6s ease;
     
-    &.transition-none {
+    .transition-none {
         transition-duration: 0s;
     }
 
-    &.leave {
+    .leave {
         opacity: 0;
     }
 
-    &.push-new {
+    .push-new {
         z-index: 100;
         opacity: 0;
         transform: translate3d(100%, 0, 0);
@@ -27,7 +27,7 @@ mg-page, mg-view, .mg-view, .mg-page {
         }
     }
 
-    &.pop-new {
+    .pop-new {
         z-index: 100;
         opacity: 0;
         transform: translate3d(-100%, 0, 0);
@@ -40,14 +40,7 @@ mg-page, mg-view, .mg-view, .mg-page {
 
     ._load_ {
         z-index: 100;
-        left: 100%;
         background-color: #fff;
-        transition: all .4s ease-in;
-
-        &.push-enter {
-            left: 0;
-            opacity: 1;
-        }
 
         .tip {
             display: block;

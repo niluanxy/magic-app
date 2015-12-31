@@ -20,7 +20,14 @@ $(function() {
                      },
         __CACHE__  : null,       // 全局页面缓存
 
-        __LOAD__   : {},         // 加载动画相关参数
+        __LOAD__   : {
+                        START  : 0,             // LOAD动画开始时间
+                        BACK   : false,         // 是否为BACK模式
+                        HANDLE : null,          // 定时器句柄
+                        $DOM   : null,          // DOM对象
+                        SHOW   : false,         // 是否正在显示LOAD动画
+                        PAGEIN : false,         // 标记是否已经插入了页面
+                     },         // 加载动画相关参数
 
         __STATE__  : null,       // 记录当前APP各种状态
     };
@@ -73,7 +80,6 @@ $(function() {
 
                 // 初始化加载动画相关信息
                 console.log("before: "+$.getTime());
-                LOAD.START = $.getTime();
                 if (opt.loading !== false) {
                     makeLoading(that, match, nowUrl);
                 }
@@ -170,6 +176,7 @@ $(function() {
         var oback = mvue.location.back;
         mvue.location.back = function() {
             console.log("xiugai")
+            clearLoading();
             mvue.__LOAD__.BACK = true;
             oback.call(mvue.location, arguments);
         }
@@ -177,7 +184,7 @@ $(function() {
         var onew  = mvue.location.go;
         mvue.location.go = function() {
             console.log("xiugai")
-            mvue.__LOAD__.BACK = false;
+            clearLoading();
             onew.call(mvue.location, arguments);
         }
     }
@@ -241,43 +248,64 @@ $(function() {
         
         $view.append(_createLoadHtml(router, match));
 
-        LOAD.$DOM = $view.find('._load_');
-        LOAD.HANDLE = setTimeout((function() {
-            if (LOAD.BACK === true) {
-                return function() {
-                    if (!mvue.__STATE__.AUTH_BEFORE) {
-                        LOAD.$DOM.addClass('pop-new');
-                    }
-                }
-            } else {
-                return function() {
-                    if (!mvue.__STATE__.AUTH_BEFORE) {
-                        LOAD.$DOM.addClass('push-new');
-                    }
-                }
+        LOAD.START = $.getTime();
+        LOAD.$DOM  = $view.find('._load_');
+        if (LOAD.BACK === true) {
+            LOAD.$DOM.addClass('pop-new');
+        } else {
+            LOAD.$DOM.addClass('push-new');
+        }
+
+        // 动画执行完设置 显示状态 为 False
+        LOAD.$DOM.once("transitionend", function() {
+            LOAD.SHOW = false;
+        })
+
+        LOAD.HANDLE = setTimeout(function() {
+            if (!mvue.__STATE__.AUTH_BEFORE && !LOAD.PAGEIN) {
+                LOAD.SHOW = true;
+                LOAD.$DOM.addClass("enter");
             }
-        })(), 200);
-    }
-
-    // 绑定动画效果
-    function bindAnimate(new, old, call) {
-
+        }, 100);
     }
 
     // 清除加载中页面
-    function clearLoading(el, delay) {
-        var LOAD = mvue.__LOAD__;
-
-        setTimeout(function() {
+    var clearLoading = (function() {
+        function clear(LOAD, el) {
             clearTimeout(LOAD.HANDLE);
+            LOAD.SHOW   = false;
+            LOAD.HANDLE = null;
             LOAD.$DOM.remove();
+            LOAD.BACK   = false;
 
             el && $(el).removeClass("hide");
-        }, delay || 0);
+        }
+
+        return function(el, delay) {
+            var LOAD = mvue.__LOAD__;
+
+            if (delay) {
+                setTimeout(function() {
+                    clear(LOAD, el);
+                }, delay);
+            } else {
+                clear(LOAD, el);
+            }
+        }
+    })();
+
+    // 绑定动画效果
+    function bindAnimate(insert, old, call) {
+
+    };
+
+    // 检测当前是否运行在 PAGE 层级还是组件层级
+    function _isRunPage(scope) {
+        return scope.$parent.$options.name == "_loadPage";
     }
 
     // 创建一个 LOAD 完成处理函数
-    function _createLoad() {
+    function _createLoadFinish() {
         var defer = $.defer(), PAGE = mvue.__PAGE__;
 
         defer.then(function(handle) {
@@ -288,7 +316,10 @@ $(function() {
                 $before = $(PAGE.BEFORE[0].$el);
             }
 
-            if ((now - LOAD.START) > 300) {
+            LOAD.PAGEIN = true;     // 标记页面已经插入
+
+            if (LOAD.SHOW != false) {
+                console.log("transition is show")
                 LOAD.$DOM.once("transitionend", function(e) {
                     console.log('trans end')
                     clearLoading($el, 80);
@@ -325,11 +356,18 @@ $(function() {
         var PAGE = mvue.__PAGE__, STAT = mvue.__STATE__,
             init = page.resolve;
 
+        function _pageReady() {
+            STAT.PAGE_READY = true;
+
+            this.$broadcast("pageReady");
+            this.$emit("pageReadyDirect");
+        }
+
         if (typeof init == "function") {
             return function() {
                console.log("pready: "+$.getTime());
                 var that = this, _params = $.extend({}, PAGE.PARAMS),
-                    _defer  = $.defer(), loadDefer = _createLoad();
+                    _defer  = $.defer(), loadDefer = _createLoadFinish();
 
                 _params = _transParams(_params);    // 修正参数列表
 
@@ -354,16 +392,15 @@ $(function() {
                     that.$emit("reciveData", initData);
                     loadDefer.resolve(that);
                 });
+
+                _pageReady.call(this);
             }
         } else {
             return function() {
-                       console.log("pready: "+$.getTime());
-                STAT.PAGE_READY = true;
+               console.log("pready: "+$.getTime());
+                _pageReady.call(this);
 
-                this.$broadcast("pageReady");
-                this.$emit("pageReadyDirect");
-
-                _createLoad().resolve(this);
+                _createLoadFinish().resolve(this);
             }
         }
     }
@@ -429,7 +466,7 @@ $(function() {
                 PAGE.HANDLE = before;
             } else {
                 var tmp = '<'+cname+' class="hide"></'+cname+'>',
-                    $insert = new Vue({ template: tmp }).$mount();
+                    $insert = new Vue({ template: tmp, name: "_loadPage" }).$mount();
 
                 if (before && before[0]) {
                     before[0].$destroy(true);
