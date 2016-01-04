@@ -23,6 +23,8 @@ $(function() {
         __LOAD__   : {
                         START  : 0,             // LOAD动画开始时间
                         BACK   : false,         // 是否为BACK模式
+                        TRANS  : true,          // 是否还在执行动画中
+                        PUSH   : true,          // 是否为新建页面的方式
                         HANDLE : null,          // 定时器句柄
                         $DOM   : null,          // DOM对象
                         SHOW   : false,         // 是否正在显示LOAD动画
@@ -175,16 +177,15 @@ $(function() {
         // 重新修改原来的 back 和 go 方法
         var oback = mvue.location.back;
         mvue.location.back = function() {
-            console.log("xiugai")
             clearLoading();
-            mvue.__LOAD__.BACK = true;
+            mvue.__LOAD__.PUSH = false;
             oback.call(mvue.location, arguments);
         }
 
         var onew  = mvue.location.go;
         mvue.location.go = function() {
-            console.log("xiugai")
             clearLoading();
+            mvue.__LOAD__.PUSH = true;
             onew.call(mvue.location, arguments);
         }
     }
@@ -249,11 +250,12 @@ $(function() {
         $view.append(_createLoadHtml(router, match));
 
         LOAD.START = $.getTime();
+        LOAD.TRANS = true;
         LOAD.$DOM  = $view.find('._load_');
-        if (LOAD.BACK === true) {
-            LOAD.$DOM.addClass('pop-new');
-        } else {
+        if (LOAD.PUSH === true) {
             LOAD.$DOM.addClass('push-new');
+        } else {
+            LOAD.$DOM.addClass('pop-new');
         }
 
         // 动画执行完设置 显示状态 为 False
@@ -263,8 +265,12 @@ $(function() {
 
         LOAD.HANDLE = setTimeout(function() {
             if (!mvue.__STATE__.AUTH_BEFORE && !LOAD.PAGEIN) {
-                LOAD.SHOW = true;
+                LOAD.SHOW  = true;
                 LOAD.$DOM.addClass("enter");
+
+                LOAD.$DOM.once("transitionend", function() {
+                    LOAD.TRANS = false;
+                })
             }
         }, 100);
     }
@@ -274,6 +280,7 @@ $(function() {
         function clear(LOAD, el) {
             clearTimeout(LOAD.HANDLE);
             LOAD.SHOW   = false;
+            LOAD.TRANS  = true;
             LOAD.HANDLE = null;
             LOAD.$DOM.remove();
             LOAD.BACK   = false;
@@ -310,7 +317,7 @@ $(function() {
 
         defer.then(function(handle) {
             var now = $.getTime(), LOAD = mvue.__LOAD__,
-                $el = $(handle.$el), $before;
+                $el = $(handle.$el), $before, cls;
 
             if (PAGE.BEFORE && PAGE.BEFORE[0]) {
                 $before = $(PAGE.BEFORE[0].$el);
@@ -319,25 +326,23 @@ $(function() {
             LOAD.PAGEIN = true;     // 标记页面已经插入
 
             if (LOAD.SHOW != false) {
-                console.log("transition is show")
-                LOAD.$DOM.once("transitionend", function(e) {
-                    console.log('trans end')
+                if (LOAD.TRANS == false) {
                     clearLoading($el, 80);
-                })
+                } else {
+                    LOAD.$DOM.once("transitionend", function(e) {
+                        clearLoading($el, 80);
+                    })
+                }
             } else {
                 console.log("can show page")
                 clearLoading($el)
 
-                if (LOAD.BACK === true) {
+                cls = LOAD.PUSH ? "push-new" : "pop-new";
 
-                } else {
-
-                }
                 $before.addClass("leave");
-
-                $el.removeClass("hide").addClass("push-new")
-                .once("transitionend", function() {
-                    $el.removeClass("push-new enter");
+                $el.removeClass("hide").addClass(cls)
+                $el.once("transitionend", function() {
+                    $el.removeClass(cls+" enter");
                     $before.removeClass("leave").addClass("hide");
                 })
 
