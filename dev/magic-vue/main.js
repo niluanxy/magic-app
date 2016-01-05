@@ -12,26 +12,24 @@ $(function() {
         __VUE__    : null,       // 全局VUE对象
         __VIEW__   : null,       // 全局MG-VIEW对象
         __PAGE__   : {
-                        ROUTER : null,
-                        PARAMS : {},
-                        HANDLE : null,
-                        CONTENT: null,
-                        BEFORE : null,
+                        ROUTER : null,          // 当前页面的 路由匹配对象
+                        PARAMS : {},            // 当前页面的 参数
+                        CONTENT: null,          // 当前页面的 主体内容
+
+                        HANDLE : null,          // 当前页面 句柄数组
+                        BEFORE : null,          // 旧页面 句柄数组
                      },
         __CACHE__  : null,       // 全局页面缓存
 
         __LOAD__   : {
                         START  : 0,             // LOAD动画开始时间
-                        BACK   : false,         // 是否为BACK模式
-                        TRANS  : true,          // 是否还在执行动画中
+                        SHOW   : false,         // 是否正在显示LOAD动画
                         PUSH   : true,          // 是否为新建页面的方式
                         HANDLE : null,          // 定时器句柄
                         $DOM   : null,          // DOM对象
-                        SHOW   : false,         // 是否正在显示LOAD动画
-                        PAGEIN : false,         // 标记是否已经插入了页面
-                     },         // 加载动画相关参数
+                     },             // 加载动画相关参数
 
-        __STATE__  : null,       // 记录当前APP各种状态
+        __STATE__  : null,          // 记录当前APP各种状态
     };
 
 
@@ -53,13 +51,13 @@ $(function() {
 
         var vue   = mvue.__VUE__  = new Vue({ el: "body" }),
             view  = mvue.__VIEW__ = $("body").query("mg-view"),
-            $view = $(mvue.__VIEW__), PAGE = mvue.__PAGE__;
+            $view = $(mvue.__VIEW__), PAGE = mvue.__PAGE__,
+            LOAD  = mvue.__LOAD__;
         
         mvue.__STATE__ = {
             AUTH_HASRUN  : false,       // 记录验证页面是否已调用
             AUTH_BEFORE  : "",          // 验证失败的页面，用于回跳
 
-            ROUTER_TYPE  : false,       // 路由事件触发加载方式
             ROUTER_AFTER : false,       // 路由事件执行状态
 
             PAGE_READY   : false,       // 页面加载状态
@@ -78,7 +76,6 @@ $(function() {
                     atest = opt.authCheck;
 
                 STAT.ROUTER_AFTER = false;
-                STAT.ROUTER_TYPE  = that.evetype;
 
                 // 初始化加载动画相关信息
                 console.log("before: "+$.getTime());
@@ -175,18 +172,16 @@ $(function() {
         }
 
         // 重新修改原来的 back 和 go 方法
-        var oback = mvue.location.back;
+        var _oback = mvue.location.back;
         mvue.location.back = function() {
-            clearLoading();
-            mvue.__LOAD__.PUSH = false;
-            oback.call(mvue.location, arguments);
+            LOAD.PUSH = false;
+            _oback.call(mvue.location, arguments);
         }
 
-        var onew  = mvue.location.go;
+        var _onew  = mvue.location.go;
         mvue.location.go = function() {
-            clearLoading();
-            mvue.__LOAD__.PUSH = true;
-            onew.call(mvue.location, arguments);
+            LOAD.PUSH = true;
+            _onew.call(mvue.location, arguments);
         }
     }
 
@@ -215,7 +210,8 @@ $(function() {
         return params;
     }
 
-    function _createLoadHtml(router, match, url) {
+    // 创建load动画的html代码
+    function _createLoadHtml(router, match) {
         var last = match[match.length-1].item, html;
             
         html = '<mg-page class="_load_">'
@@ -238,7 +234,7 @@ $(function() {
         html +=     '<div class="content has-header"><div class="tip"></div></div>'+
                 '</mg-page>';
 
-        html = $.tpl(html, { title: last.title, url  : url||'' });
+        html = $.tpl(html, { title: last.title});
 
         return html;
     }
@@ -246,30 +242,25 @@ $(function() {
     // 创建临时的加载中页面效果
     function makeLoading(router, match) {
         var $view = $(mvue.__VIEW__), LOAD = mvue.__LOAD__;
-        
+
         $view.append(_createLoadHtml(router, match));
 
         LOAD.START = $.getTime();
-        LOAD.TRANS = true;
         LOAD.$DOM  = $view.find('._load_');
+
         if (LOAD.PUSH === true) {
             LOAD.$DOM.addClass('push-new');
         } else {
             LOAD.$DOM.addClass('pop-new');
         }
 
-        // 动画执行完设置 显示状态 为 False
-        LOAD.$DOM.once("transitionend", function() {
-            LOAD.SHOW = false;
-        })
-
         LOAD.HANDLE = setTimeout(function() {
             if (!mvue.__STATE__.AUTH_BEFORE && !LOAD.PAGEIN) {
                 LOAD.SHOW  = true;
-                LOAD.$DOM.addClass("enter");
 
-                LOAD.$DOM.once("transitionend", function() {
-                    LOAD.TRANS = false;
+                LOAD.$DOM.addClass("enter")
+                .once("transitionend", function() {
+                    LOAD.SHOW  = false;
                 })
             }
         }, 100);
@@ -278,12 +269,11 @@ $(function() {
     // 清除加载中页面
     var clearLoading = (function() {
         function clear(LOAD, el) {
+            // 返回状态为初始状态，并清除创建的DOM
             clearTimeout(LOAD.HANDLE);
-            LOAD.SHOW   = false;
-            LOAD.TRANS  = true;
-            LOAD.HANDLE = null;
-            LOAD.$DOM.remove();
-            LOAD.BACK   = false;
+            LOAD.PUSH = true;
+            LOAD.SHOW = false;
+            LOAD.$DOM && LOAD.$DOM.remove();
 
             el && $(el).removeClass("hide");
         }
@@ -302,8 +292,23 @@ $(function() {
     })();
 
     // 绑定动画效果
-    function bindAnimate(insert, old, call) {
+    function startAnimate(insert, old, call) {
+        var $now = $(insert), $before = $(old),
+            LOAD = mvue.__LOAD__, cls;
 
+        cls = LOAD.PUSH ? "push-new" : "pop-new";
+        $before.removeClass("hide").addClass("leave");
+        $now.removeClass("hide").addClass(cls)
+
+        setTimeout(function() {
+            $now.addClass("enter")
+            .once("transitionend", function() {
+                console.log($before)
+                console.log($now)
+                $before.removeClass("leave").addClass("hide");
+                $now.removeClass(cls + " enter");
+            })
+        });
     };
 
     // 检测当前是否运行在 PAGE 层级还是组件层级
@@ -323,25 +328,21 @@ $(function() {
                 $before = $(PAGE.BEFORE[0].$el);
             }
 
-            LOAD.PAGEIN = true;     // 标记页面已经插入
-
-            if (LOAD.SHOW != false) {
-                if (LOAD.TRANS == false) {
-                    clearLoading($el, 80);
-                } else {
-                    LOAD.$DOM.once("transitionend", function(e) {
-                        clearLoading($el, 80);
-                    })
-                }
+            if (LOAD.SHOW /* 正在显示加载动画 */) {
+                LOAD.$DOM.once("transitionend", function(e) {
+                    clearLoading($el, 30);
+                });
             } else {
                 console.log("can show page")
-                clearLoading($el)
-
                 cls = LOAD.PUSH ? "push-new" : "pop-new";
+                clearLoading($el);      // 清除 load 内容
 
                 $before.addClass("leave");
                 $el.removeClass("hide").addClass(cls)
                 $el.once("transitionend", function() {
+                    console.log("console of loadFinish")
+                    console.log($el)
+                    console.log($before)
                     $el.removeClass(cls+" enter");
                     $before.removeClass("leave").addClass("hide");
                 })
@@ -378,7 +379,17 @@ $(function() {
 
                 // 注册 数据更新事件，用于手动触发刷新动作
                 that.$on("refreshData", function(params) {
-                    init.call(that, params || _params, _defer);
+                    var initDefer = _defer;
+
+                    // 创建后续的数据刷新回调动作
+                    if (initDefer.status == "resolved") {
+                        initDefer = $.defer();
+                        initDefer.then(function(initData) {
+                            that.$emit("reciveData", initData);
+                        })
+                    }
+
+                    init.call(that, params || _params, initDefer);
                 })
 
                 // 注册 数据接受事件，用于手动初始化数据
@@ -464,11 +475,13 @@ $(function() {
             var PAGE = mvue.__PAGE__, LOAD = mvue.__LOAD__,
                 before = PAGE.BEFORE, handle = PAGE.HANDLE;
 
-            if (LOAD.BACK === true &&
-                (before && before[0] && before[0].$options.name == cname)) {
-
+            // 修正保存的当前页面句柄和旧页面句柄
+            if (before && before[0] && before[0].$options.name == cname) {
                 PAGE.BEFORE = handle;
                 PAGE.HANDLE = before;
+
+                startAnimate(PAGE.HANDLE[0].$el, PAGE.BEFORE[0].$el);
+                clearLoading();
             } else {
                 var tmp = '<'+cname+' class="hide"></'+cname+'>',
                     $insert = new Vue({ template: tmp, name: "_loadPage" }).$mount();
@@ -478,9 +491,8 @@ $(function() {
                 }
 
                 PAGE.BEFORE = PAGE.HANDLE || null;
-                PAGE.HANDLE = $insert.$children;
-                
                 $insert.$appendTo(mvue.__VIEW__);
+                PAGE.HANDLE = $insert.$children;
             }
         }
     }
