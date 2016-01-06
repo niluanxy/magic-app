@@ -300,7 +300,7 @@ $(function() {
         $before.removeClass("hide").addClass("leave");
         $now.removeClass("hide").addClass(cls)
 
-        setTimeout(function() {
+        animateCall(function() {
             $now.addClass("enter")
             .once("transitionend", function() {
                 console.log($before)
@@ -308,8 +308,15 @@ $(function() {
                 $before.removeClass("leave").addClass("hide");
                 $now.removeClass(cls + " enter");
             })
-        });
+        }, this);
     };
+
+    // 启动动画的函数回调
+    function animateCall(call, scope) {
+        setTimeout(function() {
+            call.call(scope);
+        }, 20);
+    }
 
     // 检测当前是否运行在 PAGE 层级还是组件层级
     function _isRunPage(scope) {
@@ -348,9 +355,9 @@ $(function() {
                 })
 
                 // 必须延时绑定 CLASS 否则无法触发动画
-                setTimeout(function() {
+                animateCall(function() {
                     $el.addClass("enter");
-                });
+                }, this);
             }
         })
 
@@ -458,6 +465,13 @@ $(function() {
         }
     }
 
+    // 创建页面级的 VIEW 对象
+    mvue.__makeLoadView = function(name) {
+        var tmp = '<'+name+' class="hide"></'+name+'>';
+
+        return new Vue({ template: tmp, name: "_loadPage" }).$mount();
+    }
+
     mvue.loadView = function(name, initFix) {
         var cname = "ma-"+name;
 
@@ -473,26 +487,32 @@ $(function() {
         // 如果 initFix 值为一个 函数 ，说明为一个异步组件，用于Page层级
         return function() {
             var PAGE = mvue.__PAGE__, LOAD = mvue.__LOAD__,
-                before = PAGE.BEFORE, handle = PAGE.HANDLE;
+                before = PAGE.BEFORE, handle = PAGE.HANDLE,
+                old = before && before[0] ? before[0] : null;
 
             // 修正保存的当前页面句柄和旧页面句柄
-            if (before && before[0] && before[0].$options.name == cname) {
-                PAGE.BEFORE = handle;
-                PAGE.HANDLE = before;
+            if (LOAD.PUSH === true) {
+                var $insert = mvue.__makeLoadView(cname);
 
-                startAnimate(PAGE.HANDLE[0].$el, PAGE.BEFORE[0].$el);
-                clearLoading();
-            } else {
-                var tmp = '<'+cname+' class="hide"></'+cname+'>',
-                    $insert = new Vue({ template: tmp, name: "_loadPage" }).$mount();
-
-                if (before && before[0]) {
-                    before[0].$destroy(true);
-                }
+                if (old) old.$destroy(true);
 
                 PAGE.BEFORE = PAGE.HANDLE || null;
                 $insert.$appendTo(mvue.__VIEW__);
                 PAGE.HANDLE = $insert.$children;
+            } else {
+                PAGE.BEFORE = handle; PAGE.HANDLE = before;
+
+                if (old && old.$options.name == cname) {
+                    startAnimate(PAGE.HANDLE[0].$el, PAGE.BEFORE[0].$el);
+                    clearLoading();
+                } else {
+                    var $insert = mvue.__makeLoadView(cname);
+
+                    if (old) old.$destroy(true);
+
+                    $insert.$appendTo(mvue.__VIEW__);
+                    PAGE.HANDLE = $insert.$children;
+                }
             }
         }
     }
