@@ -3,12 +3,13 @@ module.exports = (function() {
         template: "<slot></slot>",
         ready: function() {
             var that = this, $el = $(this.$el),
-                scope, handle, page, clen, ctrl;
+                scope, handle, page, clen, ctrl, bind;
 
             ctrl  = $el.attr("handle");
+            bind  = $el.attr("view");
             scope = $$._getPage(that);
 
-            if (scope[ctrl] !== undefined) {
+            if (scope[ctrl] !== undefined || scope[bind] !== undefined) {
                 page = $el.find("mg-content").length || $el.attr("page");
                 clen = $el.children.length;
 
@@ -16,29 +17,31 @@ module.exports = (function() {
                     $el.wrapAll("<div class='modal_body'></div>");
                 }
 
-                scope[ctrl] = handle =
-                $el.addClass("modal hideOut").modal({
+                handle = $el.addClass("modal hideOut").modal({
                     page    : page,
                     align   : $el.attr("align"),
                     autoHide: $el.attr("autoHide")
                 });
 
+                if (scope[ctrl] !== undefined) {
+                    scope[ctrl] = handle;
+                }
+
                 if (page && page != "true") {
                     var _name = $$.__makeViewName(page),
-                        _view = $$.__renderView(_name, "_loadModal"),
-                        _bind = $el.attr("view");
+                        _view = $$.__renderView(_name, "_loadModal");
 
                     _view.$appendTo($el[0]).__MODAL = handle;
 
                     _view.$once("childPageReady", function() {
-                        console.log("has recive child")
                         var _child = _view.$children[0];
 
-                        if (scope[_bind] !== undefined) {
-                            scope[_bind] = _child;
+                        if (scope[bind] !== undefined) {
+                            scope[bind] = _child;
                         }
 
                         _child.__MODAL_PARENT = scope;
+                        handle.view = _child;
                     })
                 }
 

@@ -38,6 +38,10 @@ module.exports = (function() {
         return typeof call == "function"
     };
 
+    function getTime() {
+        return (new Date()).getTime();
+    }
+
     /* 最后一项为真时，表示忽略无效的值 */
     function extend(/* ... */) {
         var argv = arguments, obj = argv[0],
@@ -223,7 +227,7 @@ module.exports = (function() {
         update !== false && that.update(that.geturl(), match);
     }
 
-    /* 全局绑定时间，监控页面前进后退等操作 */
+    /* 全局绑定事件，监控页面前进后退等操作 */
     Route.prototype._bind = function() {
         var that = this, opt = that.options, last = that.last, start, change;
 
@@ -247,6 +251,97 @@ module.exports = (function() {
 
             that.evetype = "";      // 重置状态
         });
+
+
+        var docbind = document.addEventListener, bindPoint = {
+            target: null,
+            startX: 0,
+            startY: 0,
+            startTime: 0,
+
+            _start: function(e) {
+                if (e.target.tagName.toUpperCase() == "A") {
+                    var point = e.changedTouches ? e.changedTouches[0] : e;
+
+                    if (e.touches && e.touches.length > 1) {
+                        this.startX = null;
+                        this.startY = null;
+
+                        return true;
+                    }
+
+                    this.startX = point.pageX;
+                    this.startY = point.pageY;
+                    this.target    = e.target;
+                    this.startTime = getTime();
+                }
+            },
+
+            _end: function(e) {
+                if (e.target.tagName.toUpperCase() == "A") {
+                    var point = e.changedTouches ? e.changedTouches[0] : e,
+                        cx, cy, ct, delay = 300, link;
+
+                    if (e.touches && e.touches.length > 1) return;
+
+                    cx = Math.abs(point.pageX - this.startX);
+                    cy = Math.abs(point.pageY - this.startY); 
+                    ct = getTime() - this.startTime;
+                    link = e.target.getAttribute("link");
+
+                    if (link && cx<5 && cy < 5 && ct < delay
+                        && this.target == e.target) {
+
+                        this._go(e);
+                    }
+                }
+            },
+
+            _go: function(e) {
+                var target = e.target, tag, link;
+
+                if (target.tagName.toUpperCase() == "A") {
+                    link = target.getAttribute("link");
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    that.evetype = "pushstate";
+                    that.go(link);  // 跳转新页面相关动作
+                }
+            },
+
+            handleEvent: function(e) {
+                switch ( e.type ) {
+                    case 'touchstart':
+                    case 'pointerdown':
+                    case 'MSPointerDown':
+                        this._start(e);
+                        break;
+                    case 'click':
+                    case 'touchend':
+                    case 'pointerup':
+                    case 'MSPointerUp':
+                    case 'touchcancel':
+                    case 'pointercancel':
+                    case 'MSPointerCancel':
+                        this._end(e);
+                        break;
+                }
+            }
+        }
+
+        docbind("touchstart", bindPoint);
+        docbind("touchend", bindPoint);
+        docbind("touchcancel", bindPoint);
+
+        docbind("pointerdown", bindPoint);
+        docbind("pointerup", bindPoint);
+        docbind("pointercancel", bindPoint);
+
+        docbind("MSPointerDown", bindPoint);
+        docbind("MSPointerUp", bindPoint);
+        docbind("MSPointerCancel", bindPoint);
     }
 
     /* 判断给定的URL状态是不是当前状态表的最后一项 */
@@ -352,6 +447,8 @@ module.exports = (function() {
                 return rcall;   // 返回 false，会阻止后续调用 update 方法
             })
         }
+
+        that.evetype = "";      // 清楚事件跳转的状态信息
             
         return that;
     };

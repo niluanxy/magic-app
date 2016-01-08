@@ -13,7 +13,11 @@
             </div>
         </div>
 
-        <a href="#user/home" class="button button-block">test user</a>
+        <a link="#user/home" class="button button-block">test user</a>
+
+        <a @tap="modal.view.input = 456" class="button button-block">set 456</a>
+
+        <a @tap="alert" class="button button-block">alert</a>
 
         <a @tap="showUser" class="button button-block">modal user</a>
     </mg-content>

@@ -17,6 +17,10 @@ module.exports = {
     },
 
     methods: {
+        alert: function() {
+            alert(this.modal.view.input)
+        },
+
         showUser: function() {
             console.log("has test modal page")
             this.modal.toggle();

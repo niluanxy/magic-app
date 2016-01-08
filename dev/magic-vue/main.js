@@ -22,6 +22,7 @@ $(function() {
         __CACHE__  : null,       // 全局页面缓存
 
         __LOAD__   : {
+                        FIRST  : true,          // 第一次加载的时候动画特殊处理
                         START  : 0,             // LOAD动画开始时间
                         SHOW   : false,         // 是否正在显示LOAD动画
                         PUSH   : true,          // 是否为新建页面的方式
@@ -80,6 +81,12 @@ $(function() {
                 // 初始化加载动画相关信息
                 // console.log("before: "+$.getTime());
                 if (opt.loading !== false) {
+                    if (LOAD.FIRST == true) {
+                        LOAD.PUSH = true;
+                        LOAD.FIRST = false;
+                    } else {
+                        LOAD.PUSH = that.evetype == "pushstate";
+                    }
                     makeLoading(that, match, nowUrl);
                 }
 
@@ -169,19 +176,6 @@ $(function() {
                 
                 location.go(option.home, true);
             }
-        }
-
-        // 重新修改原来的 back 和 go 方法
-        var _oback = mvue.location.back;
-        mvue.location.back = function() {
-            LOAD.PUSH = false;
-            _oback.call(mvue.location, arguments);
-        }
-
-        var _onew  = mvue.location.go;
-        mvue.location.go = function() {
-            LOAD.PUSH = true;
-            _onew.call(mvue.location, arguments);
         }
     }
 
