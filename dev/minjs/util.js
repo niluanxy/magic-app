@@ -126,14 +126,14 @@ module.exports = (function() {
      * @param       {Object}    deep     - 是否深度复制
      * @param       {Object}    target   - 目标对象
      * @param       {Object}    obj...   - 要合并一个或多个对象
-     * @param       {Boolean}   ...last  - 是否忽略无效值(null,undefined)
+     * @param       {Boolean}   ...last  - 是否忽略无效值(null,undefined)，默认不忽略
      * @author      mufeng  <smufeng@gmail.com>
      * @version     0.1     <2015-04-10>
      */
     util.extend = function(/* deep, target, obj..., last */) {
         var i = 1, argv = arguments, len = argv.length,
             target = argv[0], name, copy, clone,
-            pass = false, deep = false, isarr = false;
+            pass = false, deep = false;
 
         // 如果最后一个变量是 true ，表示忽略无效字段
         if (typeof argv[len-1] === "boolean") {
@@ -170,12 +170,10 @@ module.exports = (function() {
                         continue;   
                     }
 
-                    if (deep && copy && 
-                            ( isarr = isArray(copy) || isObject(copy) ) 
-                        ) {
+                    if (deep && copy && ( isArray(copy) || isObject(copy) ) ) {
 
                         // 深度复制时，判断是否需要创建新空间
-                        if (isarr) {
+                        if (isArray(copy)) {
                             clone = src && isArray(src) ? src : [];
                         } else {
                             clone = src && isObject(src) ? src : {};

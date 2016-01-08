@@ -78,7 +78,7 @@ $(function() {
                 STAT.ROUTER_AFTER = false;
 
                 // 初始化加载动画相关信息
-                console.log("before: "+$.getTime());
+                // console.log("before: "+$.getTime());
                 if (opt.loading !== false) {
                     makeLoading(that, match, nowUrl);
                 }
@@ -303,8 +303,8 @@ $(function() {
         animateCall(function() {
             $now.addClass("enter")
             .once("transitionend", function() {
-                console.log($before)
-                console.log($now)
+                // console.log($before)
+                // console.log($now)
                 $before.removeClass("leave").addClass("hide");
                 $now.removeClass(cls + " enter");
             })
@@ -318,8 +318,24 @@ $(function() {
         }, 20);
     }
 
+    // 获取当前组件所在的最近的 PAGE 对象
+    mvue._getPage = function(vm) {
+        var page = null, tmp = vm;
+
+        while (tmp.$parent) {
+            if (tmp.$el.nodeName == "MG-PAGE") {
+                page = tmp;
+                break;
+            }
+
+            tmp = tmp.$parent;
+        }
+
+        return page;
+    }
+
     // 检测当前是否运行在 PAGE 层级还是组件层级
-    function _isRunPage(scope) {
+    mvue._isRunPage = function(scope) {
         return scope.$parent.$options.name == "_loadPage";
     }
 
@@ -327,37 +343,42 @@ $(function() {
     function _createLoadFinish() {
         var defer = $.defer(), PAGE = mvue.__PAGE__;
 
-        defer.then(function(handle) {
+        defer.then(function(scope) {
             var now = $.getTime(), LOAD = mvue.__LOAD__,
-                $el = $(handle.$el), $before, cls;
+                $el = $(scope.$el), $before, cls;
 
-            if (PAGE.BEFORE && PAGE.BEFORE[0]) {
-                $before = $(PAGE.BEFORE[0].$el);
-            }
+            // 只在PAGE模式下运行页面动画处理
+            if (mvue._isRunPage(scope)) {
+                if (PAGE.BEFORE && PAGE.BEFORE[0]) {
+                    $before = $(PAGE.BEFORE[0].$el);
+                }
 
-            if (LOAD.SHOW /* 正在显示加载动画 */) {
-                LOAD.$DOM.once("transitionend", function(e) {
-                    clearLoading($el, 30);
-                });
+                if (LOAD.SHOW /* 正在显示加载动画 */) {
+                    LOAD.$DOM.once("transitionend", function(e) {
+                        clearLoading($el, 30);
+                    });
+                } else {
+                    // console.log("can show page")
+                    cls = LOAD.PUSH ? "push-new" : "pop-new";
+                    clearLoading($el);      // 清除 load 内容
+
+                    $before.addClass("leave");
+                    $el.removeClass("hide").addClass(cls)
+                    $el.once("transitionend", function() {
+                        // console.log("console of loadFinish")
+                        // console.log($el)
+                        // console.log($before)
+                        $el.removeClass(cls+" enter");
+                        $before.removeClass("leave").addClass("hide");
+                    })
+
+                    // 必须延时绑定 CLASS 否则无法触发动画
+                    animateCall(function() {
+                        $el.addClass("enter");
+                    }, this);
+                }
             } else {
-                console.log("can show page")
-                cls = LOAD.PUSH ? "push-new" : "pop-new";
-                clearLoading($el);      // 清除 load 内容
-
-                $before.addClass("leave");
-                $el.removeClass("hide").addClass(cls)
-                $el.once("transitionend", function() {
-                    console.log("console of loadFinish")
-                    console.log($el)
-                    console.log($before)
-                    $el.removeClass(cls+" enter");
-                    $before.removeClass("leave").addClass("hide");
-                })
-
-                // 必须延时绑定 CLASS 否则无法触发动画
-                animateCall(function() {
-                    $el.addClass("enter");
-                }, this);
+                $el.removeClass("hide");
             }
         })
 
@@ -372,13 +393,15 @@ $(function() {
         function _pageReady() {
             STAT.PAGE_READY = true;
 
-            this.$broadcast("pageReady");
-            this.$emit("pageReadyDirect");
+
+            this.$dispatch("childPageReady");   // 向上冒泡事件
+            this.$broadcast("pageReady");       // 向下传递事件
+            this.$emit("pageReadyDirect");      // 触发自身事件
         }
 
         if (typeof init == "function") {
             return function() {
-               console.log("pready: "+$.getTime());
+               // console.log("pready: "+$.getTime());
                 var that = this, _params = $.extend({}, PAGE.PARAMS),
                     _defer  = $.defer(), loadDefer = _createLoadFinish();
 
@@ -420,7 +443,7 @@ $(function() {
             }
         } else {
             return function() {
-               console.log("pready: "+$.getTime());
+               // console.log("pready: "+$.getTime());
                 _pageReady.call(this);
 
                 _createLoadFinish().resolve(this);
@@ -428,16 +451,26 @@ $(function() {
         }
     }
 
+
     function _commonPage(page) {
         var old = page.data, mixins;
 
         // 采用新的方式，组件的 data 必须为函数
         if (typeof old !== "function") {
-            page.data = function() { return old; }
+            page.data = function() {
+                return $.extend(true, {}, old);
+            }
         }
 
         // 公用方法注册，利用 VUE 的 mixin 选项实现
         mixins = {
+            created: function() {
+                /* 根据运行环境不同，采用不同的操作 */
+                if (mvue._isRunPage(this)) {
+
+                }
+            },
+
             ready: _createReady(page),
 
             beforeDestroy: function() {
@@ -465,15 +498,24 @@ $(function() {
         }
     }
 
-    // 创建页面级的 VIEW 对象
-    mvue.__makeLoadView = function(name) {
-        var tmp = '<'+name+' class="hide"></'+name+'>';
+    // 渲染VIEW 对象成DOM元素
+    mvue.__renderView = function(view, name) {
+        var tmp = '<'+view+' class="hide"></'+view+'>';
 
-        return new Vue({ template: tmp, name: "_loadPage" }).$mount();
+        name = name ? name : "_loadPage";
+
+        return new Vue({ template: tmp, name: name }).$mount();
+    }
+
+    // 生成系统用的 page 的组件名称
+    mvue.__makeViewName = function(name, tag) {
+        var ret = "ma-"+name;
+
+        return tag ? "<"+ret+"></"+ret+">" : ret;
     }
 
     mvue.loadView = function(name, initFix) {
-        var cname = "ma-"+name;
+        var cname = mvue.__makeViewName(name);
 
         if (typeof initFix == "object") {
             initFix.replace = true;
@@ -492,7 +534,7 @@ $(function() {
 
             // 修正保存的当前页面句柄和旧页面句柄
             if (LOAD.PUSH === true) {
-                var $insert = mvue.__makeLoadView(cname);
+                var $insert = mvue.__renderView(cname);
 
                 if (old) old.$destroy(true);
 
@@ -506,7 +548,7 @@ $(function() {
                     startAnimate(PAGE.HANDLE[0].$el, PAGE.BEFORE[0].$el);
                     clearLoading();
                 } else {
-                    var $insert = mvue.__makeLoadView(cname);
+                    var $insert = mvue.__renderView(cname);
 
                     if (old) old.$destroy(true);
 

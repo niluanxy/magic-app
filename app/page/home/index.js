@@ -5,6 +5,7 @@ module.exports = {
     
     data: {
         modal: null,
+        view : null,
         title: "首页的信息",  
     },
 
@@ -16,6 +17,11 @@ module.exports = {
     },
 
     methods: {
+        showUser: function() {
+            console.log("has test modal page")
+            this.modal.toggle();
+        },
+
         pullDown: function(finish) {
             console.log("pullDown has run!")
             setTimeout(function() {

@@ -6,6 +6,17 @@
     <mg-content>
         home test is right
 
+        <div class="list">
+            <div class="item label-left item-input">
+                <label class="label">测试</label>
+                <input type="text" v-model="view.input" placeholder="数据同步测试">
+            </div>
+        </div>
+
         <a href="#user/home" class="button button-block">test user</a>
+
+        <a @tap="showUser" class="button button-block">modal user</a>
     </mg-content>
+
+    <mg-modal page="user" handle="modal" view="view"></mg-modal>
 </mg-page>

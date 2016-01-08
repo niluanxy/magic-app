@@ -1,5 +1,6 @@
 mg-page, mg-view, .mg-view, .mg-page {
     display: block;
+    z-index: 10;
     position: absolute;
     top: 0; bottom: 0;
     left: 0; right: 0;

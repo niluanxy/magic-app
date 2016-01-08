@@ -1,7 +1,7 @@
 module.exports = {
     template: require("./template.html"),
 
-    methods: {
-
+    data: {
+    	input: "abc"
     }
 }
