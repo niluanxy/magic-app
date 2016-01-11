@@ -298,10 +298,10 @@ module.exports = (function() {
             },
 
             _go: function(e) {
-                var target = e.target, tag, link;
+                var target = e.target, link;
 
-                if (target.tagName.toUpperCase() == "A") {
-                    link = target.getAttribute("link");
+                if (target.tagName.toUpperCase() == "A" &&
+                   (link = target.getAttribute("link")) ) {
 
                     e.preventDefault();
                     e.stopPropagation();
@@ -318,7 +318,6 @@ module.exports = (function() {
                     case 'MSPointerDown':
                         this._start(e);
                         break;
-                    case 'click':
                     case 'touchend':
                     case 'pointerup':
                     case 'MSPointerUp':
@@ -327,9 +326,14 @@ module.exports = (function() {
                     case 'MSPointerCancel':
                         this._end(e);
                         break;
+                    case 'click':
+                        this._go(e);
+                        break;
                 }
             }
         }
+
+        docbind("click", bindPoint);
 
         docbind("touchstart", bindPoint);
         docbind("touchend", bindPoint);
