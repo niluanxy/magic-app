@@ -17,7 +17,8 @@ module.exports = (function() {
                     $el.wrapAll("<div class='modal_body'></div>");
                 }
 
-                handle = $el.addClass("modal hideOut").modal({
+                that._handle = handle = $el.addClass("modal hideOut")
+                .modal({
                     page    : page,
                     align   : $el.attr("align"),
                     autoHide: $el.attr("autoHide")
@@ -28,21 +29,27 @@ module.exports = (function() {
                 }
 
                 if (page && page != "true") {
-                    var _name = $$.__makeViewName(page),
+                    var _name = $$.__makeViewName(page), _child,
                         _view = $$.__renderView(_name, "_loadModal");
 
                     _view.$appendTo($el[0]).__MODAL = handle;
+                    _child = _view.$children;
 
-                    _view.$once("childPageReady", function() {
-                        var _child = _view.$children[0];
+                    // 如果
+                    if (_child[0] && scope[bind] !== undefined) {
+                        scope[bind] = _child[0];
+                        handle.view = _child[0];
+                    } else {
+                        _view.$on("childPageReady", function() {
+                            _child[0].__MODAL_PARENT = scope;
 
-                        if (scope[bind] !== undefined) {
-                            scope[bind] = _child;
-                        }
+                            if (scope[bind] !== undefined) {
+                                scope[bind] = _child[0];
+                            }
 
-                        _child.__MODAL_PARENT = scope;
-                        handle.view = _child;
-                    })
+                            handle.view = _child[0];
+                        })
+                    }
                 }
 
                 if (!page && clen == 1) {

@@ -1,17 +1,15 @@
-require("./style.css");
-
 module.exports = {
+    style: require("./style.css"),
     template: require("./template.html"),
-    
+
     data: {
         modal: null,
         view : null,
-        title: "首页的信息",  
+        title: "首页的信息",
     },
 
     resolve: function(para, defer) {
         setTimeout(function() {
-            console.log("has load")
             defer.resolve()
         }, 330);
     },
@@ -39,5 +37,11 @@ module.exports = {
                 finish.done();
             }, 600)
         },
+    },
+
+    events: {
+        "hook:ready": function() {
+            console.log("home page has create")
+        }
     }
 }

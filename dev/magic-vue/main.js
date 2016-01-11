@@ -387,7 +387,6 @@ $(function() {
         function _pageReady() {
             STAT.PAGE_READY = true;
 
-
             this.$dispatch("childPageReady");   // 向上冒泡事件
             this.$broadcast("pageReady");       // 向下传递事件
             this.$emit("pageReadyDirect");      // 触发自身事件
@@ -447,7 +446,27 @@ $(function() {
 
 
     function _commonPage(page) {
-        var old = page.data, mixins;
+        var old = page.data, tmp = page.template,
+            mixins, head, rhead = /^\<mg\-page.*\>/, style = page.style;
+
+        // 尝试对页面添加私有的 class 名字
+        if (style && tmp && (head = tmp.match(rhead)) ) {
+            var mat, fix, rcls = /class\=[\'|"].*[\'|"]/;
+
+            head = head[0]; style = style.page;
+
+            if ((mat = head.match(rcls))) {
+                mat = mat[0].replace(/[\'|\"]/, '"');
+                fix = mat.replace(/\"$/, ' '+style+'"');
+
+                head = head.replace(rcls, fix);
+            } else {
+                style = ' class="'+style+'">';
+                head  = head.replace(/\>$/, style);
+            }
+
+            page.template = tmp.replace(rhead, head);
+        }
 
         // 采用新的方式，组件的 data 必须为函数
         if (typeof old !== "function") {
@@ -458,13 +477,6 @@ $(function() {
 
         // 公用方法注册，利用 VUE 的 mixin 选项实现
         mixins = {
-            created: function() {
-                /* 根据运行环境不同，采用不同的操作 */
-                if (mvue._isRunPage(this)) {
-
-                }
-            },
-
             ready: _createReady(page),
 
             beforeDestroy: function() {
