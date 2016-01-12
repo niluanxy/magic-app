@@ -7,6 +7,7 @@ module.exports = (function() {
         ready: function() {
             var $el = $(this.$el), val, full, half,
                 blank, tfull, thalf, tblank, html = "";
+                
             tfull  = "<i class='ion-android-star'></i>";
             thalf  = "<i class='ion-android-star-half'></i>";
             tblank = "<i class='ion-android-star-outline'></i>"

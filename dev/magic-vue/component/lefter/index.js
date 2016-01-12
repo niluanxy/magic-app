@@ -2,7 +2,7 @@ module.exports = (function() {
     $$.component("mg-lefter", {
         template: "<slot></slot>",
         ready: function() {
-            var $el = $(this.$el), val, that = this, txt, end;
+            var $el = $(this.$el), val, scope = $$._getPage(this), txt, end;
 
             val = $el.attr("runing");  // 记录倒计时是否运行，运行中为true
             txt = $el.html().replace(/\{/g, "{{")
@@ -15,19 +15,19 @@ module.exports = (function() {
                 show   : txt,
                 endshow: $el.attr("end"),
                 finish : function() {
-                            var call = that[$el.attr("finish")];
-                            if (that[val] !== undefined) that[val] = false;
+                            var call = scope[$el.attr("finish")];
+                            if (scope[val] !== undefined) scope[val] = false;
                             typeof call == "function" && call();
                          },
-                before : that[$el.attr("before")]
+                before : scope[$el.attr("before")]
             })
 
             /* 初始化设置正在运行值 */
-            if (that[val] !== undefined) {
+            if (scope[val] !== undefined) {
                 if ($.getTime() > end*1000) {
-                    that[val] = false;
+                    scope[val] = false;
                 } else {
-                    that[val] = true;
+                    scope[val] = true;
                 }
             }
 

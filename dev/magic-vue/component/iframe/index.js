@@ -13,10 +13,10 @@ module.exports = (function() {
                 src    = $el.attr("src"),
                 handle = $el.attr("handle"),
                 rcall  = $el.attr("call"),
-                parent = this.$parent, ihandle,
-                pid, iframe, $iframe, name, pcall, load;
+                scope, ihandle, pid, iframe, $iframe, name, pcall, load;
 
             if (src === undefined) return;
+            scope = $$._getPage(this);
             $el.removeAttr("src");      // 移除无用src
 
             pid   = $.getRandom();      // 生成独立的ID
@@ -32,13 +32,13 @@ module.exports = (function() {
             ihandle = $el.attr('iframe');
 
             // 给子类添加一个全局方法，用于子类通过这个触发父类回调
-            if ((parent[src] || src) && src.match(/^http[s]?:\/\//) === null) {
+            if ((scope[src] || src) && src.match(/^http[s]?:\/\//) === null) {
                 // 给父类添加一个回调的方法
                 window[pcall] = function(data) {
-                    var runcall = parent[rcall];
+                    var runcall = scope[rcall];
                     if (runcall && typeof runcall == "function") {
                         // 运行回调方法
-                        runcall.call(parent, data);
+                        runcall.call(scope, data);
                     }
                 }
 
@@ -53,12 +53,12 @@ module.exports = (function() {
                 })
             }
                 
-            if (parent[ihandle] !== undefined) {
-                parent[ihandle] = iframe;
+            if (scope[ihandle] !== undefined) {
+                scope[ihandle] = iframe;
             }
 
-            if (parent[src] !== undefined) {
-                parent.$watch(src, function(newVal) {
+            if (scope[src] !== undefined) {
+                scope.$watch(src, function(newVal) {
                     $iframe.attr("src", newVal);
                 })
             } else {
@@ -66,17 +66,17 @@ module.exports = (function() {
                 $iframe.attr("src", src || "");
             }
 
-            if (parent[handle] !== undefined) {
-                parent[handle] = $el.modal();
+            if (scope[handle] !== undefined) {
+                scope[handle] = $el.modal();
                 $el.addClass("modal hideOut");
-                parent[handle].refresh = function() {
+                scope[handle].refresh = function() {
                     $iframe.attr("src", src);
                 }
             }
 
-            if (parent[load] !== undefined) {
+            if (scope[load] !== undefined) {
                 $iframe.on("load", function() {
-                    parent[load]();
+                    scope[load]();
                 })
             }
         }
