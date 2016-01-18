@@ -115,7 +115,6 @@ $.ready(function() {
 
             if (cx<5 && cy < 5 && ct < this.delay) {
 
-                console.log("tap event fire: "+lt)
                 $target.trigger("tap");
 
                 /* 修复移动端input点击焦点不更新的问题 */
@@ -147,8 +146,16 @@ $.ready(function() {
             }
 
             /* 如果点击时间太短，手动延迟动画移除时间 */
-            var path = fixPath(e);
+            // var _animate = this.animate;
+            // setTimeout(function() {
+            //     var path = fixPath(e);
 
+            //     for(var i = 0; i<path.length; i++) {
+            //         var $item = $(path[i]);
+            //         clearActive($item);
+            //     }
+            // }, _animate-ct >= 0 ? _animate-ct : 0);
+            var path = fixPath(e);
             for(var i = 0; i<path.length; i++) {
                 var $item = $(path[i]);
                 clearActive($item);
