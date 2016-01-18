@@ -253,17 +253,42 @@ module.exports = (function() {
         });
 
 
-        var docbind = document.addEventListener, bindPoint = {
+        var doc = document, bind = "addEventListener", bindPoint;
+        
+        bindPoint = {
             target: null,
             startX: 0,
             startY: 0,
             startTime: 0,
 
-            _start: function(e) {
-                if (e.target.tagName.toUpperCase() == "A") {
-                    var point = e.changedTouches ? e.changedTouches[0] : e;
+            _getTag: function(obj) {
+                return obj.tagName.toUpperCase();
+            },
 
-                    if (e.touches && e.touches.length > 1) {
+            _getLink: function(e) {
+                var target = e.target, tag;
+
+                while(target.parentNode) {
+                    tag = this._getTag(target);
+
+                    if (tag == "A" || tag == "BUTTON") {
+                        return target;
+                    }
+
+                    target = target.parentNode;
+                }
+
+                return null;
+            },
+
+            _start: function(e) {
+                if (this._getLink(e)) {
+                    var point = e.changedTouches ? e.changedTouches[0] : e, now;
+
+                    now = getTime();
+
+                    if ( (e.touches && e.touches.length > 1)
+                        || (now - this.startTime < this.delay) ) {
                         this.startX = null;
                         this.startY = null;
 
@@ -278,18 +303,20 @@ module.exports = (function() {
             },
 
             _end: function(e) {
-                if (e.target.tagName.toUpperCase() == "A") {
+                var link = this._getLink(e);
+
+                if (link /* 自身或者父元素是 A 元素才跳转 */) {
                     var point = e.changedTouches ? e.changedTouches[0] : e,
-                        cx, cy, ct, delay = 300, link;
+                        cx, cy, ct, delay = 300, hasUrl;
 
                     if (e.touches && e.touches.length > 1) return;
 
                     cx = Math.abs(point.pageX - this.startX);
                     cy = Math.abs(point.pageY - this.startY); 
                     ct = getTime() - this.startTime;
-                    link = e.target.getAttribute("link");
+                    hasUrl = e.target.getAttribute("link");
 
-                    if (link && cx<5 && cy < 5 && ct < delay
+                    if (hasUrl && cx<5 && cy < 5 && ct < delay
                         && this.target == e.target) {
 
                         this._go(e);
@@ -298,16 +325,14 @@ module.exports = (function() {
             },
 
             _go: function(e) {
-                var target = e.target, link;
+                var link = this._getLink(e), url;
 
-                if (target.tagName.toUpperCase() == "A" &&
-                   (link = target.getAttribute("link")) ) {
+                if (link && (url = link.getAttribute("link")) ) {
 
                     e.preventDefault();
                     e.stopPropagation();
 
-                    that.evetype = "pushstate";
-                    that.go(link);  // 跳转新页面相关动作
+                    that.go(url);  // 跳转新页面相关动作
                 }
             },
 
@@ -333,19 +358,19 @@ module.exports = (function() {
             }
         }
 
-        docbind("click", bindPoint);
+        doc[bind]("click", bindPoint);
 
-        docbind("touchstart", bindPoint);
-        docbind("touchend", bindPoint);
-        docbind("touchcancel", bindPoint);
+        doc[bind]("touchstart", bindPoint);
+        doc[bind]("touchend", bindPoint);
+        doc[bind]("touchcancel", bindPoint);
 
-        docbind("pointerdown", bindPoint);
-        docbind("pointerup", bindPoint);
-        docbind("pointercancel", bindPoint);
+        doc[bind]("pointerdown", bindPoint);
+        doc[bind]("pointerup", bindPoint);
+        doc[bind]("pointercancel", bindPoint);
 
-        docbind("MSPointerDown", bindPoint);
-        docbind("MSPointerUp", bindPoint);
-        docbind("MSPointerCancel", bindPoint);
+        doc[bind]("MSPointerDown", bindPoint);
+        doc[bind]("MSPointerUp", bindPoint);
+        doc[bind]("MSPointerCancel", bindPoint);
     }
 
     /* 判断给定的URL状态是不是当前状态表的最后一项 */
@@ -428,6 +453,7 @@ module.exports = (function() {
 
             end  = match[match.length-1];
             call = replace ? "replaceState" : "pushState";
+            that.evetype = "pushstate";     // 设置事件方式为push
 
             state.title = end && end.title ? end.title : ""; // 标题
             state.clear = clear || end.clear;          // 是否无记录模式

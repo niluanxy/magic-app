@@ -31,6 +31,8 @@ $(function() {
                      },             // 加载动画相关参数
 
         __STATE__  : null,          // 记录当前APP各种状态
+
+        compontent : {},            // 组件的配置选项
     };
 
 
@@ -314,18 +316,20 @@ $(function() {
 
     // 获取当前组件所在的最近的 PAGE 对象
     mvue._getPage = function(vm) {
-        var page = null, tmp = vm;
+        // var page = null, tmp = vm, name;
 
-        while (tmp.$parent) {
-            if (tmp.$el.nodeName == "MG-PAGE") {
-                page = tmp;
-                break;
-            }
+        // while (tmp.$parent) {
+        //     name = tmp.$parent.name;
 
-            tmp = tmp.$parent;
-        }
+        //     if (name.match(/^ma\-/)) {
+        //         page = tmp.$parent;
+        //         break;
+        //     }
 
-        return page;
+        //     tmp = tmp.$parent;
+        // }
+
+        return vm.$root.$children[0];
     }
 
     // 检测当前是否运行在 PAGE 层级还是组件层级
@@ -356,14 +360,14 @@ $(function() {
                     cls = LOAD.PUSH ? "push-new" : "pop-new";
                     clearLoading($el);      // 清除 load 内容
 
-                    $before.addClass("leave");
+                    $before && $before.addClass("leave");
                     $el.removeClass("hide").addClass(cls)
                     $el.once("transitionend", function() {
                         // console.log("console of loadFinish")
                         // console.log($el)
                         // console.log($before)
                         $el.removeClass(cls+" enter");
-                        $before.removeClass("leave").addClass("hide");
+                        $before && $before.removeClass("leave").addClass("hide");
                     })
 
                     // 必须延时绑定 CLASS 否则无法触发动画
@@ -401,14 +405,14 @@ $(function() {
                 _params = _transParams(_params);    // 修正参数列表
 
                 // 注册 数据更新事件，用于手动触发刷新动作
-                that.$on("refreshData", function(params) {
+                that.$on("__refreshData", function(params) {
                     var initDefer = _defer;
 
                     // 创建后续的数据刷新回调动作
                     if (initDefer.status == "resolved") {
                         initDefer = $.defer();
                         initDefer.then(function(initData) {
-                            that.$emit("reciveData", initData);
+                            that.$emit("__updateData", initData);
                         })
                     }
 
@@ -416,7 +420,7 @@ $(function() {
                 })
 
                 // 注册 数据接受事件，用于手动初始化数据
-                that.$on("reciveData", function(initData) {
+                that.$on("__updateData", function(initData) {
                     if (typeof initData == "object") {
                         for(var key in initData) {
                             that.$set(key, initData[key]);
@@ -424,15 +428,21 @@ $(function() {
                     }
                 });
 
-                that.$emit("refreshData");  // 手动触发一下更新
+                that.$emit("__refreshData");  // 手动触发一下更新
 
                 // 通过前面注册的事件，将数据更新到对象实例上
                 _defer.then(function(initData) {
-                    that.$emit("reciveData", initData);
+                    that.$emit("__updateData", initData);
                     loadDefer.resolve(that);
                 });
 
                 _pageReady.call(this);
+
+
+                // 绑定数据更新快捷方法
+                that.$refresh = function(params) {
+                    that.$emit("__refreshData", params);
+                }
             }
         } else {
             return function() {
@@ -516,6 +526,8 @@ $(function() {
     // 生成系统用的 page 的组件名称
     mvue.__makeViewName = function(name, tag) {
         var ret = "ma-"+name;
+
+        ret = ret.replace(/[\-|\\|\/]/g, "-");
 
         return tag ? "<"+ret+"></"+ret+">" : ret;
     }

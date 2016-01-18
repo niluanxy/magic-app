@@ -43,11 +43,13 @@ $(function() {
 		    })
 		},
 
-	    "/user/home": {
-	    	title: "用户首页",
-	    	on: load("user", function(defer) {
-		    	require(["page/user"], init(defer));
-		    })
+	    "/user": {
+	    	"/home": {
+	    		title: "用户首页",
+		    	on: load("user/home", function(defer) {
+			    	require(["page/user"], init(defer));
+			    })
+	    	},
 		},
 	}).init({
 		authBase: 2,					// 所有的页面都要登陆

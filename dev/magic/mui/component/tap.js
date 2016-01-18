@@ -40,8 +40,6 @@ $.ready(function() {
     // 清除激活类
     function clearActive($target) {
         if (checkClass($target)) {
-
-            clearTimeout($target.data("_active_handle"));
             $target.removeClass("active");
         }
     }
@@ -60,14 +58,14 @@ $.ready(function() {
         startX: 0,
         startY: 0,
         startTime: 0,
+        lastTime : 0,
 
         _focus: function(e) {
             this.input = e.target;
         },
 
         _start: function(e) {
-            if ((e.touches && e.touches.length > 1) || 
-                (e.timeStamp - this.startTime < this.double)) {
+            if (e.touches && e.touches.length > 1) {
                 this.startX = null;      this.startY = null;
 
                 return true;
@@ -88,12 +86,7 @@ $.ready(function() {
                 tagName = $item[0].tagName;
 
                 if (checkClass($item)) {
-                    handle = setTimeout((function($actobj) {
-                        return function() {
-                            $actobj.addClass("active");
-                        }
-                    })($item), 24);
-                    $item.data("_active_handle", handle);
+                    $item.addClass("active");
                 }
             }
         },
@@ -110,14 +103,19 @@ $.ready(function() {
         }, 16),
 
         _end: function(e) {
-            var cx, cy, ct, $target = $(e.target), tagName,
+            var cx, cy, ct, $target = $(e.target), tagName, lt,
                 touch = e.changedTouches ? e.changedTouches[0] : e;
 
+            lt = $.getTime();
             cx = Math.abs(touch.pageX - this.startX);
             cy = Math.abs(touch.pageY - this.startY);
-            ct = $.getTime() - this.startTime;
+            ct = lt - this.startTime;
+
+            this.lastTime = lt;
 
             if (cx<5 && cy < 5 && ct < this.delay) {
+
+                console.log("tap event fire: "+lt)
                 $target.trigger("tap");
 
                 /* 修复移动端input点击焦点不更新的问题 */
@@ -149,15 +147,12 @@ $.ready(function() {
             }
 
             /* 如果点击时间太短，手动延迟动画移除时间 */
-            var _animate = this.animate;
-            setTimeout(function() {
-                var path = fixPath(e);
+            var path = fixPath(e);
 
-                for(var i = 0; i<path.length; i++) {
-                    var $item = $(path[i]);
-                    clearActive($item);
-                }
-            }, _animate-ct >= 0 ? _animate-ct : 0);
+            for(var i = 0; i<path.length; i++) {
+                var $item = $(path[i]);
+                clearActive($item);
+            }
         },
 
         handleEvent: function (e) {
@@ -205,30 +200,30 @@ $.ready(function() {
      */
     ;(function() {
         var kt = window.ontouchstart !== undefined ? 0 : 1,
-            docbind = document.addEventListener;
+            doc = document, bind = "addEventListener";
 
         /* 修复input 焦点问题 */
-        docbind("focus", tap._focus, true)
+        doc[bind]("focus", tap._focus, true)
 
-        docbind("mousedown", tap);
-        docbind("mousemove", tap);
-        docbind("mouseup", tap);
-        docbind("mousecancel", tap);
+        doc[bind]("mousedown", tap);
+        doc[bind]("mousemove", tap);
+        doc[bind]("mouseup", tap);
+        doc[bind]("mousecancel", tap);
 
-        docbind("touchstart", tap);
-        docbind("touchmove", tap);
-        docbind("touchend", tap);
-        docbind("touchcancel", tap);
+        doc[bind]("touchstart", tap);
+        doc[bind]("touchmove", tap);
+        doc[bind]("touchend", tap);
+        doc[bind]("touchcancel", tap);
 
-        docbind("pointerdown", tap);
-        docbind("pointermove", tap);
-        docbind("pointerup", tap);
-        docbind("pointercancel", tap);
+        doc[bind]("pointerdown", tap);
+        doc[bind]("pointermove", tap);
+        doc[bind]("pointerup", tap);
+        doc[bind]("pointercancel", tap);
 
-        docbind("MSPointerDown", tap);
-        docbind("MSPointerMove", tap);
-        docbind("MSPointerUp", tap);
-        docbind("MSPointerCancel", tap);
+        doc[bind]("MSPointerDown", tap);
+        doc[bind]("MSPointerMove", tap);
+        doc[bind]("MSPointerUp", tap);
+        doc[bind]("MSPointerCancel", tap);
 
         /* 修复鼠标点透问题 */
         if (kt === 0 /* 只有支持 touch 事件时才绑定 */) {

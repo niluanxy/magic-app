@@ -7,6 +7,7 @@
         border-color: $border-color;
         background-color: $bg-color;
 
+        &:active,
         &.active,
         &.actived {
             border-color: $active-border-color;
@@ -21,6 +22,7 @@
         &.button-link {
             color: $border-color !important;
 
+            &:active,
             &.active {
                 color: rgba($border-color, $button-active-opacity) !important;
             }
@@ -53,6 +55,7 @@
     border-radius: rem($button-border-radius);
     background-color: $button-default-bg;
 
+    &:active,
     &.active,
     &.activated {
         border-color: $button-default-active-border;
@@ -158,6 +161,7 @@
 
             transition: opacity .1s;
 
+            &:active,
             &.active,
             &.activated {
                 opacity: $button-clear-active;

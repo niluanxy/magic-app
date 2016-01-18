@@ -1,27 +1,25 @@
 module.exports = (function() {
-
-	function runBackAction(scope, call, router) {
-		var ret = true;		// 回调返回值
-
-		if (scope[call] && typeof scope[call] == "function") {
-			ret = scope[call]();
-		}
-
-		if (ret !== false) router.back();
-	}
-
     $$.component("mg-back", {
         template: "<slot></slot>",
         ready: function() {
             var that = this, $el = $(this.$el), state = history.state,
-            	router = $$.location, call, scope;
+            	router = $$.location, call, scope, hasBack = false;
 
             call  = $el.attr("call");
             scope = $$._getPage(that);
             
 			$el.addClass("button button-clear ion-ios-arrow-left")
 			.on("tap.common", function() {
-				runBackAction(scope, call, router);
+				var ret = true;		// 回调返回值
+
+				if (typeof scope[call] == "function") {
+					ret = scope[call]();
+				}
+
+				if (ret !== false && !hasBack) {
+					hasBack = true;
+					router.back();
+				}
 			});
 
 			/* 根据不同的情况选择判断逻辑隐藏后退按钮 */

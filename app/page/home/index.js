@@ -6,6 +6,8 @@ module.exports = {
         modal: null,
         view : null,
         title: "首页的信息",
+
+        input: 0,
     },
 
     resolve: function(para, defer) {
@@ -15,6 +17,16 @@ module.exports = {
     },
 
     methods: {
+        testInputOne: function() {
+            console.log("click fire:"+$.getTime())
+            this.input += 1;
+        },
+
+        testInputTwo: function() {
+            console.log("click fire:"+$.getTime())
+            this.input += 1;
+        },
+
         alert: function() {
             alert(this.modal.view.input)
         },

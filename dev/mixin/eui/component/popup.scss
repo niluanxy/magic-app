@@ -93,7 +93,8 @@
 					border-left-width: 0;
 				}
 
-				&.active {
+				&.active
+				&:active, {
 					box-shadow: none;
 					background-color: $popup-buttons-active-bg;
 				}

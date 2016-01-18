@@ -9,11 +9,20 @@
         <div class="list">
             <div class="item label-left item-input">
                 <label class="label">测试</label>
-                <input type="text" v-model="view.input" placeholder="数据同步测试">
+                <input type="text" v-model="input" placeholder="数据同步测试">
             </div>
         </div>
 
-        <a link="#user/home" class="button button-block">test user</a>
+        <button class="button button-block">click test</button>
+
+        <a @click="testInputOne" class="button btnInput">tap test 1</a>
+        <a @click="testInputTwo" class="button btnInput">tap test 2</a>
+
+        <a href="javascript:;" class="button button-block margin">test active</a>
+
+        <button link="#user/home" class="margin button button-block">
+            <p>test p button</p>
+        </button>
 
         <a @tap="modal.view.input = 456" class="button button-block">set 456</a>
 
@@ -22,5 +31,5 @@
         <a @tap="showUser" class="button button-block">modal user</a>
     </mg-content>
 
-    <mg-modal page="user" handle="modal" view="view"></mg-modal>
+    <mg-modal page="user/home" handle="modal" view="view"></mg-modal>
 </mg-page>

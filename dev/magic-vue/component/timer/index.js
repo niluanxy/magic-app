@@ -1,7 +1,7 @@
 module.exports = (function() {
 	Vue.directive("timer", {
         bind: function() {
-            var $el = $(this.el), val = this.raw, ctrl, scope = this.vm;
+            var $el = $(this.el), val = this.expression, ctrl, scope = this.vm;
 
             if (scope[val] !== undefined /* 值存在的话 */) {
                 var format, text, filter, show, min, 

@@ -22,7 +22,7 @@ module.exports = (function() {
                    .removeClass("hide");
         } else {
             html = "<div class='modal hideOut' id='"+mid+"'></div>";
-            that.el.addClass("modal_body")
+            that.el.addClass("wrapper")
                    .removeClass("hide")
                    .wrap(html);
             that.el = that.el.parent();

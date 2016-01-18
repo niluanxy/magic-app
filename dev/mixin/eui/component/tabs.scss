@@ -59,7 +59,8 @@
         -webkit-user-drag: none;
         user-select: none;
 
-        &.active {
+        &.active
+        &:active {
             opacity: $active-opacity;
         }
 
