@@ -55,21 +55,18 @@ $.ready(function() {
         input: null,
         target: null,
         disClick: false,
+        moveClear: false,
         delayStart: null,
 
         startX: 0,
         startY: 0,
         startTime: 0,
-        lastTime : 0,
 
         _focus: function(e) {
             this.input = e.target;
         },
 
         _start: function(e) {
-            
-            console.log("touch start: "+$.getTime()+"  ======================")
-            console.log("pageX: "+e.pageX+"   pageY: "+e.pageY)
             if (e.touches && e.touches.length > 1) {
                 this.startX = null;      this.startY = null;
 
@@ -80,10 +77,11 @@ $.ready(function() {
                 tagName, path = fixPath(e);
 
             /* 记录此次点击事件的相关信息，用于方法判断 */
-            tap.startX = touch.pageX;
-            tap.startY = touch.pageY;
-            tap.startTime = $.getTime();
-            tap.target    = e.target;
+            this.startX = touch.pageX;
+            this.startY = touch.pageY;
+            this.startTime = $.getTime();
+            this.target    = e.target;
+            this.moveClear = false;
 
             // 修复 BUTTON元素 出现点击两次的问题
             for (var i = 0; i<path.length; i++) {
@@ -98,8 +96,6 @@ $.ready(function() {
 
             this.delayStart = setTimeout(function() {
                 /* 给按钮类的组件添加点击样式 */
-                console.log("touch start runing : "+$.getTime()+"  ======================")
-                console.log(e)
                 for (var i = 0; i<path.length; i++) {
                     var $item = $(path[i]);
                     tagName = $item[0].tagName.toUpperCase();
@@ -112,28 +108,28 @@ $.ready(function() {
         },
 
         _move: $.delayCall(function(e) {
-            console.log("touch move: "+$.getTime()+"  ======================")
-            console.log("pageX: "+e.pageX+"   pageY: "+e.pageY)
             e.preventDefault(); // 修复微信下拉显示网页地址
 
             var touch = e.touches ? e.touches[0] : e;
 
-            if (Math.abs(touch.pageX - this.startX) >= 1 ||
-                Math.abs(touch.pageY - this.startY) >= 1 ) {
-                // var path = fixPath(e);
-
-                // for(var i = 0; i<path.length; i++) {
-                //     var $item = $(path[i]);
-                //     clearActive($item);
-                // }
+            if (!this.moveClear &&
+                (Math.abs(touch.pageX - this.startX) >= 1 ||
+                Math.abs(touch.pageY - this.startY) >= 1) ) {
                 
+                // 清除 tap 自定义相关操作
+                this.moveClear = true;
                 clearTimeout(this.delayStart);
+
+                // 清除事件中相关的元素的激活类
+                var path = fixPath(e), $item;
+                for(var i = 0; i<path.length; i++) {
+                    $item = $(path[i]);
+                    clearActive($item);
+                }
             }
-        }, 10),
+        }, 16),
 
         _end: function(e) {
-            console.log("touch end: "+$.getTime()+"  ======================")
-            console.log("pageX: "+e.pageX+"   pageY: "+e.pageY)
             var cx, cy, ct, $target = $(e.target), tagName, lt,
                 touch = e.changedTouches ? e.changedTouches[0] : e;
 
@@ -141,8 +137,6 @@ $.ready(function() {
             cx = Math.abs(touch.pageX - this.startX);
             cy = Math.abs(touch.pageY - this.startY);
             ct = lt - this.startTime;
-
-            this.lastTime = lt;
 
             if (cx<5 && cy < 5 && ct < this.delay) {
 
@@ -176,17 +170,6 @@ $.ready(function() {
                 $target.trigger("click");
             }
 
-            /* 如果点击时间太短，手动延迟动画移除时间 */
-            // var _animate = this.animate;
-            // setTimeout(function() {
-            //     var path = fixPath(e);
-
-            //     for(var i = 0; i<path.length; i++) {
-            //         var $item = $(path[i]);
-            //         clearActive($item);
-            //     }
-            // }, _animate-ct >= 0 ? _animate-ct : 0);
-            
             setTimeout(function() {
                 var path = fixPath(e);
                 for(var i = 0; i<path.length; i++) {
