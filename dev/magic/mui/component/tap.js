@@ -11,8 +11,6 @@ $.ready(function() {
 
     /* 修复path对象，无则自己模拟一个出来 */
     function fixPath(e) {
-        if (e.path && e.path.length) return e.path;
-
         var target = e.target, arr = [];
 
         while (target && target.parentNode) {
