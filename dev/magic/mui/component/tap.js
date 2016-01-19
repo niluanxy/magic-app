@@ -2,7 +2,7 @@
  * 为常用的 button 组件添加点击效果，同时全局增加 tap 事件
  * 
  * @author      mufeng  <smufeng@gmail.com>
- * @version     0.1     <2015-06-02>
+ * @version     0.2     <2016-01-19>
  */
 
 $.ready(function() {
@@ -11,6 +11,8 @@ $.ready(function() {
 
     /* 修复path对象，无则自己模拟一个出来 */
     function fixPath(e) {
+        if (e.path && e.path.length) return e.path;
+
         var target = e.target, arr = [];
 
         while (target && target.parentNode) {
