@@ -14,11 +14,12 @@ mg-page, mg-view, .mg-view, .mg-page {
     }
 
     &.leave, &.enter {
-        transition: all .6s ease;
+        transition: opacity,transform .6s ease;
     }
 
     .leave {
         opacity: 0;
+        transform: translate(0);
     }
 
     .push-new {

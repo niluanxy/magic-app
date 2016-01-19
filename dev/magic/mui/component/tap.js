@@ -47,13 +47,15 @@ $.ready(function() {
 
 
     tap = {
-        delay  : 300,
+        delay  : 200,
         double : 600,
         animate: 240,
+        delayClass: 80,
 
         input: null,
         target: null,
         disClick: false,
+        delayStart: null,
 
         startX: 0,
         startY: 0,
@@ -65,6 +67,9 @@ $.ready(function() {
         },
 
         _start: function(e) {
+            
+            console.log("touch start: "+$.getTime()+"  ======================")
+            console.log("pageX: "+e.pageX+"   pageY: "+e.pageY)
             if (e.touches && e.touches.length > 1) {
                 this.startX = null;      this.startY = null;
 
@@ -72,7 +77,7 @@ $.ready(function() {
             }
 
             var touch = e.touches ? e.touches[0] : e,
-                handle, tagName, path = fixPath(e);
+                tagName, path = fixPath(e);
 
             /* 记录此次点击事件的相关信息，用于方法判断 */
             tap.startX = touch.pageX;
@@ -80,29 +85,55 @@ $.ready(function() {
             tap.startTime = $.getTime();
             tap.target    = e.target;
 
-            /* 给按钮类的组件添加点击样式 */
+            // 修复 BUTTON元素 出现点击两次的问题
             for (var i = 0; i<path.length; i++) {
                 var $item = $(path[i]);
-                tagName = $item[0].tagName;
+                tagName = $item[0].tagName.toUpperCase();
 
-                if (checkClass($item)) {
-                    $item.addClass("active");
+                if (tagName == "BUTTON") {
+                    e.preventDefault();
+                    break;
                 }
             }
+
+            this.delayStart = setTimeout(function() {
+                /* 给按钮类的组件添加点击样式 */
+                console.log("touch start runing : "+$.getTime()+"  ======================")
+                console.log(e)
+                for (var i = 0; i<path.length; i++) {
+                    var $item = $(path[i]);
+                    tagName = $item[0].tagName.toUpperCase();
+
+                    if (checkClass($item)) {
+                        $item.addClass("active");
+                    }
+                }
+            }, this.delayClass);
         },
 
         _move: $.delayCall(function(e) {
+            console.log("touch move: "+$.getTime()+"  ======================")
+            console.log("pageX: "+e.pageX+"   pageY: "+e.pageY)
             e.preventDefault(); // 修复微信下拉显示网页地址
 
-            var path = fixPath(e);
+            var touch = e.touches ? e.touches[0] : e;
 
-            for(var i = 0; i<path.length; i++) {
-                var $item = $(path[i]);
-                clearActive($item);
+            if (Math.abs(touch.pageX - this.startX) >= 1 ||
+                Math.abs(touch.pageY - this.startY) >= 1 ) {
+                // var path = fixPath(e);
+
+                // for(var i = 0; i<path.length; i++) {
+                //     var $item = $(path[i]);
+                //     clearActive($item);
+                // }
+                
+                clearTimeout(this.delayStart);
             }
-        }, 16),
+        }, 10),
 
         _end: function(e) {
+            console.log("touch end: "+$.getTime()+"  ======================")
+            console.log("pageX: "+e.pageX+"   pageY: "+e.pageY)
             var cx, cy, ct, $target = $(e.target), tagName, lt,
                 touch = e.changedTouches ? e.changedTouches[0] : e;
 
@@ -155,11 +186,14 @@ $.ready(function() {
             //         clearActive($item);
             //     }
             // }, _animate-ct >= 0 ? _animate-ct : 0);
-            var path = fixPath(e);
-            for(var i = 0; i<path.length; i++) {
-                var $item = $(path[i]);
-                clearActive($item);
-            }
+            
+            setTimeout(function() {
+                var path = fixPath(e);
+                for(var i = 0; i<path.length; i++) {
+                    var $item = $(path[i]);
+                    clearActive($item);
+                }
+            }, this.delayClass); 
         },
 
         handleEvent: function (e) {

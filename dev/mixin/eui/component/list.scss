@@ -18,11 +18,8 @@
     }
 
     &.allact .item.active,
-    &.allact .item:active,
     .item[href].active,
-    .item[href]:active,
-    .item.canact.active,
-    .item.canact:active, {
+    .item.canact.active {
         @if ($build-rem == true) {
             background-color: $list-item-default-active-bg;
         } @else {
@@ -41,8 +38,7 @@
         }
     }
 
-    .item.clear.active
-    .item.clear:active {
+    .item.clear.active {
         @if ($build-rem != true) {
             @include retina-border-width(bottom, 1px);
             
