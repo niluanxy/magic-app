@@ -48,9 +48,10 @@ $.ready(function() {
 
     tap = {
         delay  : 200,
-        double : 600,
         animate: 240,
-        delayClass: 80,
+        checkMove : 2,
+        doubleTime: 160,
+        delayClass: 50,
 
         input: null,
         target: null,
@@ -66,8 +67,36 @@ $.ready(function() {
             this.input = e.target;
         },
 
+        _isMove: function(e, move) {
+            var mv = move ? move : this.checkMove,
+                touch = e.changedTouches, cx, cy;
+
+            touch = touch && touch[0] ? touch[0] : e;
+            cx = Math.abs(touch.pageX - this.startX);
+            cy = Math.abs(touch.pageY - this.startY);
+
+            return !!(cx >= mv || cy >= mv);
+        },
+
+        // 用于检测两次的点击事件是否可能为点透现象
+        _isDouble: function(e, time) {
+            var mt, testMove, ct;
+
+            testMove = !this._isMove(e);
+
+            if (time !== false) {
+                mt = parseInt(time);
+                mt = isNaN(mt) ? this.doubleTime : mt;
+                ct = $.getTime() - this.startTime;
+
+                return (ct < mt) && testMove;
+            } else {
+                return testMove;
+            }
+        },
+
         _start: function(e) {
-            if (e.touches && e.touches.length > 1) {
+            if ((e.touches && e.touches.length > 1) || this._isDouble(e)) {
                 this.startX = null;      this.startY = null;
 
                 return true;
@@ -110,11 +139,7 @@ $.ready(function() {
         _move: $.delayCall(function(e) {
             e.preventDefault(); // 修复微信下拉显示网页地址
 
-            var touch = e.touches ? e.touches[0] : e;
-
-            if (!this.moveClear &&
-                (Math.abs(touch.pageX - this.startX) >= 1 ||
-                Math.abs(touch.pageY - this.startY) >= 1) ) {
+            if (!this.moveClear && this._isMove(e, 1)) {
                 
                 // 清除 tap 自定义相关操作
                 this.moveClear = true;
@@ -127,18 +152,14 @@ $.ready(function() {
                     clearActive($item);
                 }
             }
-        }, 16),
+        }, 20),
 
         _end: function(e) {
-            var cx, cy, ct, $target = $(e.target), tagName, lt,
-                touch = e.changedTouches ? e.changedTouches[0] : e;
+            var ct, $target = $(e.target), tagName;
 
-            lt = $.getTime();
-            cx = Math.abs(touch.pageX - this.startX);
-            cy = Math.abs(touch.pageY - this.startY);
-            ct = lt - this.startTime;
+            ct = $.getTime() - this.startTime;
 
-            if (cx<5 && cy < 5 && ct < this.delay) {
+            if (!this._isMove(e) && ct < this.delay) {
 
                 $target.trigger("tap");
 
@@ -176,7 +197,7 @@ $.ready(function() {
                     var $item = $(path[i]);
                     clearActive($item);
                 }
-            }, this.delayClass); 
+            }, this.delayClass);
         },
 
         handleEvent: function (e) {

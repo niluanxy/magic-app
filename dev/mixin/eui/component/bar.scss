@@ -50,9 +50,14 @@
     @include retina-border(bottom, $bar-default-border);
 
     .title {
+        position: absolute;
         padding: 0 rem($bar-button-padding);
         max-width: 80%;
-        margin: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        margin: 0 auto;
+        line-height: rem($bar-height - $bar-padding-portrait * 2);
         font-size: rem($bar-title-font-size);
         z-index: $z-index-bar-title;
         

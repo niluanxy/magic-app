@@ -3,7 +3,7 @@
         <h3 class="title">{{title}}</h3>
     </mg-header>
 
-    <mg-content>
+    <mg-content class="has-nav-tabs">
         home test is right
 
         <div class="list">
@@ -44,5 +44,10 @@
         <a @tap="showUser" class="button button-block">modal user</a>
     </mg-content>
 
+    <mg-nav-tabs>
+        <a class="tab-item">Home</a>
+        <a class="tab-item">Shop</a>
+        <a class="tab-item">User</a>
+    </mg-nav-tabs>
     <mg-modal page="user/home" handle="modal" view="view"></mg-modal>
 </mg-page>

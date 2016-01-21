@@ -237,7 +237,13 @@ $(function() {
 
     // 创建临时的加载中页面效果
     function makeLoading(router, match) {
-        var $view = $(mvue.__VIEW__), LOAD = mvue.__LOAD__;
+        var $view = $(mvue.__VIEW__), LOAD = mvue.__LOAD__, tsend;
+
+        if ($.runtime == "weixin") {
+            tsend = "webkitTransitionEnd";
+        } else {
+            tsend = "transitionend";
+        }
 
         $view.append(_createLoadHtml(router, match));
 
@@ -255,7 +261,7 @@ $(function() {
                 LOAD.SHOW  = true;
 
                 LOAD.$DOM.addClass("enter")
-                .once("transitionend", function() {
+                .once(tsend, function() {
                     LOAD.SHOW  = false;
                 })
             }
@@ -290,7 +296,13 @@ $(function() {
     // 绑定动画效果
     function startAnimate(insert, old, call) {
         var $now = $(insert), $before = $(old),
-            LOAD = mvue.__LOAD__, cls;
+            LOAD = mvue.__LOAD__, cls, tsend;
+
+        if ($.runtime == "weixin") {
+            tsend = "webkitTransitionEnd";
+        } else {
+            tsend = "transitionend";
+        }
 
         cls = LOAD.PUSH ? "push-new" : "pop-new";
         $before.removeClass("hide").addClass("leave");
@@ -298,7 +310,7 @@ $(function() {
 
         animateCall(function() {
             $now.addClass("enter")
-            .once("transitionend", function() {
+            .once(tsend, function() {
                 // console.log($before)
                 // console.log($now)
                 $before.removeClass("leave").addClass("hide");
@@ -343,7 +355,13 @@ $(function() {
 
         defer.then(function(scope) {
             var now = $.getTime(), LOAD = mvue.__LOAD__,
-                $el = $(scope.$el), $before, cls;
+                $el = $(scope.$el), $before, cls, tsend;
+
+            if ($.runtime == "weixin") {
+                tsend = "webkitTransitionEnd";
+            } else {
+                tsend = "transitionend";
+            }
 
             // 只在PAGE模式下运行页面动画处理
             if (mvue._isRunPage(scope)) {
@@ -352,7 +370,7 @@ $(function() {
                 }
 
                 if (LOAD.SHOW /* 正在显示加载动画 */) {
-                    LOAD.$DOM.once("transitionend", function(e) {
+                    LOAD.$DOM.once(tsend, function(e) {
                         clearLoading($el, 30);
                     });
                 } else {
@@ -362,7 +380,7 @@ $(function() {
 
                     $before && $before.addClass("leave");
                     $el.removeClass("hide").addClass(cls)
-                    $el.once("transitionend", function() {
+                    $el.once(tsend, function() {
                         // console.log("console of loadFinish")
                         // console.log($el)
                         // console.log($before)

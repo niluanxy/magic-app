@@ -11,7 +11,8 @@
             // ========================================================
             var ratio = window.devicePixelRatio,
                 width = screen.width, dwidth,
-                scale = 1, html, meta, head = document.head;
+                scale = 1, html, meta, head = document.head,
+                agent = window.navigator.userAgent.toLowerCase();
 
             if (ratio !== undefined) {
                 scale  = 1/ratio;
@@ -25,7 +26,12 @@
             meta.setAttribute("name", "viewport");
             content  = 'initial-scale=' + scale;
             content += ', maximum-scale='+scale;
-            content += ', user-scalable=no, width='+dwidth;
+
+            // 微信中不能添加此段代码，会导致缩放出问题
+            if (!agent.match(/MicroMessenger/i)) {
+                content += ', user-scalable=no, width='+dwidth;
+            }
+            
             meta.setAttribute("content", content);
 
             head.appendChild(meta); // 插入到页面中

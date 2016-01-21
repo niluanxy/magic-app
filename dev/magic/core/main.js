@@ -15,7 +15,6 @@ require("extend");      // 原生对象扩展
             _TPL   = require("templayed");
 
         // platform 相关检测
-        
         magic.platform = /iP(hone|od|ad)/g.test(ua) ? "ios" :
                           /Android/g.test(ua) ? "android" : "other";
         magic.runtime  = w.$J ? "mgnative" :
