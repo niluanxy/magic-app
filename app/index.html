@@ -27,8 +27,9 @@
             content  = 'initial-scale=' + scale;
             content += ', maximum-scale='+scale;
 
-            // 微信中不能添加此段代码，会导致缩放出问题
-            if (!agent.match(/MicroMessenger/i)) {
+            // 微信 和 小米2s 中不能添加此段代码，缩放会异常
+            if (!agent.match(/MicroMessenger/i) &&
+                !agent.match(/mi 2s.*miuibrowser/i)) {
                 content += ', user-scalable=no, width='+dwidth;
             }
             

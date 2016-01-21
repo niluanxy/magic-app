@@ -50,14 +50,16 @@ $.ready(function() {
         delay  : 200,
         animate: 240,
         checkMove : 2,
-        doubleTime: 160,
+        doubleTime: 300,
         delayClass: 50,
 
         input: null,
         target: null,
+        lastType: "",
         disClick: false,
         moveClear: false,
         delayStart: null,
+        tapIsStart: false,
 
         startX: 0,
         startY: 0,
@@ -96,7 +98,15 @@ $.ready(function() {
         },
 
         _start: function(e) {
-            if ((e.touches && e.touches.length > 1) || this._isDouble(e)) {
+            var touch = e.touches ? e.touches[0] : e,
+                tagName, path = fixPath(e), ltype;
+
+            ltype = this.lastType;
+            this.lastType = e.type;
+
+            if ((e.touches && e.touches.length > 1) || 
+                (e.type == "mousedown" && ltype != e.type
+                    && this._isDouble(e)) ) {
                 this.startX = null;      this.startY = null;
 
                 return true;
@@ -111,6 +121,7 @@ $.ready(function() {
             this.startTime = $.getTime();
             this.target    = e.target;
             this.moveClear = false;
+            this.tapIsStart= true;
 
             // 修复 BUTTON元素 出现点击两次的问题
             for (var i = 0; i<path.length; i++) {
@@ -158,9 +169,9 @@ $.ready(function() {
             var ct, $target = $(e.target), tagName;
 
             ct = $.getTime() - this.startTime;
+            this.tapIsStart = false;
 
             if (!this._isMove(e) && ct < this.delay) {
-
                 $target.trigger("tap");
 
                 /* 修复移动端input点击焦点不更新的问题 */
