@@ -1984,8 +1984,8 @@ if ($ && $.fn && !$.fn.scroll) {
         handle = new scroll(this[0], option);
 
         if (probe === 3 /* 设置下拉刷新 */) {
-            var ispull, defer, sph = 54, $pup,
-                $pdown, $text, finish, starty,
+            var ispull, defer, $pup, $pdown,
+                $text, finish, starty,
                 callup   = option.pullRefreshUp,
                 calldown = option.pullRefreshDown;
 
@@ -2001,7 +2001,7 @@ if ($ && $.fn && !$.fn.scroll) {
                 $pup = $el.find(".scroll_pullUp");
             }
 
-            finish = function(istrue, refresh, reset) {
+            finish = function(istrue, norefresh, reset) {
                 if (!reset /* 非重置模式再修改 */) {
                     if (istrue === false) {
                         $text.text("刷新失败");
@@ -2015,8 +2015,10 @@ if ($ && $.fn && !$.fn.scroll) {
                     handle.maxScrollY = handle.wrapperHeight - handle.scrollerHeight;
 
                     $text   && $text.text("释放刷新内容");
-                    refresh && handle.refresh();
-                    handle.resetPosition(handle.options.bounceTime);     // 重置位置
+                    // 非 reset 重置状态情况下，默认刷新页面
+                    !reset && !norefresh && handle.refresh();
+                    // 非 reset 重置状态情况下，重设位置
+                    !reset && handle.resetPosition(handle.options.bounceTime);
                     defer = null;               // 释放内存
                 }, reset ? 0 : 600);
             }
@@ -2031,19 +2033,34 @@ if ($ && $.fn && !$.fn.scroll) {
                 } else {
                     ispull = false;
                 }
+
+                scrolling = true;
             }).on("touchend", function() {
-                if (!ispull) return false;   // 不满足下拉动作中止程序
+                if (!ispull) {
+                    finish(null, null, true);   // 触发失败则重置
+
+                    return false;   // 不满足下拉动作中止程序
+                }
 
                 var posy = handle.y, dir = handle.directionY,
-                    maxy = handle.wrapperHeight - handle.scrollerHeight;
+                    maxy = handle.wrapperHeight - handle.scrollerHeight,
+                    sph = 0, dirup = false, dirdown = false;
 
-                if (dir == -1 && posy >= sph) {
-                    handle.minScrollY = sph;    // 刷新提示定位修复
+                if ($pdown && $pdown[0]) {
+                    sph = $pdown.height();
+                    dirdown = true;
+                } else if ($pup && $pup[0]) {
+                    sph = $pup.height();
+                    dirup = true;
+                }
+
+                if (dirdown && dir == -1 && posy >= sph) {
+                    handle.minScrollY = sph;        // 刷新提示定位修复
 
                     $text = $pdown.find(".text").text("内容刷新中...");
                     calldown && calldown(defer);    // 尝试执行下拉回调
-                } else if (posy <= (maxy-sph)) {
-                    handle.maxScrollY = maxy-sph;       // 刷新提示定位修复
+                } else if (dirup && posy <= (maxy-sph)) {
+                    handle.maxScrollY = maxy-sph;   // 刷新提示定位修复
 
                     $text = $pup.find(".text").text("内容刷新中...");
                     callup   && callup(defer);      // 尝试执行上拉回调
@@ -2051,7 +2068,7 @@ if ($ && $.fn && !$.fn.scroll) {
                     finish(null, null, true);       // 触发失败则重置
                 }
 
-                ispull = false;             // 重置下拉状态
+                ispull = false;                     // 重置下拉状态
             })
 
             handle.on("scroll", function() {
