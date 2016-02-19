@@ -1990,14 +1990,10 @@ if ($ && $.fn && !$.fn.scroll) {
                 calldown = option.pullRefreshDown;
 
             if (calldown /* 添加下拉刷新提示框 */) {
-                $el.insertBefore("<div class='scroll_pullDown'><i class='icon'></i>"+
-                    "<i class='result'></i><span class='text'>释放刷新内容</span></div>");     // 开头插入元素
                 $pdown = $el.find(".scroll_pullDown");
             }
 
             if (callup /* 添加上拉刷新提示框 */) {
-                $el.append("<div class='scroll_pullUp'><i class='icon'></i>"+
-                    "<i class='result'></i><span class='text'>释放刷新内容</span></div>");             // 末尾插入元素
                 $pup = $el.find(".scroll_pullUp");
             }
 
