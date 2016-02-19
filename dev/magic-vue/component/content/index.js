@@ -11,8 +11,8 @@ module.exports = (function() {
 
             refresh = $el.attr("refresh")   // 默认开启自动刷新
             opt.refresh = refresh=="true"?"true":"once";
-            opt.pullRefreshDown = this[$el.attr("pullRefreshDown")] || null;
-            opt.pullRefreshUp   = this[$el.attr("pullRefreshUp")]   || null;
+            opt.pullRefreshDown = scope[$el.attr("pullRefreshDown")] || null;
+            opt.pullRefreshUp   = scope[$el.attr("pullRefreshUp")]   || null;
 
             $scroll = $el.addClass("content").scroll(opt); // 初始化
 
