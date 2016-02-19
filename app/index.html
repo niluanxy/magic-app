@@ -10,13 +10,23 @@
             // 页面缩放修改
             // ========================================================
             var ratio = window.devicePixelRatio,
-                width = screen.width, dwidth,
+                width = screen.width, dwidth, isPhone,
                 scale = 1, html, meta, head = document.head,
                 agent = window.navigator.userAgent.toLowerCase();
 
-            if (ratio !== undefined) {
-                scale  = 1/ratio;
-                dwidth = ratio * width;
+            // 检测是运行在移动端还是桌面端环境
+            isPhone = /iP(hone|od|ad)/ig.test(agent) 
+                        || /Android/ig.test(agent) || false;
+
+            // 如果检测到是移动端才执行设置，PC端忽略设置
+            if (isPhone) {
+                if (ratio !== undefined) {
+                    scale  = 1/ratio;
+                    dwidth = ratio * width;
+                } else {
+                    scale  = 1;
+                    dwidth = "device-width";
+                }
             } else {
                 scale  = 1;
                 dwidth = "device-width";
@@ -34,7 +44,6 @@
             }
             
             meta.setAttribute("content", content);
-
             head.appendChild(meta); // 插入到页面中
 
             // ========================================================
@@ -42,15 +51,13 @@
             // ========================================================
             var font = 20, width = 375, docEl = doc.documentElement,
                 resizeEvt = 'orientationchange' in win ? 'orientationchange' : 'resize',
+                ratio = win.devicePixelRatio,
                 recalc = function () {
-                    var clientWidth = docEl.clientWidth, ratio = win.devicePixelRatio;
+                    var clientWidth = docEl.clientWidth, base;
                     if (!clientWidth) return;
 
-                    if (ratio) {
-                        docEl.style.fontSize = font * ratio + 'px';
-                    } else {
-                        docEl.style.fontSize = font * (clientWidth / width) + 'px';
-                    }
+                    base = isPhone ? win.devicePixelRatio || (clientWidth / width) : 1;
+                    docEl.style.fontSize = font * base + 'px';
                 };
 
             if (!doc.addEventListener) return;
@@ -58,10 +65,10 @@
             doc.addEventListener('DOMContentLoaded', recalc, false);
         })(window, document);
     </script>
-    <meta name="apple-mobile-web-app-title" content="weishop">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-touch-fullscreen" content="yes" />
     <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-title" content="weishop">
 
     
     <link rel="stylesheet" href="page/main.css">
@@ -69,6 +76,7 @@
 
     <script type="text/javascript" src="pub/lib/vue.min.js"></script>
     <script type="text/javascript" src="page/main.js"></script>
+    <script type="text/javascript" src="pub/lib/fdb-all.min.js"></script>
 </head>
 <body>
     <mg-view></mg-view>
