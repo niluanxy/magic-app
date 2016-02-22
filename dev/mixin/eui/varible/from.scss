@@ -2,20 +2,28 @@
 // 表单元素 默认样式变量
 // ========================================================
 
-$input-inline-size:				  32px !default;
+$input-inline-size:				  24px !default;
 $input-inline-fix:				   5px !default;
+$input-inline-disabled:			  #e4e4e4 !default;
 
-$input-icon-size:				  38px !default;
+$input-check-width:				  $input-inline-size * 0.3 !default;
+$input-check-height:			  $input-inline-size * 0.6 !default;
+$input-check-radius:			  $input-inline-size * 0.15 !default;
+$input-check-top:				  $input-inline-size * 0.1 !default;
+$input-check-left:				  $input-inline-size * 0.35 !default;
+$input-check-border-base:         $input-inline-size * 0.075 !default;
+$input-check-border-check:		  $input-inline-size * 0.1 !default;
 
-$input-toggle-radius:			  50% !default;
-$input-toggle-width: 			  56px !default;
+$input-toggle-width: 			  $input-inline-size * 1.75 !default;
 $input-toggle-height:			  $input-inline-size !default;
-$input-toggle-border:			   2px !default;
+$input-toggle-border:			  $input-inline-size * 0.1 !default;
 $input-toggle-back:				  $color-positive !default;
 $input-toggle-uncheck:			  #ddd !default;
 $input-toggle-unback:			  #fff !default;
 $input-toggle-center:  		      #fff !default;
 $input-toggle-move:               $input-toggle-width - $input-toggle-height;
+
+$input-radio-size:				  $input-inline-size * 0.35 !default;
 
 
 $input-shadow-vpos:				   2px !default;

@@ -2,6 +2,12 @@
 // form 表单元素UI
 // ========================================================
 
+
+/**
+ * checkbox 代码借鉴: http://forsigner.com/magic-check/
+ * 实现核心: 采用 border 来做出来 对勾 效果，然后旋转
+ */
+
 @mixin form() {
     @at-root {
         input, button, select, textarea {
@@ -28,56 +34,89 @@
 
             // 禁用原生样式，方便后面重置样式
             &.checkbox, &.radio, &.toggle {
+                cursor: pointer;
+                position: relative;
                 background-color: transparent;
                 text-align: center;
                 height: rem($input-inline-size);
                 width: rem($input-inline-size);
                 -webkit-appearance: none;
+
+                &:disabled, &.disabled {
+                    opacity: .35;
+                    cursor: not-allowed;
+                    pointer-events: none;
+                }
             }
 
             &.checkbox, &.radio {
-                color: $color-positive;
-                position: relative;
                 margin: rem($input-inline-fix);
 
+                &:before, &:after {
+                    transition: 0.3s cubic-bezier(0, 1.1, 1, 1.1);
+                    transition-property: background-color, display;
+                }
+
                 &:before {
+                    content: " ";
+                    display: block;
+                    border: rem($input-check-border-base) solid $color-positive;
+                    width: 100%;
+                    height: 100%;
                     position: absolute;
-                    z-index: 1;
-                    font-size: rem($input-icon-size);
-                    @include icon-base;
-                    @include trans-center;
                 }
 
                 &:after {
                     content: " ";
-                    display: block;
-                    top: rem(- $input-inline-fix);
-                    left: rem(- $input-inline-fix);
-                    right: rem(- $input-inline-fix);
-                    bottom: rem(- $input-inline-fix);
+                    display: none;
                     position: absolute;
+                }
+
+                &:checked:after,
+                &.checked:after {
+                    display: block;
                 }
             }
 
             &.checkbox {
                 &:before {
-                    content: $icon-font-checkbox-empty;   
+                    border-radius: rem($input-check-radius);
                 }
 
-                &:checked:before,
-                &.checked:before {
-                    content: $icon-font-checkbox-select;
+                &:after {
+                    width: $input-check-width;
+                    height: $input-check-height;
+                    top: rem($input-check-top);
+                    left: rem($input-check-left);
+                    transform: rotate(45deg);
+                    border: rem($input-check-border-check) solid #fff;
+                    border-top: 0;
+                    border-left: 0; 
+                }
+
+                &:checked,
+                &.checked {
+                    &:before {
+                        background-color: $color-positive;
+                    }
                 }
             }
 
+
             &.radio {
+                line-height: rem($input-inline-size);
+
                 &:before {
-                    content: $icon-font-radio-empty;
+                    border-radius: 50%;
                 }
 
-                &:checked:before,
-                &.checked:before {
-                    content: $icon-font-radio-select;
+                &:after {
+                    width: rem($input-radio-size);
+                    height: rem($input-radio-size);
+                    margin: auto;
+                    @include trans-center;
+                    border-radius: 50%;
+                    background-color: $color-positive;
                 }
             }
 
@@ -85,7 +124,6 @@
                 width: rem($input-toggle-width);
                 height: rem($input-toggle-height);
                 border-radius: rem($input-toggle-height);
-                position: relative;
                 overflow: hidden;
 
                 &:before, &:after {
