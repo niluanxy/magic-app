@@ -125,10 +125,12 @@ $.ready(function() {
 
             // 修复 BUTTON元素 出现点击两次的问题
             for (var i = 0; i<path.length; i++) {
-                var $item = $(path[i]);
+                var $item = $(path[i]), type;
                 tagName = $item[0].tagName.toUpperCase();
+                type    = ($item.attr("type") || "").toUpperCase();
 
-                if (tagName == "BUTTON") {
+                if (tagName == "BUTTON" || (tagName == "INPUT" && 
+                    "RADIO CHECKBOX".split(" ").indexOf(type) >= 0) ) {
                     e.preventDefault();
                     break;
                 }
