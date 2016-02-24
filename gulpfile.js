@@ -24,8 +24,10 @@ var DIR_APP       = __dirname + "/app/",
     DIR_MINJS     = __dirname + "/dev/minjs/",
     DIR_MAGIC     = __dirname + "/dev/magic/",
     DIR_MAGIC_VUE = __dirname + "/dev/magic-vue/",
-    DIR_CORDOVA   = __dirname + "/cordova/";
-    DIR_RESOURCE  = __dirname + "/resource/";
+    DIR_CORDOVA   = __dirname + "/cordova/",
+    DIR_RESOURCE  = __dirname + "/resource/",
+    DIR_PUBLIC    = "public/",
+    DIR_APP_PUB   = DIR_APP+DIR_PUBLIC;
 
 var px2remOptions = {
         rootValue: 20,
@@ -41,7 +43,7 @@ var release = false;    // 是否为发布输出，发布输出会压缩优化
 var cordova = false;    // APP打包是否为cordova输出
 /* mixin 想关任务方法 */
 function task_dev_mixin() {
-    var defer = Q.defer(), path = DIR_APP+"pub/css/lib/";
+    var defer = Q.defer(), path = DIR_APP_PUB+"css/lib/";
 
     gulp.src([DIR_MIXIN+"base/tools.scss",
         DIR_MIXIN+"base/color.scss",
@@ -101,7 +103,7 @@ function task_dev_magic_css() {
     .pipe(autoprefixer())
     .pipe(px2rem(px2remOptions))
     .pipe(rename("magic.css"))
-    .pipe(gulp.dest(DIR_APP+"pub/lib/"))
+    .pipe(gulp.dest(DIR_APP_PUB+"lib/"))
     .on("finish", function() { defer.resolve(); });
 
     return defer.promise;
@@ -150,7 +152,7 @@ function task_dev_magic_js() {
                 }
             })
         .pipe(gulp.dest(DIR_MAGIC_VUE+"lib/"))
-        .pipe(gulp.dest(DIR_APP + "pub/lib/"))
+        .pipe(gulp.dest(DIR_APP_PUB + "lib/"))
         .on("finish", function() { defer.resolve(); });
     })
         
@@ -178,7 +180,7 @@ function task_dev_magic_vue() {
                 ]
             }
         })
-    .pipe(gulp.dest(DIR_APP+"pub/lib/"))
+    .pipe(gulp.dest(DIR_APP_PUB+"lib/"))
     .on("finish", function() { defer.resolve() });
 
     return defer.promise;
@@ -192,13 +194,13 @@ function task_dev_app_pub() {
         fpath = cordova?DIR_CORDOVA+"www/":
                         DIR_APP+"dist/";
 
-    gulp.src([DIR_APP+"pub/**/*", "!"+DIR_APP+"pub/main*",
-              // "!"+DIR_APP+"pub/lib/magic*",
-              "!"+DIR_APP+"pub/lib/mixin.scss",
-              "!"+DIR_APP+"pub/css/"])
-    .pipe(gulp.dest(fpath+"pub/"))
+    gulp.src([DIR_APP_PUB+"**/*", "!"+DIR_APP_PUB+"main*",
+              // "!"+DIR_APP+"lib/magic*",
+              "!"+DIR_APP_PUB+"lib/mixin.scss",
+              "!"+DIR_APP_PUB+"css/"])
+    .pipe(gulp.dest(fpath+DIR_PUBLIC))
     .on("finish", function() {
-        del(fpath+"/pub/css");      // 空文件夹删除
+        del(fpath+DIR_PUBLIC+"css");      // 空文件夹删除
         defer.resolve();            // 方法执行完通知
     });
 
@@ -232,49 +234,49 @@ function task_dev_app_css() {
         fpath = cordova?DIR_CORDOVA+"www/":
                         DIR_APP+"dist/";
 
-    base = [DIR_APP+"pub/css/lib/mixin_core.scss",
+    base = [DIR_APP_PUB+"css/lib/mixin_core.scss",
 
-            DIR_APP+"pub/css/varible/_z-index.scss",
-            DIR_APP+"pub/css/varible/_color.scss",
-            DIR_APP+"pub/css/varible/_base.scss",
-            DIR_APP+"pub/css/varible/button.scss",
-            DIR_APP+"pub/css/varible/*.scss",
+            DIR_APP_PUB+"css/varible/_z-index.scss",
+            DIR_APP_PUB+"css/varible/_color.scss",
+            DIR_APP_PUB+"css/varible/_base.scss",
+            DIR_APP_PUB+"css/varible/button.scss",
+            DIR_APP_PUB+"css/varible/*.scss",
 
-            DIR_APP+"pub/css/lib/mixin_end.scss",
-            DIR_APP+"pub/css/component/*.scss"]
+            DIR_APP_PUB+"css/lib/mixin_end.scss",
+            DIR_APP_PUB+"css/component/*.scss"]
 
-    build = base.slice(0).concat([DIR_APP+"pub/css/*.scss",
-                                  DIR_APP+"pub/css/main.scss",
-                                  DIR_APP+"pub/css/build.scss"]);
+    build = base.slice(0).concat([DIR_APP_PUB+"css/*.scss",
+                                  DIR_APP_PUB+"css/main.scss",
+                                  DIR_APP_PUB+"css/build.scss"]);
 
     del(fpath+"page/main.css", function() {
 
         gulp.src(base).pipe(concat("mixin.scss"))
-            .pipe(gulp.dest(DIR_APP+"pub/"))
+            .pipe(gulp.dest(DIR_APP_PUB))
             .on("finish", function() {
-                gulp.src([DIR_APP+"pub/css/lib/mixin_core.scss",
+                gulp.src([DIR_APP_PUB+"css/lib/mixin_core.scss",
 
-                    DIR_APP+"pub/css/varible/_z-index.scss",
-                    DIR_APP+"pub/css/varible/_color.scss",
-                    DIR_APP+"pub/css/varible/_base.scss",
-                    DIR_APP+"pub/css/varible/button.scss",
-                    DIR_APP+"pub/css/varible/*.scss",
+                    DIR_APP_PUB+"css/varible/_z-index.scss",
+                    DIR_APP_PUB+"css/varible/_color.scss",
+                    DIR_APP_PUB+"css/varible/_base.scss",
+                    DIR_APP_PUB+"css/varible/button.scss",
+                    DIR_APP_PUB+"css/varible/*.scss",
 
-                    DIR_APP+"pub/css/lib/mixin_end.scss",
-                    DIR_APP+"pub/css/component/*.scss",
+                    DIR_APP_PUB+"css/lib/mixin_end.scss",
+                    DIR_APP_PUB+"css/component/*.scss",
 
-                    DIR_APP+"pub/css/*.scss",
-                    DIR_APP+"pub/css/main.scss",
+                    DIR_APP_PUB+"css/*.scss",
+                    DIR_APP_PUB+"css/main.scss",
 
-                    DIR_APP+"pub/css/build.scss"])
+                    DIR_APP_PUB+"css/build.scss"])
                 .pipe(concat("main.scss"))
-                .pipe(gulp.dest(DIR_APP+"pub/"))
+                .pipe(gulp.dest(DIR_APP_PUB+""))
                 .on("finish", function() {
                     var hash = hashint((new Date).getTime())+"",
                         name = "main"+hash.substr(0, 5)+".css",
                         newn = release?name:"main.css";
 
-                    gulp.src(DIR_APP+"pub/main.scss")
+                    gulp.src(DIR_APP_PUB+"main.scss")
                     .pipe(sass())
                     .pipe(autoprefixer())
                     .pipe(px2rem(px2remOptions))
@@ -332,7 +334,7 @@ function task_dev_app_js() {
         .on("finish", function() {
             webpack({
                 context: DIR_APP,
-                entry: [DIR_APP + "pub/main.js"],
+                entry: [DIR_APP_PUB + "main.js"],
                 output: {
                     filename: wname,
                     publicPath: "./page/"
@@ -341,14 +343,14 @@ function task_dev_app_js() {
                     loaders: [
                         { test: /\.html$/, loader: "html" },
                         { test: /\.css$/, loader: "style!css" },
-                        { test: /\.(jpg|png|gif)$/, loader: "url-loader?limit=8192&name=../pub/img/[name].[ext]" },
+                        { test: /\.(jpg|png|gif)$/, loader: "url-loader?limit=8192&name=../"+DIR_PUBLIC+"img/[name].[ext]" },
                     ]
                 },
                 resolve: {
                     alias: {
                         modules   : DIR_APP + "modules/",
                         page      : DIR_APP + "page/",
-                        public    : DIR_APP + "pub/",
+                        public    : DIR_APP_PUB,
                     }
                 },
                 plugins: pugls,
@@ -499,6 +501,8 @@ gulp.task("watch-magic-js", function() {
 
 /* 监控刷新调试 */
 gulp.task("serve", function() {
+    var pub_path = "app/"+DIR_PUBLIC;
+
     browserSync({
         server: "./app/dist/"
     });
@@ -520,11 +524,11 @@ gulp.task("serve", function() {
 
     /* APP 动态刷新任务 */
     gulp.watch(["app/index.html"], ["dev-app-html", reload])
-    gulp.watch(["app/pub/css/**/*.scss"], ["dev-app-css", reload])
-    gulp.watch(["app/pub/lib/*.js", "app/page/**/*", "app/srvs/*.js",
-                "app/pub/main.js", "app/modules/**/*", "!app/**/style.css"], ["dev-app-js", reload])
-    gulp.watch(["app/pub/**/*", "!app/pub/main.*", "!app/pub/lib/magic*",
-                "!app/pub/mixin.scss", "!app/pub/css/**/*"], ["dev-app-pub", reload])
+    gulp.watch([pub_path+"css/**/*.scss"], ["dev-app-css", reload])
+    gulp.watch([pub_path+"lib/*.js", "app/page/**/*", "app/srvs/*.js",
+                pub_path+"main.js", "app/modules/**/*", "!app/**/style.css"], ["dev-app-js", reload])
+    gulp.watch([pub_path+"**/*", "!"+pub_path+"main.*", "!"+pub_path+"lib/magic*",
+                "!"+pub_path+"mixin.scss", "!"+pub_path+"css/**/*"], ["dev-app-pub", reload])
 })
 
 /* 全局构建任务 */
@@ -565,10 +569,10 @@ gulp.task("build", ["dev-app-css"], function(rel) {
 /* APP 清理任务 */
 gulp.task("clean", function() {
     del(DIR_APP + "dist/");
-    del(DIR_APP + "pub/main.css");
-    del(DIR_APP + "pub/main.scss");
-    del(DIR_APP + "pub/lib/magic*");
-    del(DIR_APP + "pub/lib/mixin.scss");
+    del(DIR_APP_PUB + "main.css");
+    del(DIR_APP_PUB + "main.scss");
+    del(DIR_APP_PUB + "lib/magic*");
+    del(DIR_APP_PUB + "lib/mixin.scss");
 })
 
 gulp.task("clean.cordova", function() {
