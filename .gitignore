@@ -9,19 +9,19 @@
 
 # APP目录忽略设置
 /app/dist/*
-/app/pub/main.css
-/app/pub/main.scss
-/app/pub/mixin.scss
-/app/pub/css/lib/mixin_*.scss
-/app/pub/css/varible/*.scss
-/app/pub/css/component/*.scss
-/app/pub/lib/magic.js
-/app/pub/lib/magic.vue.js
-/app/pub/lib/magic.css
-/app/pub/lib/mixin.scss
+/app/public/main.css
+/app/public/main.scss
+/app/public/mixin.scss
+/app/public/css/lib/mixin_*.scss
+/app/public/css/varible/*.scss
+/app/public/css/component/*.scss
+/app/public/lib/magic.js
+/app/public/lib/magic.vue.js
+/app/public/lib/magic.css
+/app/public/lib/mixin.scss
 
 /app/page/**/style.css
-/app/modules/**/style.css
+/app/module/**/style.css
 
 # DEV目录忽略设置
 /dev/magic/lib/
