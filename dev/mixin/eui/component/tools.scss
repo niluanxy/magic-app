@@ -13,7 +13,11 @@
 
     .hide {
         display: none !important;
-    } 
+    }
+
+    .show {
+        display: block !important;
+    }
 
     .float-left {
         float: left;

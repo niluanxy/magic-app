@@ -1,73 +1,89 @@
 module.exports = (function() {
     var Modal = function(element, option) {
-        this.el      = $(element);
-        this.isHide  = false;
-        this.option  = $.extend({}, Modal.DEFAULT, option, true);
+        this.$el      = $(element);
+        this.$wrapper = null;
+        this.isHide   = false;
+        this.option   = $.extend({}, Modal.DEFAULT, option, true);
     };
 
+    Modal.CONFIG = {
+        zindex: 100,
+        wrapClass : require("./style.css").modal_wrapper,
+        itemClass : "modal-item",
+    }
+
     Modal.DEFAULT = {
-        align     : "bottom",
+        wrap      : true,
+        insert    : document.body,
         autoHide  : true,
-        hasInsert : false,
-        background: true,
+        background: false,
+    }
+
+    Modal.checkWrapper = function(el) {
+        var wrapper = $(el).find('.'+Modal.CONFIG.wrapClass);
+
+        return wrapper[0] ? wrapper : null;
+    }
+
+    Modal.createWrapper = function(el, zindex) {
+        var $el = $(el), CONFIG = Modal.CONFIG,
+            zindex = zindex || CONFIG.zindex;
+
+        if (!Modal.checkWrapper(el)) {
+            if ($el[0] !== document.body && $el.css("position") == "static") {
+                $el.css("position", "relative");
+            }
+
+            $el.append('<div class="'+CONFIG.wrapClass
+                +'" style="z-index:'+zindex+';"></div>');
+        }
+
+        return Modal.checkWrapper(el);
+    }
+
+    Modal.createItem = function(wrap, el, hasBack) {
+        var cls = Modal.CONFIG.itemClass, $el = $(el);
+
+        $el.wrap('<div class="'+cls+'"></div>');
+
+        if (!!hasBack) {
+            $el.parent().append('<div class="back"></div>');
+        }
+
+        return $el.parent();
     }
 
     Modal.prototype.init = function() {
-        var mid  = "modal_"+$.getRandom(), html,
-            that = this, opt = that.option;
+        var that = this, opt = that.option;
 
-        if (opt.hasInsert /* 已插入页面直接处理 */) {
-            that.el.attr("id", mid);
-            that.el.addClass("hideOut")
-                   .removeClass("hide");
-        } else {
-            html = "<div class='modal hideOut' id='"+mid+"'></div>";
-            that.el.addClass("wrapper")
-                   .removeClass("hide")
-                   .wrap(html);
-            that.el = that.el.parent();
-            $("body").append(that.el);     // 添加到页面中
-        }
+        that.$wrapper = Modal.createWrapper(opt.insert);
+        that.$el = Modal.createItem(opt.wrap, that.$el, opt.background);
 
-        that.el.addClass("align"+opt.align.toUpFirst());
-        if (opt.page) that.el.addClass("page");
+        that.$wrapper.append(that.$el);
 
-        if (opt.autoHide /* 绑定默认关闭方法 */) {
-            var that = this, ele = this.el[0];
-            that.el.on("tap", function(e) {
-                e.stopPropagation(); // 阻止冒泡
-                if (e.target == ele) that.hide();
-            })
-        } else {
-            that.el.on("tap", function(e) {
-                e.stopPropagation(); // 阻止冒泡
-            })
-        }
-
-        if (that.el.hasClass("hideOut")) {
-            that.isHide = true; // 设置隐藏状态
-        }
-
-        if (opt.background == false) {
-            that.el.addClass("clear");
-        }
-
-        return this;
+        return that;
     };
 
     Modal.prototype.show = function(anim) {
-        var scroll = this.el.data("ui_scroll");
-
+        this.$wrapper.addClass("show");
+        this.$el.addClass("show");
         this.isHide = false;
-        this.el.removeClass("hideOut").addClass("showIn");
-        if (scroll) scroll.scrollTo(0, 0);
-        
+
         return this;
     };
 
     Modal.prototype.hide = function(anim) {
+        var cls = Modal.CONFIG.itemClass,
+            $wrapper = this.$wrapper;
+
+        this.$el.removeClass("show");
+
+        if ($wrapper.find('.'+cls+'.show').length < 0) {
+            $wrapper.removeClass("show");
+        }
+
         this.isHide = true;
-        this.el.removeClass("showIn").addClass("hideOut");
+
         return this;
     };
 
@@ -76,23 +92,21 @@ module.exports = (function() {
     };
 
     Modal.prototype.destroy = function() {
-        this.el.remove();   // 删除自身
+        this.$el.remove();   // 删除自身
     };
 
     /* 尝试绑定方法到 magic 框架的全局对象上 */
     if ($ && !$.modal) {
-        $.extend({modal: function(element, option) {
-            return new Modal(element, option).init();
-        }});
+        $.extend({modal: Modal});
     };
 
     if ($ && $.fn && !$.fn.modal) {
-        $.fn.extend({modal: function(option) {
+        $.fn.extend({modal: function(el, option) {
             var opt = $.extend({}, option);
-            if (opt.hasInsert === undefined) {
-                opt.hasInsert = true;
-            }
-            return new Modal(this[0], opt).init();
+
+            opt.insert = this;
+
+            return new Modal(el, opt).init();
         }});
     };
 })();

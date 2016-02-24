@@ -1,7 +1,6 @@
 window.$u = {};                             // 定义一个全局的快捷UI对象
 
-require("./util/insert");					// 加载相关工具方法
-
+require("./component/place");				// 加载相关工具方法
 require("./component/tap.js");              // 加载常用组件的点击事件
 require("./component/scroll.js");           // 加载滚动UI组件scroll
 require("./component/slider");              // 加载轮播UI组件slider
