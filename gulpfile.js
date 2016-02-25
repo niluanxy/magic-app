@@ -281,6 +281,7 @@ function task_dev_app_css() {
                     .pipe(autoprefixer())
                     .pipe(px2rem(px2remOptions))
                     .pipe(gulpif(release, minifycss()))
+                    .pipe(rename(newn))
                     .pipe(gulp.dest(fpath+"page/"))
                     .on("finish", function() {
                         gulp.src(fpath+"index.html")
@@ -300,14 +301,23 @@ gulp.task("dev-app-css", ["dev-mixin"], task_dev_app_css);
 
 function task_dev_app_js() {
     var UglifyJsPlugin = require("webpack/lib/optimize/UglifyJsPlugin.js");
+    var DefinePlugin   = require("webpack/lib/DefinePlugin.js");
     var CordovaPlugin  = require('webpack-cordova-plugin');
     var commonsPlugin  = require("webpack/lib/optimize/CommonsChunkPlugin");
     var ignorePlugin   = require("webpack/lib/IgnorePlugin");
 
     var pugls = release ? [new UglifyJsPlugin({
-                sourceMap: false,
-                mangle: false 
-            })] : [];
+                    sourceMap: false,
+                    mangle: false,
+                    minimize: true,
+                    compress: {
+                        warnings: false
+                    }
+                }), new DefinePlugin({
+                    'process.env': {
+                        NODE_ENV: '"production"'
+                    }
+                })] : [];
 
     if (cordova) pugls.push(new CordovaPlugin({
                 config: 'config.xml',

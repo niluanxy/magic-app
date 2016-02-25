@@ -475,15 +475,16 @@ $(function() {
 
     function _commonPage(page) {
         var old = page.data, tmp = page.template,
-            mixins, head, rhead = /^\<mg\-page.*\>/, style = page.style;
+            mixins, head, rhead = /^\<mg\-page[^\>]*\>/, style = page.style;
 
         // 尝试对页面添加私有的 class 名字
         if (style && tmp && (head = tmp.match(rhead)) ) {
             var mat, fix, rcls = /class\=[\'|"].*[\'|"]/;
 
             head = head[0]; style = style.page;
+            mat  = head.match(rcls);
 
-            if ((mat = head.match(rcls))) {
+            if (mat) {
                 mat = mat[0].replace(/[\'|\"]/, '"');
                 fix = mat.replace(/\"$/, ' '+style+'"');
 
@@ -491,7 +492,7 @@ $(function() {
             } else {
                 style = ' class="'+style+'">';
                 head  = head.replace(/\>$/, style);
-            }
+            };
 
             page.template = tmp.replace(rhead, head);
         }
