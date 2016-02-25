@@ -348,15 +348,10 @@ function task_dev_app_js() {
                 },
                 module: {
                     loaders: [
-                        { test: /\.html$/, loader: "html?config=htmlLoader"},
+                        { test: /\.html$/, loader: "vue-html"},
                         { test: /\.css$/, loader: "style!css" },
                         { test: /\.(jpg|png|gif)$/, loader: "url-loader?limit=8192&name=../"+DIR_PUBLIC+"img/[name].[ext]" },
-                    ],
-
-                    htmlLoader: {
-                        customAttrSurround: [ [/\@/, /[^\=]/] ],
-                        ignoreCustomFragments: [/\{\{.*?}}/]
-                    }
+                    ]
                 },
                 resolve: {
                     alias: {
