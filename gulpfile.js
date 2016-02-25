@@ -304,11 +304,9 @@ function task_dev_app_js() {
     var DefinePlugin   = require("webpack/lib/DefinePlugin.js");
     var CordovaPlugin  = require('webpack-cordova-plugin');
     var commonsPlugin  = require("webpack/lib/optimize/CommonsChunkPlugin");
-    var ignorePlugin   = require("webpack/lib/IgnorePlugin");
 
     var pugls = release ? [new UglifyJsPlugin({
                     sourceMap: false,
-                    mangle: false,
                     minimize: true,
                     compress: {
                         warnings: false
@@ -358,9 +356,9 @@ function task_dev_app_js() {
                 },
                 resolve: {
                     alias: {
-                        modules   : DIR_APP + "modules/",
-                        page      : DIR_APP + "page/",
-                        public    : DIR_APP_PUB,
+                        module   : DIR_APP + "module/",
+                        page     : DIR_APP + "page/",
+                        public   : DIR_APP_PUB,
                     }
                 },
                 plugins: pugls,
