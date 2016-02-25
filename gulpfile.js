@@ -10,8 +10,8 @@ var gulp         = require('gulp-param')(require('gulp'), process.argv),
     hashint      = require("hash-int"),
     autoprefixer = require("gulp-autoprefixer"),
     minifycss    = require("gulp-minify-css"),
-    mininline    = require("gulp-minify-inline"),
     uglify       = require("gulp-uglify"),
+    htmlmin      = require('gulp-htmlmin'),
     rename       = require("gulp-rename"),
     webpack      = require("gulp-webpack"),
     browserSync  = require("browser-sync"),
@@ -210,18 +210,17 @@ gulp.task("dev-app-pub", task_dev_app_pub);
 
 
 function task_dev_app_html() {
-    var inline = {
-            js: {output: { comments: true }},
-            css: {output: { comments: true }}
-        },
-        html = { conditionals: true, spare: true };
-
     var defer = Q.defer(),
         fpath = cordova?DIR_CORDOVA+"www/":
                         DIR_APP+"dist/";
 
     gulp.src(DIR_APP+"index.html")
-    .pipe(gulpif(release, mininline(inline)))
+    .pipe(gulpif(release, htmlmin({
+            minifyJS: true,
+            minifyCSS: true,
+            removeComments: true,
+        }) 
+    ))
     .pipe(gulp.dest(fpath))
     .on("finish", function() { defer.resolve() });
 
@@ -304,6 +303,7 @@ function task_dev_app_js() {
     var DefinePlugin   = require("webpack/lib/DefinePlugin.js");
     var CordovaPlugin  = require('webpack-cordova-plugin');
     var commonsPlugin  = require("webpack/lib/optimize/CommonsChunkPlugin");
+    var HtmlWebpackPlugin = require('html-webpack-plugin');
 
     var pugls = release ? [new UglifyJsPlugin({
                     sourceMap: false,
@@ -329,7 +329,6 @@ function task_dev_app_js() {
                         DIR_APP+"dist/",
         wname = release?"[name][hash:5].js":"[name].js";
 
-
     del(fpath+"page/*.js", function() {
         gulp.src(DIR_APP+"**/style.scss")
         .pipe(sass({
@@ -349,10 +348,15 @@ function task_dev_app_js() {
                 },
                 module: {
                     loaders: [
-                        { test: /\.html$/, loader: "html" },
+                        { test: /\.html$/, loader: "html?config=htmlLoader"},
                         { test: /\.css$/, loader: "style!css" },
                         { test: /\.(jpg|png|gif)$/, loader: "url-loader?limit=8192&name=../"+DIR_PUBLIC+"img/[name].[ext]" },
-                    ]
+                    ],
+
+                    htmlLoader: {
+                        customAttrSurround: [ [/\@/, /[^\=]/] ],
+                        ignoreCustomFragments: [/\{\{.*?}}/]
+                    }
                 },
                 resolve: {
                     alias: {
