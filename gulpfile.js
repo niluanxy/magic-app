@@ -26,6 +26,7 @@ var DIR_APP       = __dirname + "/app/",
     DIR_MAGIC_VUE = __dirname + "/dev/magic-vue/",
     DIR_CORDOVA   = __dirname + "/cordova/",
     DIR_RESOURCE  = __dirname + "/resource/",
+    DIR_MODULE    = "module",
     DIR_PUBLIC    = "public/",
     DIR_APP_PUB   = DIR_APP+DIR_PUBLIC;
 
@@ -175,6 +176,7 @@ function task_dev_magic_vue() {
             },
             module: {
                 loaders: [
+                    { test: /\.(jpg|png|gif)$/, loader: "url-loader" },
                     { test: /\.html$/, loader: "html" },
                     { test: /\.scss$/, loader: "style!css!sass!autoprefixer" }
                 ]
@@ -332,7 +334,7 @@ function task_dev_app_js() {
     del(fpath+"page/*.js", function() {
         gulp.src(DIR_APP+"**/style.scss")
         .pipe(sass({
-            includePaths: [DIR_APP, DIR_APP+"modules/"]
+            includePaths: [DIR_APP, DIR_APP+DIR_MODULE]
         }))
         .pipe(autoprefixer())
         .pipe(px2rem(px2remOptions))
@@ -355,7 +357,7 @@ function task_dev_app_js() {
                 },
                 resolve: {
                     alias: {
-                        module   : DIR_APP + "module/",
+                        module   : DIR_APP + DIR_MODULE,
                         page     : DIR_APP + "page/",
                         public   : DIR_APP_PUB,
                     }

@@ -30,7 +30,14 @@ $(function() {
                         $DOM   : null,          // DOM对象
                      },             // 加载动画相关参数
 
-        __STATE__  : null,          // 记录当前APP各种状态
+        __STATE__  : {
+                        AUTH_HASRUN  : false,       // 记录验证页面是否已调用
+                        AUTH_BEFORE  : "",          // 验证失败的页面，用于回跳
+
+                        ROUTER_AFTER : false,       // 路由事件执行状态
+
+                        PAGE_READY   : false,       // 页面加载状态
+                     },
 
         compontent : {},            // 组件的配置选项
     };
@@ -56,15 +63,6 @@ $(function() {
             view  = mvue.__VIEW__ = $("body").query("mg-view"),
             $view = $(mvue.__VIEW__), PAGE = mvue.__PAGE__,
             LOAD  = mvue.__LOAD__;
-        
-        mvue.__STATE__ = {
-            AUTH_HASRUN  : false,       // 记录验证页面是否已调用
-            AUTH_BEFORE  : "",          // 验证失败的页面，用于回跳
-
-            ROUTER_AFTER : false,       // 路由事件执行状态
-
-            PAGE_READY   : false,       // 页面加载状态
-        }
 
         var tables = $.extend.apply({}, config.tables);
 
@@ -374,16 +372,12 @@ $(function() {
                         clearLoading($el, 30);
                     });
                 } else {
-                    // console.log("can show page")
                     cls = LOAD.PUSH ? "push-new" : "pop-new";
                     clearLoading($el);      // 清除 load 内容
 
                     $before && $before.addClass("leave");
                     $el.removeClass("hide").addClass(cls)
                     $el.once(tsend, function() {
-                        // console.log("console of loadFinish")
-                        // console.log($el)
-                        // console.log($before)
                         $el.removeClass(cls+" enter");
                         $before && $before.removeClass("leave").addClass("hide");
                     })
@@ -614,4 +608,7 @@ $(function() {
 
     /* 加载默认的核心样式文件和组件 */
     require("./component/main.js");
+
+    /* 加载默认核心的指令组件 */
+    require("./directive/main.js");
 });
