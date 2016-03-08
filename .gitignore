@@ -13,8 +13,6 @@
 /app/public/main.scss
 /app/public/mixin.scss
 /app/public/css/lib/mixin_*.scss
-/app/public/css/varible/*.scss
-/app/public/css/component/*.scss
 /app/public/lib/magic.js
 /app/public/lib/magic.vue.js
 /app/public/lib/magic.css
