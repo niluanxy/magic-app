@@ -534,8 +534,8 @@ gulp.task("serve", function() {
     /* APP 动态刷新任务 */
     gulp.watch(["app/index.html"], ["dev-app-html", reload])
     gulp.watch([pub_path+"css/**/*.scss"], ["dev-app-css", reload])
-    gulp.watch([pub_path+"lib/*.js", pub_path+"css/**/*", "app/page/**/*", pub_path+"main.js",
-                "app/"+DIR_MODULE+"/**/*", "!app/**/style.css"], ["dev-app-js", reload])
+    gulp.watch([pub_path+"lib/*.js", "app/page/**/*", "app/srvs/*.js",
+                pub_path+"main.js", "app/modules/**/*", "!app/**/style.css"], ["dev-app-js", reload])
     gulp.watch([pub_path+"**/*", "!"+pub_path+"main.*", "!"+pub_path+"lib/magic*",
                 "!"+pub_path+"mixin.scss", "!"+pub_path+"css/**/*"], ["dev-app-pub", reload])
 })

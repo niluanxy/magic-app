@@ -54,7 +54,7 @@
         z-index: $z-index-item;
 
         line-height: rem($list-item-line-height);
-        min-height: rem($list-item-height);
+        min-height: rem($list-item-padding*2 + $list-item-line-height);
 
         font-size: rem($list-item-font-size);
         padding: rem($list-item-padding);
@@ -138,12 +138,12 @@
 
 
     /*====================================================
-     * item-avator 相关代码
+     * item-avatar 相关代码
      *====================================================*/
     .item {
-        &.item-avator,
-        &.item-avator-large {
-            .avator {
+        &.item-avatar,
+        &.item-avatar-large {
+            .avatar {
                 border-radius: $list-border-radius;
                 position: absolute;
                 top: rem($list-item-padding);
@@ -161,59 +161,59 @@
                 position: relative;
 
                 &:first-of-type {
-                    top: rem(-$list-item-avator-fix);
+                    top: rem(-$list-item-avatar-fix);
                 }
 
                 &:last-of-type {
-                    bottom: rem(-$list-item-avator-fix);
+                    bottom: rem(-$list-item-avatar-fix);
                 }
             }
         }
 
-        &.item-avator {
-            min-height: rem($list-item-padding*2 + $list-item-avator);
-            padding-left: rem($list-item-padding*2 + $list-item-avator);
+        &.item-avatar {
+            min-height: rem($list-item-padding*2 + $list-item-avatar);
+            padding-left: rem($list-item-padding*2 + $list-item-avatar);
 
-            .avator {
-                width: rem($list-item-avator);
-                height: rem($list-item-avator);
+            .avatar {
+                width: rem($list-item-avatar);
+                height: rem($list-item-avatar);
             }
 
             .line {
-                line-height: rem($list-item-avator/2);
+                line-height: rem($list-item-avatar/2);
             }
         }
 
-        &.item-avator-large {
-            min-height: rem($list-item-padding*2 + $list-item-avator-large);
-            padding-left: rem($list-item-padding*2 + $list-item-avator-large);
+        &.item-avatar-large {
+            min-height: rem($list-item-padding*2 + $list-item-avatar-large);
+            padding-left: rem($list-item-padding*2 + $list-item-avatar-large);
 
-            .avator {
-                width: rem($list-item-avator-large);
-                height: rem($list-item-avator-large);
+            .avatar {
+                width: rem($list-item-avatar-large);
+                height: rem($list-item-avatar-large);
             }
 
             .line {
-                line-height: rem($list-item-avator-large/3);
+                line-height: rem($list-item-avatar-large/3);
             }
         }
     }
     &.list-embed .item,
     &.list-embed-left .item,
     .item.item-embed, {
-        &.item-avator,
-        &.item-avator-large {
-            .avator {
+        &.item-avatar,
+        &.item-avatar-large {
+            .avatar {
                 left: 0;
             }
         }
 
-        &.item-avator {
-            padding-left: rem($list-item-padding + $list-item-avator);
+        &.item-avatar {
+            padding-left: rem($list-item-padding + $list-item-avatar);
         }
 
-        &.item-avator-large {
-            padding-left: rem($list-item-padding + $list-item-avator-large);
+        &.item-avatar-large {
+            padding-left: rem($list-item-padding + $list-item-avatar-large);
         }
     }
 
