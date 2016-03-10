@@ -34,7 +34,7 @@
 		}
 
 		>*, .flex-item {
-			flex: 0 1 auto;
+			flex: 0 0 auto;
 
 			@for $space from 1 through 8 {
 				/* 默认的横向栅格布局 */
