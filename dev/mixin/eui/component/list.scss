@@ -54,7 +54,7 @@
         z-index: $z-index-item;
 
         line-height: rem($list-item-line-height);
-        min-height: rem($list-item-padding*2 + $list-item-line-height);
+        min-height: rem($list-item-height);
 
         font-size: rem($list-item-font-size);
         padding: rem($list-item-padding);
