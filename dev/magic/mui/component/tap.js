@@ -136,35 +136,44 @@ $.ready(function() {
                 }
             }
 
-            this.delayStart = setTimeout(function() {
-                /* 给按钮类的组件添加点击样式 */
-                for (var i = 0; i<path.length; i++) {
-                    var $item = $(path[i]);
-                    tagName = $item[0].tagName.toUpperCase();
+            // this.delayStart = setTimeout(function() {
+            //     /* 给按钮类的组件添加点击样式 */
+            //     for (var i = 0; i<path.length; i++) {
+            //         var $item = $(path[i]);
+            //         tagName = $item[0].tagName.toUpperCase();
 
-                    if (checkClass($item)) {
-                        $item.addClass("active");
-                    }
+            //         if (checkClass($item)) {
+            //             $item.addClass("active");
+            //         }
+            //     }
+            // }, this.delayClass);
+
+            for (var i = 0; i<path.length; i++) {
+                var $item = $(path[i]);
+                tagName = $item[0].tagName.toUpperCase();
+
+                if (checkClass($item)) {
+                    $item.addClass("active");
                 }
-            }, this.delayClass);
+            }
         },
 
         _move: $.delayCall(function(e) {
             e.preventDefault(); // 修复微信下拉显示网页地址
 
-            if (!this.moveClear && this._isMove(e, 1)) {
+            // if (!this.moveClear && this._isMove(e, 1)) {
                 
-                // 清除 tap 自定义相关操作
-                this.moveClear = true;
-                clearTimeout(this.delayStart);
+            //     // 清除 tap 自定义相关操作
+            //     this.moveClear = true;
+            //     clearTimeout(this.delayStart);
 
-                // 清除事件中相关的元素的激活类
-                var path = fixPath(e), $item;
-                for(var i = 0; i<path.length; i++) {
-                    $item = $(path[i]);
-                    clearActive($item);
-                }
-            }
+            //     // 清除事件中相关的元素的激活类
+            //     var path = fixPath(e), $item;
+            //     for(var i = 0; i<path.length; i++) {
+            //         $item = $(path[i]);
+            //         clearActive($item);
+            //     }
+            // }
         }, 20),
 
         _end: function(e) {
