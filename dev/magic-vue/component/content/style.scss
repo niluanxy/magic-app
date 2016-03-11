@@ -2,6 +2,11 @@
     display: block;
     width: 100%;
     overflow: hidden;
+
+    .scroll-x {
+        display: table;
+        white-space: nowrap;
+    }
 }
 
 .scroll_body {

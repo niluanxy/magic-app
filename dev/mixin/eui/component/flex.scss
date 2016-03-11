@@ -2,16 +2,8 @@
 
 @mixin flex-layout() {
 
-	.flex {
+	.flex, .flex-col, .flex-row, .flex-split {
 		display: flex;
-	}
-
-	.flex-inline {
-		display: inline-flex;
-	}
-
-
-	.flex, .flex-inline {
 		flex-direction: row;
 
 		/* 元素对其方式 */
@@ -25,12 +17,6 @@
 	
 		&.align-end {
 			justify-content: flex-end;
-		}
-
-		&.flex-split {
-			>*, .flex-item {
-				flex: 1;
-			}
 		}
 
 		>*, .flex-item {
@@ -49,13 +35,10 @@
 		}
 	}
 
-	/* 空余控件平分 */
-	.space-between {
-		justify-content: space-between;
-	}
-
-	.space-around {
-		justify-content: space-around;
+	.flex-split {
+		>*, .flex-item {
+			flex: 1;
+		}
 	}
 
 	.flex-col {
@@ -65,6 +48,19 @@
 	.flex-row {
 		flex-wrap: nowrap;
 		flex-direction: row;
+	}
+
+	.flex-inline {
+		display: inline-flex;
+	}
+
+	/* 空余控件平分 */
+	.space-between {
+		justify-content: space-between;
+	}
+
+	.space-around {
+		justify-content: space-around;
 	}
 
 	/* 栅格化相关代码 */
