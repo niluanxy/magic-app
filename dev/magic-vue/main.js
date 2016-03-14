@@ -400,9 +400,10 @@ $(function() {
         var PAGE = mvue.__PAGE__, STAT = mvue.__STATE__,
             init = page.resolve;
 
-        function _pageReady() {
+        function _pageReady(params) {
             STAT.PAGE_READY = true;
 
+            this.$set('params', params || {});
             this.$dispatch("childPageReady");   // 向上冒泡事件
             this.$broadcast("pageReady");       // 向下传递事件
             this.$emit("pageReadyDirect");      // 触发自身事件
@@ -410,7 +411,6 @@ $(function() {
 
         if (typeof init == "function") {
             return function() {
-               // console.log("pready: "+$.getTime());
                 var that = this, _params = $.extend({}, PAGE.PARAMS),
                     _defer  = $.defer(), loadDefer = _createLoadFinish();
 
@@ -448,8 +448,7 @@ $(function() {
                     loadDefer.resolve(that);
                 });
 
-                _pageReady.call(this);
-
+                _pageReady.call(this, _transParams(PAGE.PARAMS));
 
                 // 绑定数据更新快捷方法
                 that.$refresh = function(params) {
@@ -459,7 +458,7 @@ $(function() {
         } else {
             return function() {
                // console.log("pready: "+$.getTime());
-                _pageReady.call(this);
+                _pageReady.call(this, _transParams(PAGE.PARAMS));
 
                 _createLoadFinish().resolve(this);
             }
@@ -494,7 +493,7 @@ $(function() {
         // 采用新的方式，组件的 data 必须为函数
         if (typeof old !== "function") {
             page.data = function() {
-                return $.extend(true, {}, old);
+                return $.extend(true, {params: {}}, old);
             }
         }
 

@@ -3,17 +3,17 @@ module.exports = (function() {
         template: "<slot></slot>",
         ready: function() {
             var that = this, $el = $(this.$el),
-                scope, handle, page, clen, ctrl, bind;
+                scope, isPage, clen, ctrl, bind;
 
-            ctrl  = $el.attr("handle");
+            ctrl  = $el.attr("ctrl");
             bind  = $el.attr("view");
             scope = $$._getPage(that);
 
             if (scope[ctrl] !== undefined || scope[bind] !== undefined) {
-                page = $el.find("mg-content").length || $el.attr("page");
-                clen = $el.children.length;
+                isPage = $el.find("mg-content").length || $el.attr("page");
+                clen   = $el.children.length;
 
-                if (!page && clen > 1) {
+                if (!isPage && clen > 1) {
                     $el.wrapAll("<div class='modal_body'></div>");
                 }
 
