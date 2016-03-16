@@ -47,28 +47,37 @@ function task_dev_mixin() {
     var defer = Q.defer(), path = DIR_APP_PUB+"css/lib/";
 
     gulp.src([DIR_MIXIN+"base/tools.scss",
+        DIR_MIXIN+"base/z-index.scss",
         DIR_MIXIN+"base/color.scss",
-        DIR_MIXIN+"base/*.scss",
-        DIR_MIXIN+"core/*.scss",
-        DIR_MIXIN+"eui/varible/button.scss",
-        DIR_MIXIN+"eui/varible/*.scss"])
-    .pipe(concat("mixin_core.scss"))
+        DIR_MIXIN+"base/*.scss"])
+    .pipe(concat("mixin_base.scss"))
     .pipe(gulp.dest(path))
 
-
     .on("finish", function() {
-        gulp.src(DIR_MIXIN+"eui/component/*.scss")
-        .pipe(concat("mixin_end.scss"))
+        gulp.src([DIR_MIXIN+"eui/varible/button.scss",
+            DIR_MIXIN+"eui/varible/*.scss"])
+        .pipe(concat("mixin_coms.scss"))
         .pipe(gulp.dest(path))
 
-
         .on("finish", function() {
-            gulp.src([path+"mixin_core.scss",
-                path+"mixin_end.scss"])
-            .pipe(concat("mixin.scss"))
+            gulp.src([
+                DIR_MIXIN+"core/animate.scss",
+                DIR_MIXIN+"core/tool.scss",
+                DIR_MIXIN+"core/*.scss",
+                DIR_MIXIN+"eui/component/*.scss"])
+            .pipe(concat("mixin_end.scss"))
+            .pipe(gulp.dest(path))
 
-            .pipe(gulp.dest(DIR_MAGIC+"lib/"))
-            .on("finish", function() { defer.resolve(); });
+            .on("finish", function() {
+                gulp.src([
+                    path+"mixin_base.scss",
+                    path+"mixin_coms.scss",
+                    path+"mixin_end.scss"])
+                .pipe(concat("mixin.scss"))
+
+                .pipe(gulp.dest(DIR_MAGIC+"lib/"))
+                .on("finish", function() { defer.resolve(); });
+            })
         })
     })
 
@@ -235,15 +244,20 @@ function task_dev_app_css() {
         fpath = cordova?DIR_CORDOVA+"www/":
                         DIR_APP+"dist/";
 
-    base = [DIR_APP_PUB+"css/lib/mixin_core.scss",
+    base = [DIR_APP_PUB+"css/lib/mixin_base.scss",
 
-            DIR_APP_PUB+"css/varible/_z-index.scss",
-            DIR_APP_PUB+"css/varible/_color.scss",
-            DIR_APP_PUB+"css/varible/_base.scss",
+            DIR_APP_PUB+"css/varible/z-index.scss",
+            DIR_APP_PUB+"css/varible/color.scss",
+            DIR_APP_PUB+"css/varible/core.scss",
+            DIR_APP_PUB+"css/varible/tool.scss",
+
+            DIR_APP_PUB+"css/lib/mixin_coms.scss",
+
             DIR_APP_PUB+"css/varible/button.scss",
             DIR_APP_PUB+"css/varible/*.scss",
 
             DIR_APP_PUB+"css/lib/mixin_end.scss",
+
             DIR_APP_PUB+"css/component/*.scss"]
 
     build = base.slice(0).concat([DIR_APP_PUB+"css/*.scss",
@@ -255,21 +269,7 @@ function task_dev_app_css() {
         gulp.src(base).pipe(concat("mixin.scss"))
             .pipe(gulp.dest(DIR_APP_PUB))
             .on("finish", function() {
-                gulp.src([DIR_APP_PUB+"css/lib/mixin_core.scss",
-
-                    DIR_APP_PUB+"css/varible/_z-index.scss",
-                    DIR_APP_PUB+"css/varible/_color.scss",
-                    DIR_APP_PUB+"css/varible/_base.scss",
-                    DIR_APP_PUB+"css/varible/button.scss",
-                    DIR_APP_PUB+"css/varible/*.scss",
-
-                    DIR_APP_PUB+"css/lib/mixin_end.scss",
-                    DIR_APP_PUB+"css/component/*.scss",
-
-                    DIR_APP_PUB+"css/*.scss",
-                    DIR_APP_PUB+"css/main.scss",
-
-                    DIR_APP_PUB+"css/build.scss"])
+                gulp.src(build)
                 .pipe(concat("main.scss"))
                 .pipe(gulp.dest(DIR_APP_PUB+""))
                 .on("finish", function() {

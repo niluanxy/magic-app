@@ -219,6 +219,29 @@ module.exports = (function() {
     }
 
     /**
+     * 删除 对象的 HTML 属性
+     *
+     * @param       {Element}           e - 操作对象
+     * @param       {String||Array}     attr - 要删除的属性名
+     * @version     0.1                 <2016-03-16>
+     */
+    util.removeAttr = function(e, attr) {
+        var nType = e.nodeType;
+
+        if (nType === 3 || nType === 8 || nType === 2) {
+            return; // 忽略掉 文本节点、注释和属性节点
+        }
+
+        if (typeof attr == "string") {
+            e.removeAttribute(attr);
+        } else if (attr instanceof Array) {
+            for(var i=0; i<attr.length; i++) {
+                e.removeAttribute(attr[i].toLowerCase())
+            }
+        }
+    }
+
+    /**
      * 操作对象的 data 值
      * @param  {Element}    el  操作对象
      * @param  {String}     key 键名
@@ -264,26 +287,6 @@ module.exports = (function() {
             }
         };
     })();
-
-
-    /**
-     * 移除对象的某个属性
-     * @param       {Element}   e - 操作对象
-     * @param       {String}    attr - 要删除的属性名
-     * @version     0.1         <2015-04-28>
-     */
-    util.removeAttr = function(e, attr) {
-        var nType = e.nodeType, lattr;
-
-        if (nType === 3 || nType === 8 || nType ===2) {
-            return; // 忽略掉 文本节点、注释和属性节点
-        }
-
-        if (!!attr /* 过滤掉 undefined */) {
-            lattr = attr.toLowerCase();
-            e.removeAttribute(lattr);
-        }
-    }
 
     /**
      * 检测对象是否有某个类

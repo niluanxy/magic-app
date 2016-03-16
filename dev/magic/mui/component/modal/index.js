@@ -14,6 +14,7 @@ module.exports = (function() {
 
     Modal.DEFAULT = {
         wrap      : true,
+        align     : 'bottom',
         insert    : document.body,
         autoHide  : true,
         background: false,
@@ -44,7 +45,7 @@ module.exports = (function() {
     Modal.createItem = function(wrap, el, hasBack) {
         var cls = Modal.CONFIG.itemClass, $el = $(el);
 
-        $el.wrap('<div class="'+cls+'"></div>');
+        $el.wrap('<div class="'+cls+'"></div>').addClass("modal");
 
         if (!!hasBack) {
             $el.parent().append('<div class="back"></div>');
@@ -54,10 +55,16 @@ module.exports = (function() {
     }
 
     Modal.prototype.init = function() {
-        var that = this, opt = that.option;
+        var that = this, opt = that.option, $dom;
 
         that.$wrapper = Modal.createWrapper(opt.insert);
         that.$el = Modal.createItem(opt.wrap, that.$el, opt.background);
+
+        $dom = that.$el.children(".modal");
+
+        if (opt.align != 'null' && opt.align != null) {
+            $dom.addClass(opt.align);
+        }
 
         that.$wrapper.append(that.$el);
 

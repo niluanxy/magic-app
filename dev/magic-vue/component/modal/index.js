@@ -10,19 +10,15 @@ module.exports = (function() {
             scope = $$._getPage(that);
 
             if (scope[ctrl] !== undefined || scope[show] !== undefined) {
-                view = $el.find("mg-content").length || $el.attr("view");
+                view = $el.attr("view");
                 clen = $el.children.length;
 
-                if (!view && clen > 1) {
-                    $el.wrapAll("<div class='modal_body'></div>");
-                }
-
-                that._handle = handle = $el.addClass("modal hideOut")
-                .modal({
-                    page    : !!view,
-                    align   : $el.attr("align"),
-                    autoHide: $el.attr("autoHide")
+                that._handle = handle = $(scope.$el).modal($el, {
+                    align     : $el.attr("align"),
+                    background: true,
                 });
+
+                $el.removeAttr(["ctrl", "show", "align"]);
 
                 if (scope[ctrl] !== undefined) {
                     scope[ctrl] = handle;
