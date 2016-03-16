@@ -602,6 +602,77 @@ $(function() {
         return Vue.component(ids, opt);
     }
 
+    /**
+     * 数据 Store 相关方法
+     */
+    mvue.store = function(name, option) {
+        if (arguments.length == 1) {
+            option = name;   // 只有一个参数时，修正顺序
+            name   = undefined;
+        }
+
+        var obj = {}, store, type, item, actions;
+
+        if (option.state) obj.state = option.state;
+        if (option.mutations) obj.mutations = option.mutations;
+        if (option.modules) obj.modules = option.modules;
+        if (option.middlewares) obj.middlewares = option.middlewares;
+
+        actions = option.actions;
+        delete option.actions;
+        store = new Vuex.Store(obj);
+
+        for(var key in actions) {
+            item = actions[key];
+            type = typeof item;
+
+            if (type == "function") {
+                store[key] = item;
+            } else if (type == "string") {
+                store[key] = (function(mutation) {
+                    return function(store) {
+                        var dispatch = store.dispatch, args = [mutation];
+
+                        for(var i=1; i<arguments.length; i++) {
+                            args.push(arguments[i]);
+                        }
+
+                        return dispatch.apply(undefined, args);
+                    }
+                })(item);
+            }
+        }
+        
+        option.$snapshot = function() {
+            return $.extend(true, {}, this.state);
+        }
+
+        option.$recover = function(snapshot) {
+            this.$set('state', snapshot);
+        }
+
+        // 注册为全局的对象
+        if (typeof name == "string") {
+            mvue.storeReg(name, store);
+        }
+
+        return store;
+    }
+
+    /**
+     * 将 Store 对象注册为全局
+     * @return {[type]} [description]
+     */
+    mvue.storeReg = (function() {
+        var $db = window.$db = {};
+
+        return function(name, store) {
+            if (name && store) {
+                $db[name] = store;
+            }
+        }
+    })();
+
     /* 加载常用工具方法 */
     require("./util/main.js");
 

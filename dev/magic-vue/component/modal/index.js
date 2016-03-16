@@ -3,23 +3,23 @@ module.exports = (function() {
         template: "<slot></slot>",
         ready: function() {
             var that = this, $el = $(this.$el),
-                scope, isPage, clen, ctrl, bind;
+                scope, view, clen, ctrl, show, handle;
 
             ctrl  = $el.attr("ctrl");
-            bind  = $el.attr("view");
+            show  = $el.attr("show");
             scope = $$._getPage(that);
 
-            if (scope[ctrl] !== undefined || scope[bind] !== undefined) {
-                isPage = $el.find("mg-content").length || $el.attr("page");
-                clen   = $el.children.length;
+            if (scope[ctrl] !== undefined || scope[show] !== undefined) {
+                view = $el.find("mg-content").length || $el.attr("view");
+                clen = $el.children.length;
 
-                if (!isPage && clen > 1) {
+                if (!view && clen > 1) {
                     $el.wrapAll("<div class='modal_body'></div>");
                 }
 
                 that._handle = handle = $el.addClass("modal hideOut")
                 .modal({
-                    page    : page,
+                    page    : !!view,
                     align   : $el.attr("align"),
                     autoHide: $el.attr("autoHide")
                 });
@@ -28,8 +28,8 @@ module.exports = (function() {
                     scope[ctrl] = handle;
                 }
 
-                if (page && page != "true") {
-                    var _name = $$.__makeViewName(page), _child,
+                if (view && view != "true" && view !== true) {
+                    var _name = $$.__makeViewName(view), _child,
                         _view = $$.__renderView(_name, "_loadModal");
 
                     _view.$appendTo($el[0]).__MODAL = handle;
@@ -52,7 +52,7 @@ module.exports = (function() {
                     }
                 }
 
-                if (!page && clen == 1) {
+                if (!view && clen == 1) {
                     $el.children().addClass("modal_body");
                 }
             } else {
