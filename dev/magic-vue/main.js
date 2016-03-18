@@ -645,25 +645,18 @@ $(function() {
 
         // 注册为全局的对象
         if (typeof name == "string") {
-            mvue.storeReg(name, store);
+            mvue.store[name] = store;
         }
 
         return store;
     }
 
-    /**
-     * 将 Store 对象注册为全局
-     * @return {[type]} [description]
-     */
-    mvue.storeReg = (function() {
-        var $db = window.$db = {};
+    mvue.filter = function(name, fun) {
+        Vue.filter(name, fun);
+        mvue.filter[name] = fun;
 
-        return function(name, store) {
-            if (name && store) {
-                $db[name] = store;
-            }
-        }
-    })();
+        return mvue.filter;
+    };
 
     /* 加载常用工具方法 */
     require("./util/main.js");
