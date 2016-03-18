@@ -7,7 +7,7 @@ module.exports = (function() {
 
             ctrl  = $el.attr("ctrl");
             show  = $el.attr("show");
-            scope = $$._getPage(that);
+            scope = $$.getVm(that);
 
             if (scope[ctrl] !== undefined || scope[show] !== undefined) {
                 view = $el.attr("view");
@@ -15,6 +15,7 @@ module.exports = (function() {
 
                 that._handle = handle = $(scope.$el).modal($el, {
                     align     : $el.attr("align"),
+                    autoHide  : false,
                     background: true,
                 });
 

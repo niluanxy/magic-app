@@ -324,21 +324,13 @@ $(function() {
         }, 20);
     }
 
-    // 获取当前组件所在的最近的 PAGE 对象
-    mvue._getPage = function(vm) {
-        // var page = null, tmp = vm, name;
+    // 获取当前组件的 父 page 组件
+    mvue.getVm = function(vm) {
+        return vm.$parent;
+    },
 
-        // while (tmp.$parent) {
-        //     name = tmp.$parent.name;
-
-        //     if (name.match(/^ma\-/)) {
-        //         page = tmp.$parent;
-        //         break;
-        //     }
-
-        //     tmp = tmp.$parent;
-        // }
-
+    // 获取当前组件的 根 page 组件
+    mvue.getVmRoot = function(vm) {
         return vm.$root.$children[0];
     }
 

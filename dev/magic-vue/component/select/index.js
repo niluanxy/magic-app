@@ -2,7 +2,7 @@ module.exports = (function() {
     $$.component("mg-select", {
         template: "<slot></slot>",
         ready: function() {
-            var scope = $$._getPage(this), $el = $(this.$el), bind,
+            var scope = $$.getVm(this), $el = $(this.$el), bind,
                 opt = {}, val, pos, show, call, handle;
 
             pos  = $el.attr("pos")

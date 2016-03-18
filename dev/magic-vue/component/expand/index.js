@@ -4,7 +4,7 @@ module.exports = (function() {
         ready: function() {
             var scope, $el = $(this.$el), central;
 
-            scope = $$._getPage(this);
+            scope = $$.getVm(this);
             central = $el.attr("central");
 
             $el.addClass("expand hide").on("tap", function(e) {

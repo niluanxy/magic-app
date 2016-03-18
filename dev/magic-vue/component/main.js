@@ -12,6 +12,5 @@ require("./star");              // STAR组件
 require("./router");			// 路由返回组件
 require("./lefter");            // LEFTER倒计时组件
 require("./expand");			// EXPAND展开收缩控件
-require("./numpad");			// NUMPAD输入面板组件
 require("./timer");				// TIMER时间选择控件
 require("./nav-tabs");			// NAV-TABS导航组件

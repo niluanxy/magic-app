@@ -2,7 +2,7 @@ module.exports = (function() {
     $$.component("mg-confirm", {
         template: "<div class='confirm modal_body'><slot></slot></div>",
         ready: function() {
-            var scope = $$._getPage(this), $el = $(this.$el),
+            var scope = $$.getVm(this), $el = $(this.$el),
                 handle, show, $confirm; 
 
             handle = $el.attr("handle");

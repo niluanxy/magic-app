@@ -66,6 +66,23 @@ module.exports = (function() {
             $dom.addClass(opt.align);
         }
 
+        // 内容区域的点击动作阻止冒泡
+        $dom.on("tap", function(e) {
+            var $tar = $(e.target);
+
+            if ($tar.attr("role") == "close") {
+                that.hide();    // 自动关闭按钮
+            }
+
+            e.stopPropagation();
+        });
+
+        if (opt.autoHide == true) {
+            that.$el.on("tap", function() {
+                that.hide();
+            })
+        }
+
         that.$wrapper.append(that.$el);
 
         return that;
@@ -85,7 +102,7 @@ module.exports = (function() {
 
         this.$el.removeClass("show");
 
-        if ($wrapper.find('.'+cls+'.show').length < 0) {
+        if ($wrapper.find('.'+cls+'.show').length <= 0) {
             $wrapper.removeClass("show");
         }
 

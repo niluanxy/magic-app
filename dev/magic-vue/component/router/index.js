@@ -6,7 +6,7 @@ module.exports = (function() {
             	router = $$.location, call, scope, hasBack = false;
 
             call  = $el.attr("call");
-            scope = $$._getPage(that);
+            scope = $$.getVm(that);
             
 			$el.addClass("button button-clear ion-ios-arrow-left")
 			.on("tap.common", function() {

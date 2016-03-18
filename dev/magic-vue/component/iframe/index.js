@@ -16,7 +16,7 @@ module.exports = (function() {
                 scope, ihandle, pid, iframe, $iframe, name, pcall, load;
 
             if (src === undefined) return;
-            scope = $$._getPage(this);
+            scope = $$.getVm(this);
             $el.removeAttr("src");      // 移除无用src
 
             pid   = $.getRandom();      // 生成独立的ID

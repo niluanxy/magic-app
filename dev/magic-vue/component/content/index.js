@@ -7,7 +7,7 @@ module.exports = (function() {
             var $el = $(this.$el), $scroll, childs, scope,
                 handle, refresh, opt = {}, repos;   // 定义操作对象
 
-            scope = $$._getPage(this);
+            scope = $$.getVm(this);
 
             refresh = $el.attr("refresh")   // 默认开启自动刷新
             opt.refresh = refresh=="true"?"true":"once";
@@ -57,7 +57,7 @@ module.exports = (function() {
             var $el = $(this.$el), $scroll, handle,
                 refresh, repos, opt = {}, scope;   // 定义操作对象
 
-            scope = $$._getPage(this);
+            scope = $$.getVm(this);
 
             refresh = $el.attr("refresh")   // 默认开启自动刷新
             opt.refresh = refresh=="true"?"true":"once";

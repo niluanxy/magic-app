@@ -10,6 +10,5 @@ require("./component/confirm");             // 加载confirm组件
 require("./component/spinner.js");          // 加载Loading组件
 require("./component/select");              // 加载select组件
 require("./component/timer");               // 加载timer时间组件
-require("./component/numpad");              // 加载numpad键盘组件
 require("./component/lefter");              // 加载倒计时组件
 

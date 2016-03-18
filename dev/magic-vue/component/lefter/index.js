@@ -2,7 +2,7 @@ module.exports = (function() {
     $$.component("mg-lefter", {
         template: "<slot></slot>",
         ready: function() {
-            var $el = $(this.$el), val, scope = $$._getPage(this), txt, end;
+            var $el = $(this.$el), val, scope = $$.getVm(this), txt, end;
 
             val = $el.attr("runing");  // 记录倒计时是否运行，运行中为true
             txt = $el.html().replace(/\{/g, "{{")

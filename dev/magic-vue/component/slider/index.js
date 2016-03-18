@@ -4,7 +4,7 @@ module.exports = (function() {
         ready: function() {
             var $el = $(this.$el), handle, $slider, scope;
 
-            scope = $$._getPage(this);
+            scope = $$.getVm(this);
 
             $slider = $el.addClass("slider").slider({
                 time     : $el.attr("time"),
