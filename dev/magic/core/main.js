@@ -82,6 +82,14 @@ require("extend");      // 原生对象扩展
             hasClass: function(className) {
                 return this[0] ? _UTIL.hasClass(this[0], className) : false;
             },
+            belowClass: function(className, stop) {
+                var $stop = $(stop)[0], ret;
+                if (this[0] && $stop) {
+                    ret = _UTIL.belowClass(this[0], className, $stop);
+
+                    return ret ? $(ret) : false;
+                }
+            },
             addClass: function(className) {
                 this[0] && _UTIL.addClass(this[0], className);
 

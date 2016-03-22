@@ -303,6 +303,29 @@ module.exports = (function() {
     };
 
     /**
+     * 检测对象是否位于某个类下(会检测父元素)
+     *
+     * @param       {Element}   e - 操作对象
+     * @param       {Object}    c - 要检测的类名
+     * @param       {Element}   stop - 停止向上查找的元素
+     * @return      {Boolean}   是否含有某个类
+     * @author      mufeng  <smufeng@gmail.com>
+     * @version     0.1     <2016-03-22>
+     */
+    util.belowClass = function(e, c, stop) {
+        var now = e, has;
+
+        do {
+            has = util.hasClass(now, c);
+
+            if (has) break;
+            now = now.parentNode;
+        } while(now && (!stop || stop != now))
+
+        return has ? now : false;
+    }
+
+    /**
      * 为对象添加某个类
      *
      * @param       {Element}   e - 操作对象
