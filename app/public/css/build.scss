@@ -16,7 +16,6 @@
 .list       { @include list(); }
 .slider     { @include slider(); }
 .popup		{ @include popup(); }
-.modal		{ @include modal(); }
 
 
 @include form();			// form   表单组件元素
