@@ -463,7 +463,7 @@ $(function() {
             mixins, head, rhead = /^\<mg\-page[^\>]*\>/, style = page.style;
 
         // 尝试对页面添加私有的 class 名字
-        if (style && tmp && (head = tmp.match(rhead)) ) {
+        if (style && style.page && tmp && (head = tmp.match(rhead)) ) {
             var mat, fix, rcls = /class\=[\'|"].*[\'|"]/;
 
             head = head[0]; style = style.page;
