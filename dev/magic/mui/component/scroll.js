@@ -1776,25 +1776,9 @@ var scroll = module.exports = (function (window, document, Math) {
             if ( this.scroller.hasHorizontalScroll && this.scroller.hasVerticalScroll ) {
                 utils.addClass(this.wrapper, 'iScrollBothScrollbars');
                 utils.removeClass(this.wrapper, 'iScrollLoneScrollbar');
-
-                if ( this.options.defaultScrollbars && this.options.customStyle ) {
-                    if ( this.options.listenX ) {
-                        this.wrapper.style.right = '8px';
-                    } else {
-                        this.wrapper.style.bottom = '8px';
-                    }
-                }
             } else {
                 utils.removeClass(this.wrapper, 'iScrollBothScrollbars');
                 utils.addClass(this.wrapper, 'iScrollLoneScrollbar');
-
-                if ( this.options.defaultScrollbars && this.options.customStyle ) {
-                    if ( this.options.listenX ) {
-                        this.wrapper.style.right = '2px';
-                    } else {
-                        this.wrapper.style.bottom = '2px';
-                    }
-                }
             }
 
             var r = this.wrapper.offsetHeight;  // force refresh

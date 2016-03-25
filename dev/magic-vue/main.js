@@ -249,21 +249,14 @@ $(function() {
         LOAD.$DOM  = $view.find('._load_');
 
         if (LOAD.PUSH === true) {
-            LOAD.$DOM.addClass('push-new');
+            LOAD.$DOM.addClass('slideInRight');
         } else {
-            LOAD.$DOM.addClass('pop-new');
+            LOAD.$DOM.addClass('slideOutLeft');
         }
 
-        LOAD.HANDLE = setTimeout(function() {
-            if (!mvue.__STATE__.AUTH_BEFORE && !LOAD.PAGEIN) {
-                LOAD.SHOW  = true;
-
-                LOAD.$DOM.addClass("enter")
-                .once(tsend, function() {
-                    LOAD.SHOW  = false;
-                })
-            }
-        }, 100);
+        LOAD.$DOM.once(tsend, function() {
+            LOAD.SHOW  = false;
+        })
     }
 
     // 清除加载中页面
@@ -292,37 +285,26 @@ $(function() {
     })();
 
     // 绑定动画效果
-    function startAnimate(insert, old, call) {
-        var $now = $(insert), $before = $(old),
-            LOAD = mvue.__LOAD__, cls, tsend;
+    function backAnimate(now, old, call) {
+        var $now = $(now), $old = $(old),
+            LOAD = mvue.__LOAD__, nowCls, oldCls, tsend;
 
         if ($.runtime == "weixin") {
-            tsend = "webkitTransitionEnd";
+            tsend = "webkitTransitionEnd webkitAnimationEnd";
         } else {
-            tsend = "transitionend";
+            tsend = "transitionend animationend";
         }
 
-        cls = LOAD.PUSH ? "push-new" : "pop-new";
-        $before.removeClass("hide").addClass("leave");
-        $now.removeClass("hide").addClass(cls)
+        oldCls = "slideOutRight";
+        nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";
 
-        animateCall(function() {
-            $now.addClass("enter")
+        $old.removeClass("hide").addClass(oldCls);
+        $now.removeClass("hide").addClass(nowCls)
             .once(tsend, function() {
-                // console.log($before)
-                // console.log($now)
-                $before.removeClass("leave").addClass("hide");
-                $now.removeClass(cls + " enter");
+                $old.removeClass(oldCls).addClass("hide");
+                $now.removeClass(nowCls).removeClass("hide");
             })
-        }, this);
     };
-
-    // 启动动画的函数回调
-    function animateCall(call, scope) {
-        setTimeout(function() {
-            call.call(scope);
-        }, 20);
-    }
 
     // 获取当前组件的 父 page 组件
     mvue.getVm = function(vm) {
@@ -340,47 +322,43 @@ $(function() {
     }
 
     // 创建一个 LOAD 完成处理函数
-    function _createLoadFinish() {
+    function crateNewAnimate() {
         var defer = $.defer(), PAGE = mvue.__PAGE__;
 
         defer.then(function(scope) {
-            var now = $.getTime(), LOAD = mvue.__LOAD__,
-                $el = $(scope.$el), $before, cls, tsend;
+            var LOAD = mvue.__LOAD__, $now = $(scope.$el),
+                $old, nowCls, oldCls, tsend;
 
             if ($.runtime == "weixin") {
-                tsend = "webkitTransitionEnd";
+                tsend = "webkitTransitionEnd webkitAnimationEnd";
             } else {
-                tsend = "transitionend";
+                tsend = "transitionend animationend";
             }
 
             // 只在PAGE模式下运行页面动画处理
             if (mvue._isRunPage(scope)) {
                 if (PAGE.BEFORE && PAGE.BEFORE[0]) {
-                    $before = $(PAGE.BEFORE[0].$el);
+                    $old = $(PAGE.BEFORE[0].$el);
                 }
 
                 if (LOAD.SHOW /* 正在显示加载动画 */) {
                     LOAD.$DOM.once(tsend, function(e) {
-                        clearLoading($el, 30);
+                        clearLoading($now, 30);
                     });
                 } else {
-                    cls = LOAD.PUSH ? "push-new" : "pop-new";
-                    clearLoading($el);      // 清除 load 内容
+                    nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";
+                    oldCls = LOAD.PUSH ? "slideOutLeft" : "slideOutRight";
+                    clearLoading($now);      // 清除 load 内容
 
-                    $before && $before.addClass("leave");
-                    $el.removeClass("hide").addClass(cls)
-                    $el.once(tsend, function() {
-                        $el.removeClass(cls+" enter");
-                        $before && $before.removeClass("leave").addClass("hide");
+                    $old && $old.addClass(oldCls);
+                    $now.removeClass("hide").addClass(nowCls)
+                    .once(tsend, function() {
+                        $now.removeClass(nowCls);
+                        $old && $old.removeClass(oldCls).addClass("hide");
                     })
-
-                    // 必须延时绑定 CLASS 否则无法触发动画
-                    animateCall(function() {
-                        $el.addClass("enter");
-                    }, this);
                 }
             } else {
-                $el.removeClass("hide");
+                $now.removeClass("hide");
             }
         })
 
@@ -404,7 +382,7 @@ $(function() {
         if (typeof init == "function") {
             return function() {
                 var that = this, _params = $.extend({}, PAGE.PARAMS),
-                    _defer  = $.defer(), loadDefer = _createLoadFinish();
+                    _defer  = $.defer(), loadDefer = crateNewAnimate();
 
                 _params = _transParams(_params);    // 修正参数列表
 
@@ -452,7 +430,7 @@ $(function() {
                // console.log("pready: "+$.getTime());
                 _pageReady.call(this, _transParams(PAGE.PARAMS));
 
-                _createLoadFinish().resolve(this);
+                crateNewAnimate().resolve(this);
             }
         }
     }
@@ -567,7 +545,7 @@ $(function() {
                 PAGE.BEFORE = handle; PAGE.HANDLE = before;
 
                 if (old && old.$options.name == cname) {
-                    startAnimate(PAGE.HANDLE[0].$el, PAGE.BEFORE[0].$el);
+                    backAnimate(PAGE.HANDLE[0].$el, PAGE.BEFORE[0].$el);
                     clearLoading();
                 } else {
                     var $insert = mvue.__renderView(cname);

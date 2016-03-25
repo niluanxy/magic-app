@@ -9,7 +9,7 @@ module.exports = (function() {
             scope = $$.getVm(that);
             
 			$el.addClass("button button-clear ion-ios-arrow-left")
-			.on("tap.common", function() {
+			.on("tap.back", function() {
 				var ret = true;		// 回调返回值
 
 				if (typeof scope[call] == "function") {
@@ -18,9 +18,9 @@ module.exports = (function() {
 
 				if (ret !== false && !hasBack) {
 					hasBack = true;
-					router.back();
+                    router.back();
 				}
-			});
+			})
 
 			/* 如果是首个页面，直接隐藏 back 组件 */
 			if (router.check(state, "first")) {
