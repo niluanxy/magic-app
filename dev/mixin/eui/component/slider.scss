@@ -46,6 +46,7 @@
         text-align: center;
         width: 100%;
         bottom: 0;
+        display: table;
         height: rem($slider-points-height);
         padding: rem(($slider-points-height - $slider-points-size) / 2) 0;
         position: absolute;

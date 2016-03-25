@@ -579,15 +579,18 @@ var scroll = module.exports = (function (window, document, Math) {
         },
 
         refresh: function () {
-            var rf = this.wrapper.offsetHeight;     // Force reflow
+            var wrapperRect, scrollerRect;
 
-            this.wrapperWidth   = this.wrapper.clientWidth;
-            this.wrapperHeight  = this.wrapper.clientHeight;
+            wrapperRect  = this.wrapper.getBoundingClientRect();
+            scrollerRect = this.scroller.getBoundingClientRect();
+
+            this.wrapperWidth   = wrapperRect.width;
+            this.wrapperHeight  = wrapperRect.height;
 
             /* REPLACE START: refresh */
 
-            this.scrollerWidth  = this.scroller.offsetWidth;
-            this.scrollerHeight = this.scroller.offsetHeight;
+            this.scrollerWidth  = scrollerRect.width;
+            this.scrollerHeight = scrollerRect.height;
 
             this.maxScrollX     = this.wrapperWidth - this.scrollerWidth;
             this.maxScrollY     = this.wrapperHeight - this.scrollerHeight;
@@ -1525,13 +1528,11 @@ var scroll = module.exports = (function (window, document, Math) {
 
         if ( direction == 'h' ) {
             if ( type === true ) {
-                scrollbar.style.cssText += ';height:4px;left:2px;right:2px;bottom:0';
                 indicator.style.height = '100%';
             }
             scrollbar.className = 'iScrollHorizontalScrollbar';
         } else {
             if ( type === true ) {
-                scrollbar.style.cssText += ';width:4px;bottom:2px;top:2px;right:1px';
                 indicator.style.width = '100%';
             }
             scrollbar.className = 'iScrollVerticalScrollbar';

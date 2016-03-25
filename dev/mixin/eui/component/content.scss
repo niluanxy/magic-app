@@ -48,6 +48,20 @@
         }
     }
 
+    .iScrollVerticalScrollbar {
+        height: 100%; width: rem(3px);
+
+        right: rem(1px);
+        bottom: rem(2px); top: rem(2px);
+    }
+
+    .iScrollHorizontalScrollbar {
+        width: 100%; height: rem(3px);
+
+        right: rem(2px);
+        left: rem(2px); bottom: 0;
+    }
+
     .scroll_pullDown {
         top: rem(-$content-pull-height);
     }

@@ -22,14 +22,8 @@ module.exports = (function() {
 				}
 			});
 
-			/* 根据不同的情况选择判断逻辑隐藏后退按钮 */
-			if (!$$._isRunPage(scope)) {
-				$el.off("tap.common").on("tap.modal", function() {
-					if (scope.$parent.__MODAL) {
-						scope.$parent.__MODAL.hide();
-					}
-				})
-			} else if (router.check(state, "first")) {
+			/* 如果是首个页面，直接隐藏 back 组件 */
+			if (router.check(state, "first")) {
 				var last = router.last.state;
 
 				if (!$J || !$J.router) {
