@@ -7,7 +7,6 @@ module.exports = (function() {
     	this.state   = [];				// 状态信息
         this.last    = {};              // 上一次的路由地址
         this.statpos = 0;               // 记录路由的状态位置
-        this.tapinfo = {};              // 记录点击开始的事件
         this.evetype = "";              // 触发事件的方式
   		this.options = extend({}, Route.DEFAULT, options, true);
     };

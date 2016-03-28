@@ -20,7 +20,7 @@
         top: rem($bar-height);
     }
     &.has-footer {
-        bottom: rem($bar-height);
+        bottom: rem($tabs-height);
     }
 
     >*:first-child {

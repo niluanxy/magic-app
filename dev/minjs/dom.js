@@ -7,12 +7,15 @@ module.exports = (function() {
      * 检测字符串是否可以创建为 dom 元素 
      */
     _dom.check = function(text) {
-        if (typeof text === "string" &&
-             text[0] === "<" && 
-             text[ text.length - 1 ] === ">" &&
-             text.length >= 3) {
+        if (typeof text === "string") {
+            // 去除字符串中的换行符等
+            var txt = text.replace(/[\r\n]/g,"");
 
-            return true;
+            if (txt[0] === "<" && 
+             txt[ txt.length - 1 ] === ">" &&
+             txt.length >= 3) {
+                return true;
+            }
         }
 
         return false;

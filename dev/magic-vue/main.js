@@ -21,6 +21,12 @@ $(function() {
                      },
         __CACHE__  : null,       // 全局页面缓存
 
+        __NAVS__   : {
+                        $el    : null,          // 导航栏对象
+                        show   : false,         // 当前是否匹配显示
+                        match  : [],            // 每个子项目的匹配信息
+        },
+
         __LOAD__   : {
                         FIRST  : true,          // 第一次加载的时候动画特殊处理
                         START  : 0,             // LOAD动画开始时间
@@ -28,7 +34,7 @@ $(function() {
                         PUSH   : true,          // 是否为新建页面的方式
                         HANDLE : null,          // 定时器句柄
                         $DOM   : null,          // DOM对象
-                     },             // 加载动画相关参数
+                     },                         // 加载动画相关参数
 
         __STATE__  : {
                         AUTH_HASRUN  : false,       // 记录验证页面是否已调用
@@ -62,9 +68,30 @@ $(function() {
         var vue   = mvue.__VUE__  = new Vue({ el: "body" }),
             view  = mvue.__VIEW__ = $("body").query("mg-view"),
             $view = $(mvue.__VIEW__), PAGE = mvue.__PAGE__,
-            LOAD  = mvue.__LOAD__;
+            LOAD  = mvue.__LOAD__, NAVS = mvue.__NAVS__;
 
         var tables = $.extend.apply({}, config.tables);
+
+        // NAVS 全局导航组件初始化
+        if (_option.navTabs && _option.navTabs.template) {
+            var $navs = $(_option.navTabs.template).children(),
+                items = $navs[0].children;
+
+            NAVS.$el = $navs.appendTo($view);
+
+            for(var i=0; i<items.length; i++) {
+                var $now = $(items[i]);
+
+                NAVS.match[i] = {
+                    pos: i,
+                    url: $now.attr("match") || ""
+                };
+
+                $now.removeAttr("match");
+            }
+
+            NAVS.$el.addClass("hide navs");
+        }
 
         mvue.location = new Router(tables, $.extend({
             /* 页面跳转前的回调方法 */
@@ -79,7 +106,6 @@ $(function() {
                 STAT.ROUTER_AFTER = false;
 
                 // 初始化加载动画相关信息
-                // console.log("before: "+$.getTime());
                 if (opt.loading !== false) {
                     if (LOAD.FIRST == true) {
                         LOAD.PUSH = true;
@@ -123,8 +149,36 @@ $(function() {
 
             /* 页面跳转成功后的回调方法 */
             after : function(lastUrl, nowUrl, match, that) {
-                mvue.__STATE__.ROUTER_AFTER = true;
+                var items = NAVS.match, show = false, fix, $navs;
 
+                $navs = NAVS.$el;
+                fix   = nowUrl.replace(/^[#|\\|\/]/, '');
+
+                for(var i=0; i<items.length; i++) {
+                    var match = items[i].url,
+                        pos = items[i].pos, $act;
+
+                    // 判断是普通的语句还是正则检测表达式
+                    if (match[0] == "/" && match[match.length-1] == "/") {
+                        match = new RegExp(match+"i");
+                    } else {
+                        match = new RegExp("^"+match);
+                    }
+
+                    if (match.test(fix)) {
+                        $act = $($navs[0].children[pos]);
+
+                        $navs.find("actived").removeClass("actived");
+                        $act.addClass("actived");
+
+                        show = true; break;
+                    }
+                }
+
+                NAVS.show = show;       // 更新NAVS状态
+                NAVS.$el.toggleClass("hide", !NAVS.show);
+
+                mvue.__STATE__.ROUTER_AFTER = true;
                 vue.$broadcast("routeChange", nowUrl);
             },
 
@@ -377,6 +431,12 @@ $(function() {
             this.$dispatch("childPageReady");   // 向上冒泡事件
             this.$broadcast("pageReady");       // 向下传递事件
             this.$emit("pageReadyDirect");      // 触发自身事件
+
+            if (mvue.__NAVS__.show /* 当前是否显示 footer */) {
+                var $com = $(this.$el).children(".content");
+
+                $com.addClass("has-footer");
+            }
         }
 
         if (typeof init == "function") {
@@ -427,7 +487,6 @@ $(function() {
             }
         } else {
             return function() {
-               // console.log("pready: "+$.getTime());
                 _pageReady.call(this, _transParams(PAGE.PARAMS));
 
                 crateNewAnimate().resolve(this);
