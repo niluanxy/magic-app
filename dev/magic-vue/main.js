@@ -125,7 +125,7 @@ $(function() {
                 PAGE.PARAMS = mnow.para;
                 PAGE.ROUTER = match;
 
-                navToggle(nowUrl);
+                navToggle(nowUrl, match);
 
                 if (apage && nowUrl != apage) {
                     var auth;   // 检测页面的Auth值，可继承父类
@@ -317,13 +317,17 @@ $(function() {
     })();
 
     // 更新 NAVS 导航的状态
-    function navToggle(nowUrl) {
+    function navToggle(nowUrl, match) {
         var NAVS = mvue.__NAVS__, items = NAVS.match,
             show = false, fix, $navs = NAVS.$el;
 
         fix = nowUrl.replace(/^[#|\\|\/]/, '');
 
-        if ($navs && items.length) {
+        // 明确声明当前页面有自定义 foot 则隐藏
+        if (match && match[match.length-1].item.foot) {
+            NAVS.last = NAVS.show;
+            NAVS.show = false;
+        } else if ($navs && items.length) {
             for(var i=0; i<items.length; i++) {
                 var match = items[i].url,
                     pos = items[i].pos, $act;
