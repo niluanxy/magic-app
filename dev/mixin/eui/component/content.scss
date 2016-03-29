@@ -17,10 +17,10 @@
     }
 
     &.has-header {
-        top: rem($bar-height);
+        top: rem($content-head-size);
     }
     &.has-footer {
-        bottom: rem($tabs-height);
+        bottom: rem($content-foot-size);
     }
 
     >*:first-child {

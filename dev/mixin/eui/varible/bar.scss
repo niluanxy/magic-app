@@ -3,7 +3,9 @@
 // ========================================================
 
 
-$bar-height:                      44px !default;
+$bar-height:                      $block-header !default;
+$bar-foot-height:                 $block-footer !default;
+$bar-foot-plus:                   $bar-foot-height - $bar-height !default;
 
 $bar-title-font-size:             16px !default;
 $bar-padding-left: 			 	  35px !default;
@@ -11,8 +13,6 @@ $bar-padding-portrait:            5px !default;
 $bar-padding-landscape:           5px !default;
 $bar-inline-height:               $bar-height - $bar-padding-portrait*2 !default;   
 $bar-transparency:                1 !default;
-
-$bar-text-button-font:			  $font-size-base + 4px;
 
 $bar-default-bg:                  rgba($color-light, $bar-transparency) !default;
 $bar-default-text:                #444 !default;
@@ -33,6 +33,7 @@ $bar-positive-active-bg:          darken($color-positive, 15%) !default;
 $bar-positive-active-border:      darken($color-positive, 15%) !default;
 
 $bar-button-height:               32px !default;
+$bar-button-foot-height:          $bar-button-height + $bar-foot-plus !default;
 $bar-button-padding:              8px !default;
 $bar-button-icon-size:            20px !default;
 $bar-button-icon-clear-size:      24px !default;

@@ -130,12 +130,23 @@
 
         .bar-footer {
             bottom: 0;
+            height: rem($bar-foot-height);
+            line-height: rem($bar-foot-height);
             position: absolute;
 
             background-position: top;
 
             @include retina-border-width(top);
             @include retina-border-width(bottom, 0);
+
+            .button {
+                line-height: rem($bar-button-foot-height);
+                min-height: rem($bar-button-foot-height);
+
+                &:after {
+                    height: rem($bar-foot-height);
+                }
+            }
         }
     }
 
@@ -145,24 +156,6 @@
         .button {
             min-height: rem($bar-height - $bar-padding-portrait * 2 - 2);
             line-height: rem($bar-height - $bar-padding-portrait * 2 - 2);
-        }
-    }
-
-    &.text-button {
-        .text, .button {
-            display: inline-block;
-        }
-
-        .text {
-            width: 60%;
-            height: 100%;
-            float: left;
-            padding-right: rem($padding-base-horizontal);
-        }
-
-        .button {
-            width: 40%;
-            font-size: rem($bar-text-button-font);
         }
     }
 }
