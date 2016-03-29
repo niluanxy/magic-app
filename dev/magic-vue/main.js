@@ -23,6 +23,7 @@ $(function() {
 
         __NAVS__   : {
                         $el    : null,          // 导航栏对象
+                        last   : false,         // 上一次是否为显示状态
                         show   : false,         // 当前是否匹配显示
                         match  : [],            // 每个子项目的匹配信息
         },
@@ -119,6 +120,8 @@ $(function() {
                 PAGE.PARAMS = mnow.para;
                 PAGE.ROUTER = match;
 
+                navToggle(nowUrl);
+
                 if (apage && nowUrl != apage) {
                     var auth;   // 检测页面的Auth值，可继承父类
 
@@ -149,35 +152,6 @@ $(function() {
 
             /* 页面跳转成功后的回调方法 */
             after : function(lastUrl, nowUrl, match, that) {
-                var items = NAVS.match, show = false, fix, $navs;
-
-                $navs = NAVS.$el;
-                fix   = nowUrl.replace(/^[#|\\|\/]/, '');
-
-                for(var i=0; i<items.length; i++) {
-                    var match = items[i].url,
-                        pos = items[i].pos, $act;
-
-                    // 判断是普通的语句还是正则检测表达式
-                    if (match[0] == "/" && match[match.length-1] == "/") {
-                        match = new RegExp(match+"i");
-                    } else {
-                        match = new RegExp("^"+match);
-                    }
-
-                    if (match.test(fix)) {
-                        $act = $($navs[0].children[pos]);
-
-                        $navs.find("actived").removeClass("actived");
-                        $act.addClass("actived");
-
-                        show = true; break;
-                    }
-                }
-
-                NAVS.show = show;       // 更新NAVS状态
-                NAVS.$el.toggleClass("hide", !NAVS.show);
-
                 mvue.__STATE__.ROUTER_AFTER = true;
                 vue.$broadcast("routeChange", nowUrl);
             },
@@ -338,6 +312,65 @@ $(function() {
         }
     })();
 
+    // 更新 NAVS 导航的状态
+    function navToggle(nowUrl) {
+        var NAVS = mvue.__NAVS__, items = NAVS.match,
+            show = false, fix, $navs = NAVS.$el;
+
+        fix = nowUrl.replace(/^[#|\\|\/]/, '');
+
+        if ($navs && items) {
+            for(var i=0; i<items.length; i++) {
+                var match = items[i].url,
+                    pos = items[i].pos, $act;
+
+                // 判断是普通的语句还是正则检测表达式
+                if (match[0] == "/" && match[match.length-1] == "/") {
+                    match = new RegExp(match+"i");
+                } else {
+                    match = new RegExp("^"+match);
+                }
+
+                if (match.test(fix)) {
+                    $act = $($navs[0].children[pos]);
+
+                    $navs.find("actived").removeClass("actived");
+                    $act.addClass("actived");
+
+                    show = true; break;
+                }
+            }
+
+            NAVS.last = NAVS.show;
+            NAVS.show = show;       // 更新NAVS状态
+        }
+    }
+
+    // 根据不同的条件，创建不同的动画效果
+    function navAnimate(newCls, oldCls) {
+        var NAVS = mvue.__NAVS__, $nav = NAVS.$el, tsend, navCls;
+
+        if ($.runtime == "weixin") {
+            tsend = "webkitTransitionEnd webkitAnimationEnd";
+        } else {
+            tsend = "transitionend animationend";
+        }
+
+        if ($nav && NAVS.show != NAVS.last) {
+            if (NAVS.show && !NAVS.last) {
+                navCls = newCls;    // 现在显示，采用进入动画
+            } else if (NAVS.last && !NAVS.show) {
+                navCls = oldCls     // 现在隐藏，采用离开动画
+            }
+
+            $nav.removeClass("hide").addClass(navCls)
+            .once(tsend, function() {
+                if ($nav) $nav.removeClass(navCls);
+                if ($nav && !NAVS.show) $nav.addClass("hide");
+            })
+        }
+    }
+
     // 绑定动画效果
     function backAnimate(now, old, call) {
         var $now = $(now), $old = $(old),
@@ -352,6 +385,7 @@ $(function() {
         oldCls = "slideOutRight";
         nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";
 
+        navAnimate(nowCls, oldCls);     // 同步 NAV 组件动画
         $old.removeClass("hide").addClass(oldCls);
         $now.removeClass("hide").addClass(nowCls)
             .once(tsend, function() {
@@ -404,7 +438,8 @@ $(function() {
                     oldCls = LOAD.PUSH ? "slideOutLeft" : "slideOutRight";
                     clearLoading($now);      // 清除 load 内容
 
-                    $old && $old.addClass(oldCls);
+                    navAnimate(nowCls, oldCls);
+                    if ($old) $old.addClass(oldCls);
                     $now.removeClass("hide").addClass(nowCls)
                     .once(tsend, function() {
                         $now.removeClass(nowCls);

@@ -6,8 +6,12 @@ mg-page, mg-view, .mg-view, .mg-page {
     overflow: hidden;
     position: relative;
 
-    >.navs {
-        z-index: 100;
+    >.navs {        
+        &.slideInRight, &.slideInLeft,
+        &.slideOutRight, &.slideOutLeft {
+            top: auto;
+            display: flex !important;
+        }
     }
 
     .transition-none {
