@@ -75,10 +75,15 @@ $(function() {
 
         // NAVS 全局导航组件初始化
         if (_option.navTabs && _option.navTabs.template) {
-            var $navs = $(_option.navTabs.template).children(),
-                items = $navs[0].children;
+            var $navs = $(_option.navTabs.template), items;
 
-            NAVS.$el = $navs.appendTo($view);
+            // 修复 $navs 对象，防止出错
+            if ($navs[0] instanceof DocumentFragment) {
+                $navs = $navs.children();
+            }
+
+            items = $navs[0].children;
+            NAVS.$el = $navs.addClass("hide").appendTo($view);
 
             for(var i=0; i<items.length; i++) {
                 var $now = $(items[i]);
@@ -220,7 +225,6 @@ $(function() {
         mvue.__ROUTER__.on(url, option);
     }
 
-
     // 转换 000 字符为 空 值
     function _transParams(params) {
         for (var key in params) {
@@ -319,7 +323,7 @@ $(function() {
 
         fix = nowUrl.replace(/^[#|\\|\/]/, '');
 
-        if ($navs && items) {
+        if ($navs && items.length) {
             for(var i=0; i<items.length; i++) {
                 var match = items[i].url,
                     pos = items[i].pos, $act;

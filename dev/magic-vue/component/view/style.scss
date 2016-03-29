@@ -7,6 +7,8 @@ mg-page, mg-view, .mg-view, .mg-page {
     position: relative;
 
     >.navs {        
+        z-index: 12;
+        
         &.slideInRight, &.slideInLeft,
         &.slideOutRight, &.slideOutLeft {
             top: auto;

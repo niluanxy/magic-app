@@ -66,8 +66,25 @@ module.exports = (function() {
         return obj;
     }
 
+    /* 更新页面的 title 属性 */
+    function updateTitle(title) {
+        var child = document.head.children, item;
+
+        for(var i=0; i<child.length; i++) {
+            var tag = child[i].tagName;
+
+            if (tag == "TITLE") {
+                item = child[i];
+                break;
+            }
+        }
+
+        item.textContent = title;
+    }
+
     Route.DEFAULT = {
     	home     : "/home",				// 默认首页
+        title    : true,                // 如果有title信息，是否自动更新
         html5mode: false,               // 是否启用H5模式，启用则省略 # 符号（后台需rewrite）
         replace  : true,                // replace模式，自动把 只参数不同的页面 replace 加载，默认开启
     	notcall  : null,				// 页面未找到时候的回调方法
@@ -423,14 +440,14 @@ module.exports = (function() {
     /* 跳到指定的页面 */
     Route.prototype.go = function(toUrl, replace, clear, refresh) {
         var that = this, opt = that.options, call, last = that.last,
-            state = {}, end, rcall, match = that.fire(toUrl), now;
+            state = {}, end, rcall, match = that.fire(toUrl), nowUrl;
 
         /* 修正URL的格式，便于比较和计算 */
-        toUrl = that.geturl(toUrl);     now = that.geturl();
+        toUrl = that.geturl(toUrl);     nowUrl = that.geturl();
 
         /* 要跳转的页面和当前页面不一样时才跳转 */
-        if (match && (refresh || toUrl != now )) {
-            if (refresh && toUrl === now) replace = true;
+        if (match && (refresh || toUrl != nowUrl )) {
+            if (refresh && toUrl === nowUrl) replace = true;
 
             /* 如果当前页面和上个页面一样，只不过参数不同，则转为替换模式 */
             if (opt.replace && last.match && last.match.length == match.length) {
@@ -471,6 +488,12 @@ module.exports = (function() {
                         match: match, url: toUrl
                     }));
                     history[call](state, state.title, toUrl);
+
+                    if (opt.title /* 如果自动更新 title 功能开启 */) {
+                        var lastItem = match[match.length-1].item;
+
+                        if (lastItem.title) updateTitle(lastItem.title);
+                    }
                 }
 
                 return rcall;   // 返回 false，会阻止后续调用 update 方法
