@@ -3,7 +3,7 @@
 // ========================================================
 
 @mixin content() {
-    position: absolute;
+    position: absolute !important;
     top: 0; right: 0;
     bottom: 0; left: 0;
     overflow: hidden;
@@ -22,51 +22,4 @@
     &.has-footer {
         bottom: rem($content-foot-size);
     }
-
-    >*:first-child {
-        padding-bottom: 1px;
-    }
-
-    &.refreshUp {
-        padding-top: rem($content-pull-height);
-    }
-
-    .scroll_pullDown, .scroll_pullUp {
-        position: absolute;
-        z-index: 1;
-        width: 100%;
-        color: #fff;
-        padding: 0 15%;
-        text-align: center;
-        overflow: hidden;
-        height: rem($content-pull-height);
-        line-height: rem($content-pull-height);
-        background-color: $content-pull-back;
-
-        .icon {
-            float: left;
-        }
-    }
-
-    .iScrollVerticalScrollbar {
-        width: rem(3px);
-
-        right: rem(1px);
-        bottom: rem(2px); top: rem(2px);
-    }
-
-    .iScrollHorizontalScrollbar {
-        height: rem(3px);
-
-        right: rem(2px); left: rem(2px);
-    }
-
-    .scroll_pullDown {
-        top: rem(-$content-pull-height);
-    }
-
-    .scroll_pullUp {
-        bottom: rem(-$content-pull-height);
-    }
 }
-

@@ -23,8 +23,7 @@ $(function() {
 
         __NAVS__   : {
                         $el    : null,          // 导航栏对象
-                        last   : false,         // 上一次是否为显示状态
-                        show   : false,         // 当前是否匹配显示
+                        $dom   : null,          // 当前状态渲染的DOM
                         match  : [],            // 每个子项目的匹配信息
         },
 
@@ -83,7 +82,7 @@ $(function() {
             }
 
             items = $navs[0].children;
-            NAVS.$el = $navs.addClass("hide").appendTo($view);
+            NAVS.$el = $navs;
 
             for(var i=0; i<items.length; i++) {
                 var $now = $(items[i]);
@@ -95,8 +94,6 @@ $(function() {
 
                 $now.removeAttr("match");
             }
-
-            NAVS.$el.addClass("hide navs");
         }
 
         mvue.location = new Router(tables, $.extend({
@@ -319,15 +316,16 @@ $(function() {
     // 更新 NAVS 导航的状态
     function navToggle(nowUrl, match) {
         var NAVS = mvue.__NAVS__, items = NAVS.match,
-            show = false, fix, $navs = NAVS.$el;
+            show = false, fix, $copy;
 
         fix = nowUrl.replace(/^[#|\\|\/]/, '');
 
-        // 明确声明当前页面有自定义 foot 则隐藏
-        if (match && match[match.length-1].item.foot) {
-            NAVS.last = NAVS.show;
-            NAVS.show = false;
-        } else if ($navs && items.length) {
+        // 明确声明当前页面有自定义 foot 则不渲染
+        if (match && !match[match.length-1].item.foot &&
+            NAVS.$el && items.length) {
+
+            $copy = NAVS.$el.clone();
+
             for(var i=0; i<items.length; i++) {
                 var match = items[i].url,
                     pos = items[i].pos, $act;
@@ -335,48 +333,20 @@ $(function() {
                 // 判断是普通的语句还是正则检测表达式
                 if (match[0] == "/" && match[match.length-1] == "/") {
                     match = new RegExp(match+"i");
-                } else {
+                } else if (match) {
                     match = new RegExp("^"+match);
                 }
 
-                if (match.test(fix)) {
-                    $act = $($navs[0].children[pos]);
+                if (match && match.test(fix)) {
+                    $act = $($copy[0].children[pos]);
 
-                    $navs.find("actived").removeClass("actived");
-                    $act.addClass("actived");
-
-                    show = true; break;
+                    $copy.find("actived").removeClass("actived");
+                    $act.addClass("actived"); break;
                 }
             }
-
-            NAVS.last = NAVS.show;
-            NAVS.show = show;       // 更新NAVS状态
-        }
-    }
-
-    // 根据不同的条件，创建不同的动画效果
-    function navAnimate(newCls, oldCls) {
-        var NAVS = mvue.__NAVS__, $nav = NAVS.$el, tsend, navCls;
-
-        if ($.runtime == "weixin") {
-            tsend = "webkitTransitionEnd webkitAnimationEnd";
-        } else {
-            tsend = "transitionend animationend";
         }
 
-        if ($nav && NAVS.show != NAVS.last) {
-            if (NAVS.show && !NAVS.last) {
-                navCls = newCls;    // 现在显示，采用进入动画
-            } else if (NAVS.last && !NAVS.show) {
-                navCls = oldCls     // 现在隐藏，采用离开动画
-            }
-
-            $nav.removeClass("hide").addClass(navCls)
-            .once(tsend, function() {
-                if ($nav) $nav.removeClass(navCls);
-                if ($nav && !NAVS.show) $nav.addClass("hide");
-            })
-        }
+        NAVS.$dom = $copy ? $copy : null;
     }
 
     // 绑定动画效果
@@ -393,7 +363,6 @@ $(function() {
         oldCls = "slideOutRight";
         nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";
 
-        navAnimate(nowCls, oldCls);     // 同步 NAV 组件动画
         $old.removeClass("hide").addClass(oldCls);
         $now.removeClass("hide").addClass(nowCls)
             .once(tsend, function() {
@@ -446,7 +415,6 @@ $(function() {
                     oldCls = LOAD.PUSH ? "slideOutLeft" : "slideOutRight";
                     clearLoading($now);      // 清除 load 内容
 
-                    navAnimate(nowCls, oldCls);
                     if ($old) $old.addClass(oldCls);
                     $now.removeClass("hide").addClass(nowCls)
                     .once(tsend, function() {
@@ -571,6 +539,16 @@ $(function() {
 
         // 公用方法注册，利用 VUE 的 mixin 选项实现
         mixins = {
+            compiled: function() {
+                var $el  = $(this.$el),
+                    $dom = mvue.__NAVS__.$dom;
+
+                if ($dom) {
+                    $el.append($dom)
+                    .children("mg-content").addClass("has-footer");
+                } 
+            },
+
             ready: _createReady(page),
 
             beforeDestroy: function() {
@@ -632,11 +610,11 @@ $(function() {
         return function() {
             var PAGE = mvue.__PAGE__, LOAD = mvue.__LOAD__,
                 before = PAGE.BEFORE, handle = PAGE.HANDLE,
-                old = before && before[0] ? before[0] : null;
+                old = before && before[0] ? before[0] : null, $insert;
 
             // 修正保存的当前页面句柄和旧页面句柄
             if (LOAD.PUSH === true) {
-                var $insert = mvue.__renderView(cname);
+                $insert = mvue.__renderView(cname);
 
                 if (old) old.$destroy(true);
 
@@ -650,7 +628,7 @@ $(function() {
                     backAnimate(PAGE.HANDLE[0].$el, PAGE.BEFORE[0].$el);
                     clearLoading();
                 } else {
-                    var $insert = mvue.__renderView(cname);
+                    $insert = mvue.__renderView(cname);
 
                     if (old) old.$destroy(true);
 

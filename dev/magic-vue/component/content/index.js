@@ -1,5 +1,3 @@
-require("./style.scss");
-
 module.exports = (function() {
     $$.component("mg-content", {
         template: "<div class='scroll_body'><slot></slot></div>",
@@ -14,7 +12,7 @@ module.exports = (function() {
             opt.pullRefreshDown = scope[$el.attr("pullRefreshDown")] || null;
             opt.pullRefreshUp   = scope[$el.attr("pullRefreshUp")]   || null;
 
-            $scroll = $el.addClass("content").scroll(opt); // 初始化
+            $scroll = $el.addClass("scroll content").scroll(opt); // 初始化
 
             childs = $el.parent()[0].children;
             for(var i=0; i<childs.length; i++) {
@@ -61,7 +59,7 @@ module.exports = (function() {
 
             refresh = $el.attr("refresh")   // 默认开启自动刷新
             opt.refresh = refresh=="true"?"true":"once";
-            opt.scrollbars = $el.attr("scrollbars");
+            opt.scrollbars = true;
 
             if ($el.attr("scroll-x")) {
                 opt.scrollX = true;
@@ -69,7 +67,7 @@ module.exports = (function() {
                 $el.children().addClass("scroll-x");
             }
 
-            $scroll = $el.addClass("mg-scroll").scroll(opt);
+            $scroll = $el.addClass("scroll").scroll(opt);
 
             handle = $el.attr("handle");
             if (handle && scope[handle] !== undefined) {

@@ -110,6 +110,11 @@ module.exports = (function() {
         return el;
     }
 
+    /* 克隆当前元素，暂时不支持复制事件 */
+    _dom.clone = function(el, copyEvent) {
+        return el.cloneNode(true);
+    },
+
     /* 选择元素的末尾插入对象 */
     _dom.append = function(el, html) {
         if ( el && el.appendChild &&

@@ -287,6 +287,11 @@ require("extend");      // 原生对象扩展
                 }
             },
 
+            /* 返回当前元素的克隆元素 */
+            clone: function() {
+                return this[0] ? $(_DOM.clone(this[0])) : null;
+            },
+
             /* 为对象添加HTML对象或者字符串 */
             append: function(text) {
                 if (text instanceof Magic) {
@@ -382,13 +387,8 @@ require("extend");      // 原生对象扩展
 
                     if (typeof cls == "string") {
                         tmp = [];   // 临时存放结果
-                        cls = cls.replace('.', '');
 
-                        for(var i=0; i<children.length; i++) {
-                            if (_UTIL.hasClass(children[i], cls)) {
-                                tmp.push(children[i]); break;
-                            }
-                        }
+                        tmp = this[0].querySelectorAll(cls)
 
                         children = tmp;
                     }
@@ -546,5 +546,5 @@ require("extend");      // 原生对象扩展
 })(window, document);
 
 require("../mui/muicore.js");       // 加载核心UI组件
-require("../plug/main.js");         // 加载硬件扩展方法
+// require("../plug/main.js");         // 加载硬件扩展方法
 require("../lib/minjs/route.js");   // 路由对象
