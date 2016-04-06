@@ -10,19 +10,6 @@
 	align-items: center;
 	z-index: $z-index-modal;
 	
-	// &:after {
-	// 	height: 100%;
-	// 	width: 100%;
-	// 	content: " ";
-	// 	display: block;
-	// 	z-index: 1;
-	// 	opacity: 0;
-	// 	top: 0; left: 0;
-	// 	background-color: $popup-back-color;
-	// 	opacity: $popup-back-opacity;
-	// 	position: absolute;
-	// }
-
 	&.zoomIn, &.zoomOut {
 		display: flex;
 	}

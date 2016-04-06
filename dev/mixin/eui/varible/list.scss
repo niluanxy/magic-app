@@ -34,6 +34,9 @@ $list-item-icon-font-size:             	18px !default;
 $list-item-icon-padding:               	$list-item-padding * 3 !default;
 $list-item-icon-fix:					2px !default;
 
+$list-item-icon-label-padding:          $list-item-inset-left-padding + $list-item-padding * 2 !default;
+$list-item-icon-label-left:             $list-item-icon-padding;
+
 $list-item-icon-right-color:			$list-item-default-text !default;
 $list-item-icon-right-font-size:       	$button-icon-size !default;
 $list-item-icon-right-padding:         	$list-item-padding + $list-item-icon-right-font-size + 5px !default;

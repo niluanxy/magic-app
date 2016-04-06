@@ -59,7 +59,7 @@
             height: rem($slider-points-size);
             border-radius: 50%;
 
-            &.active {
+            &.actived {
                 background-color: $slider-points-active;
             }
         }

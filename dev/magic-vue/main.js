@@ -341,12 +341,13 @@ $(function() {
                     $act = $($copy[0].children[pos]);
 
                     $copy.find("actived").removeClass("actived");
-                    $act.addClass("actived"); break;
+                    $act.addClass("actived"); show = true; break;
                 }
             }
         }
 
         NAVS.$dom = $copy ? $copy : null;
+        NAVS.show = show;
     }
 
     // 绑定动画效果
@@ -373,7 +374,19 @@ $(function() {
 
     // 获取当前组件的 父 page 组件
     mvue.getVm = function(vm) {
-        return vm.$parent;
+        var parent = vm, name, ret;
+
+        do {
+            name = parent.$options.name;
+
+            if (name.match(/^ma\-/)) {
+                ret = parent; break;
+            } else {
+                parent = parent.$parent;
+            }
+        } while(parent)
+
+        return ret ? ret : null;
     },
 
     // 获取当前组件的 根 page 组件
@@ -442,12 +455,6 @@ $(function() {
             this.$dispatch("childPageReady");   // 向上冒泡事件
             this.$broadcast("pageReady");       // 向下传递事件
             this.$emit("pageReadyDirect");      // 触发自身事件
-
-            if (mvue.__NAVS__.show /* 当前是否显示 footer */) {
-                var $com = $(this.$el).children(".content");
-
-                $com.addClass("has-footer");
-            }
         }
 
         if (typeof init == "function") {
@@ -543,7 +550,7 @@ $(function() {
                 var $el  = $(this.$el),
                     $dom = mvue.__NAVS__.$dom;
 
-                if ($dom) {
+                if ($dom /* 要插入的 DOM 不为空说明有 footer */) {
                     $el.append($dom)
                     .children("mg-content").addClass("has-footer");
                 } 

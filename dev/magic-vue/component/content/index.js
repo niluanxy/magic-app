@@ -25,7 +25,7 @@ module.exports = (function() {
                 }
             }
 
-            handle = $el.attr("handle");
+            handle = $el.attr("ctrl");
             if (handle && scope[handle] !== undefined) {
                 scope[handle] = $scroll;
             }
@@ -69,7 +69,7 @@ module.exports = (function() {
 
             $scroll = $el.addClass("scroll").scroll(opt);
 
-            handle = $el.attr("handle");
+            handle = $el.attr("ctrl");
             if (handle && scope[handle] !== undefined) {
                 scope[handle] = $scroll;
             }

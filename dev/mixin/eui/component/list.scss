@@ -24,7 +24,7 @@
             background-color: $list-item-default-active-bg;
         } @else {
             @include retina-border-width(bottom, 0);
-            
+
             &:after {
                 content: " ";
                 position: absolute;
@@ -41,7 +41,7 @@
     .item.clear.active {
         @if ($build-rem != true) {
             @include retina-border-width(bottom, 1px);
-            
+
             &:after {
                 display: none;
             }
@@ -229,7 +229,7 @@
             left: rem($list-item-padding);
             top:50%;
             transform: translate(0,-50%);
-        } 
+        }
     }
     &.list-embed .item,
     &.list-embed-left .item,
@@ -238,7 +238,7 @@
         &.icon-left .icon,
         &.icon-left .icon-small {
             left: 0;
-        } 
+        }
     }
 
 
@@ -265,6 +265,14 @@
     .item {
         &.icon-left {
             padding-left: rem($list-item-icon-padding);
+
+            &.label-left {
+                padding-left: rem($list-item-icon-label-padding);
+
+                .label {
+                    left: rem($list-item-icon-label-left);
+                }
+            }
         }
     }
 
@@ -290,7 +298,7 @@
             right: 0;
         }
     }
-    
+
 
     /*====================================================
      * icon-right 相关代码

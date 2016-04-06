@@ -540,6 +540,7 @@ gulp.task("serve", function() {
                 "!"+pub_path+"mixin.scss", "!"+pub_path+"css/**/*"], ["dev-app-pub", reload])
 })
 
+
 /* 全局构建任务 */
 gulp.task("build.base", function() {
     return Q.all([

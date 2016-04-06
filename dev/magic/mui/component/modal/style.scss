@@ -26,11 +26,16 @@
 			flex-direction: column;
 			transform: translateX(-50%);
 
+			&.full {
+				width: 100%;
+				height: 100%;
+			}
+
 			&.center {
 				top: 50%;
 				transform: translate(-50%, -50%);
 			}
-			
+
 			&.top {
 				top: 0;
 			}

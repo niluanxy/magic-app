@@ -22,32 +22,51 @@ module.exports = (function() {
         leave: null,            // 当前页退出时候执行的方法
     }
 
-    Slider.prototype.init = function() {
-        var that = this, opt = that.options, childs, $first, scroll, $point;
+    Slider.prototype.initPoint = function() {
+        var point = this.el.query(".slider-points"),
+            html = "", items, cnew = false, $add;
 
-        that.el.wrapAll("<div class='slider_scroll'></div>");
-        $point = that.el.find(".slider-points");
+        if (point.length == 0) point = null;
 
-        scroll = that.el.children();
-        childs = scroll.query(".slider-item");
-        $first = $(childs[0] || childs);
- 
-        if ($point.length > 0) {
-            $point.appendTo(that.el);
-        } else {
-            var html = '<div class="slider-points">';
+        if (!point || !point.children.length) {
+            if (!point /* 无 DOM 先创建外围容器 */) {
+                html = '<div class="slider-points">';
+                cnew = true;
+                $add = this.el;
+            } else {
+                $add = $(point);
+            }
 
-            for(var i=0; i<childs.length; i++) {
+            items = this.el.query(".slider-item");
+
+            for(var i=0; i<items.length; i++) {
                 if (i == 0) {
-                    html += '<i class="item active"></i>';
+                    html += '<i class="item actived"></i>';
                 } else {
                     html += '<i class="item"></i>';
                 }
             }
 
-            that.el.append(html+"</div>");
+            html += cnew ? "</div>" : "";
+            $add.append(html);
+        }
+    }
+
+    Slider.prototype.init = function() {
+        var that = this, opt = that.options, childs, $first, scroll;
+
+        if (!that.el.children(".slider_scroll").length) {
+            that.el.wrapAll("<div class='slider_scroll'></div>");
         }
 
+        scroll = that.el.children();
+        childs = scroll.query(".slider-item");
+        $first = $(childs[0] || childs);
+ 
+        if (opt.indicator) {
+            this.initPoint();   // 创建指示器
+        }
+        
         that.__render = $first.render(function() {
             that.pageWidth = $first.width();
             if (opt.scale) {
@@ -128,8 +147,8 @@ module.exports = (function() {
             index = pagex <= 0 ? 1 : pagex + 1,
             point = this.el.find(".slider-points");
 
-        point.find(".item.active").removeClass('active');
-        point.find(".item:nth-child("+index+")").addClass("active");
+        point.find(".item.actived").removeClass('actived');
+        point.find(".item:nth-child("+index+")").addClass("actived");
     }
 
     /* 重新启动定时器，尝试切换到给定的页面 */
