@@ -35,9 +35,10 @@ module.exports = (function() {
 
                 if (view && view != "true" && view !== true) {
                     var _name = $$.__makeViewName(view), _child,
-                        _view = $$.__renderView(_name, "_loadModal");
+                        _view = $$.__renderView(_name, "_loadModal"),
+                        _call = scope[$el.attr("call")];
 
-                    _view.$appendTo($el[0])._MODAL_ = handle;
+                    _view.$appendTo($el[0]);
                     _child = _view.$children;
 
                     // 页面渲染后，将子页面的 句柄 暴露出来
@@ -45,7 +46,12 @@ module.exports = (function() {
                         handle.view = _child[0];
                     } else {
                         _view.$on("childPageReady", function() {
-                            _child[0].__MODAL_PARENT = scope;
+                            _child[0]._MODAL_PARENT = scope;
+                            _child[0]._MODAL_       = handle;
+
+                            if ($.isFun(_call)) {
+                                _child[0]._MODAL_CALL = _call;
+                            }
 
                             handle.view = _child[0];
                         })
