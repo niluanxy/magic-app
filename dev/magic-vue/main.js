@@ -3,7 +3,7 @@ require("./lib/magic.js");
 $(function() {
     if (!window.$J) window.$J = undefined;
 
-    var mvue, config = {tables: []}, _option = {}
+    var mvue, config = {tables: []}, _OPTION_ = {}
         Router = require("./lib/route.js");
         
     window.$$ = mvue = {
@@ -61,52 +61,20 @@ $(function() {
 
     // APP初始化方法
     mvue.init = function(option, repath) {
-        _option = option;   // 保存下初始化设置的选项
-
-        $$.key("__MAGIC_RUNID", $.getRandom());
-
-        var vue   = mvue.__VUE__  = new Vue({ el: "body" }),
-            view  = mvue.__VIEW__ = $("body").query("mg-view"),
-            $view = $(mvue.__VIEW__), PAGE = mvue.__PAGE__,
-            LOAD  = mvue.__LOAD__, NAVS = mvue.__NAVS__;
-
-        var tables = $.extend.apply({}, config.tables);
-
-        // NAVS 全局导航组件初始化
-        if (_option.navTabs && _option.navTabs.template) {
-            var $navs = $(_option.navTabs.template), items;
-
-            // 修复 $navs 对象，防止出错
-            if ($navs[0] instanceof DocumentFragment) {
-                $navs = $navs.children();
-            }
-
-            items = $navs[0].children;
-            NAVS.$el = $navs;
-
-            for(var i=0; i<items.length; i++) {
-                var $now = $(items[i]);
-
-                NAVS.match[i] = {
-                    pos: i,
-                    url: $now.attr("match") || ""
-                };
-
-                $now.removeAttr("match");
-            }
-        }
-
-        mvue.location = new Router(tables, $.extend({
+        // 修改路由构造参数
+        _OPTION_ = $.extend({
             /* 页面跳转前的回调方法 */
             before : function(lastUrl, nowUrl, match, that) {
                 var mnow  = match[match.length-1],
                     STAT  = mvue.__STATE__, aret,
-                    LOAD  = mvue.__LOAD__,
+                    LOAD  = mvue.__LOAD__, $oload,
                     opt   = that.options,
-                    apage = opt.authPage,
                     atest = opt.authCheck;
 
                 STAT.ROUTER_AFTER = false;
+
+                // 尝试清空上一次的load页面
+                $view.children("._load_").remove();
 
                 // 初始化加载动画相关信息
                 if (opt.loading !== false) {
@@ -122,9 +90,7 @@ $(function() {
                 PAGE.PARAMS = mnow.para;
                 PAGE.ROUTER = match;
 
-                navToggle(nowUrl, match);
-
-                if (apage && nowUrl != apage) {
+                if (!authPassTest(nowUrl, opt, that)) {
                     var auth;   // 检测页面的Auth值，可继承父类
 
                     for (var i=match.length-1; i>=0; i--) {
@@ -150,6 +116,8 @@ $(function() {
                         return false;   // 阻止后续程序执行
                     }
                 }
+
+                navToggle(nowUrl, match);
             },
 
             /* 页面跳转成功后的回调方法 */
@@ -177,14 +145,49 @@ $(function() {
                 }
             },
 
+            home      : Router.DEFAULT.home,
             authBase  : 1,
             authCheck : 2,
-        }, option || {})).init(repath);
+        }, option || {});
+
+        $$.key("__MAGIC_RUNID", $.getRandom());
+
+        var vue   = mvue.__VUE__  = new Vue({ el: "body" }),
+            view  = mvue.__VIEW__ = $("body").query("mg-view"),
+            $view = $(mvue.__VIEW__), PAGE = mvue.__PAGE__,
+            LOAD  = mvue.__LOAD__, NAVS = mvue.__NAVS__,
+
+            tables = $.extend.apply({}, config.tables);
+
+        // NAVS 全局导航组件初始化
+        if (_OPTION_.navTabs && _OPTION_.navTabs.template) {
+            var $navs = $(_OPTION_.navTabs.template), items;
+
+            // 修复 $navs 对象，防止出错
+            if ($navs[0] instanceof DocumentFragment) {
+                $navs = $($navs[0].childNodes[0]);
+            }
+
+            items = $navs[0].children;
+            NAVS.$el = $navs;
+
+            for(var i=0; i<items.length; i++) {
+                var $now = $(items[i]);
+
+                NAVS.match[i] = {
+                    pos: i,
+                    url: $now.attr("match") || ""
+                };
+
+                $now.removeAttr("match");
+            }
+        }
+
+        mvue.location = new Router(tables, _OPTION_).init(repath);
 
         /* 返回到登陆页面的方法 */
         mvue.location.authRepath = function(set, togo) {
-            var option   = mvue.location.options,
-                location = mvue.location,
+            var location = mvue.location,
                 STAT     = mvue.__STATE__;
 
             if (set !== undefined) {
@@ -192,23 +195,46 @@ $(function() {
                 STAT.AUTH_BEFORE = set;
 
                 if (togo === true) {
+                    STAT.AUTH_HASRUN = true;
+
                     // !!! MgNative 下调用原生跳转
                     if ($J && $J.router) {
                         $J.loginRepath(STAT.AUTH_BEFORE);
                     } else {
-                        location.go(option.authPage, true);
+                        location.go(_OPTION_.authPage, true);
                     }
-                    STAT.AUTH_HASRUN = true;
                 }
             } else {
+                set = STAT.AUTH_BEFORE || _OPTION_.home;
                 STAT.AUTH_BEFORE = "";
                 STAT.AUTH_HASRUN = false;
                 
-                location.go(option.home, true);
+                location.go(set, true);
             }
         }
     }
 
+    function authPassTest(nowUrl, option, router) {
+        var authPage = option.authPage,
+            passList = option.authPass, test;
+
+        if (authPage && nowUrl) {
+            authPage = router.geturl(authPage);
+            nowUrl   = router.geturl(nowUrl);
+
+            if (nowUrl == authPage) return true;
+
+            if (passList && passList.length) {
+                for(var i=0; i<passList.length; i++) {
+                    test = router.geturl(passList[i]);
+
+                    if (nowUrl == test) return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     // APP路由初始化方法
     mvue.route = function(table) {
@@ -237,10 +263,10 @@ $(function() {
     function _createLoadHtml(router, match) {
         var last = match[match.length-1].item, html;
             
-        html = '<mg-page class="_load_">'
+        html = '<mg-page class="_load_ hide">'
 
         // 判断是否创建 header 部分
-        if (last.head != false && _option.loadHead != false) {
+        if (last.head != false && _OPTION_.loadHead != false) {
             html   += '<div class="bar bar-header">';
 
             // 判断是否需要创建 back 按钮
@@ -251,10 +277,15 @@ $(function() {
                 html += '<mg-back></mg-back>';
             }
 
-            html   += '<h3 class="title">{{title}}</h3></div>';
+            html +=     '<h3 class="title">{{title}}</h3>'+
+                    '</div>'+
+                    '<div class="content has-header">';
+        } else {
+            html += '<div class="content">';
         }
 
-        html +=     '<div class="content has-header"><div class="tip"></div></div>'+
+        html +=          '<div class="tip"></div>'+
+                    '</div>'+
                 '</mg-page>';
 
         html = $.tpl(html, { title: last.title});
@@ -264,7 +295,8 @@ $(function() {
 
     // 创建临时的加载中页面效果
     function makeLoading(router, match) {
-        var $view = $(mvue.__VIEW__), LOAD = mvue.__LOAD__, tsend;
+        var $view = $(mvue.__VIEW__), LOAD = mvue.__LOAD__,
+            tsend, loadcls;
 
         if ($.runtime == "weixin") {
             tsend = "webkitTransitionEnd";
@@ -272,20 +304,22 @@ $(function() {
             tsend = "transitionend";
         }
 
+        loadcls = LOAD.PUSH ? 'slideInRight' : 'slideOutLeft';
         $view.append(_createLoadHtml(router, match));
 
         LOAD.START = $.getTime();
         LOAD.$DOM  = $view.find('._load_');
 
-        if (LOAD.PUSH === true) {
-            LOAD.$DOM.addClass('slideInRight');
-        } else {
-            LOAD.$DOM.addClass('slideOutLeft');
-        }
+        LOAD.HANDLE = setTimeout(function() {
+            if (!mvue.__STATE__.AUTH_BEFORE && !LOAD.PAGEIN) {
+                LOAD.SHOW  = true;
 
-        LOAD.$DOM.once(tsend, function() {
-            LOAD.SHOW  = false;
-        })
+                LOAD.$DOM.addClass(loadcls)
+                .once(tsend, function() {
+                    LOAD.SHOW  = false;
+                })
+            }
+        }, _OPTION_.loadTime || 100);
     }
 
     // 清除加载中页面
@@ -421,7 +455,9 @@ $(function() {
 
                 if (LOAD.SHOW /* 正在显示加载动画 */) {
                     LOAD.$DOM.once(tsend, function(e) {
-                        clearLoading($now, 30);
+                        clearLoading($now);
+                        $old && $old.addClass("hide");
+                        $now.removeClass("hide");
                     });
                 } else {
                     nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";
@@ -465,7 +501,7 @@ $(function() {
                 _params = _transParams(_params);    // 修正参数列表
 
                 // 注册 数据更新事件，用于手动触发刷新动作
-                that.$on("__refreshData", function(params) {
+                that.$on("__refreshData", function(params, defer) {
                     var initDefer = _defer;
 
                     // 创建后续的数据刷新回调动作
@@ -473,6 +509,10 @@ $(function() {
                         initDefer = $.defer();
                         initDefer.then(function(initData) {
                             that.$emit("__updateData", initData);
+
+                            if (defer && defer.resolve) {
+                                defer.resolve(initData);
+                            }
                         })
                     }
 
@@ -499,8 +539,8 @@ $(function() {
                 _pageReady.call(this, _transParams(PAGE.PARAMS));
 
                 // 绑定数据更新快捷方法
-                that.$refresh = function(params) {
-                    that.$emit("__refreshData", params);
+                that.$refresh = function(params, defer) {
+                    that.$emit("__refreshData", params, defer);
                 }
             }
         } else {
@@ -548,11 +588,14 @@ $(function() {
         mixins = {
             compiled: function() {
                 var $el  = $(this.$el),
-                    $dom = mvue.__NAVS__.$dom;
+                    $dom = mvue.__NAVS__.$dom, $child;
 
                 if ($dom /* 要插入的 DOM 不为空说明有 footer */) {
-                    $el.append($dom)
-                    .children("mg-content").addClass("has-footer");
+                    $child = $el.append($dom).children("mg-content")
+
+                    if ($child && $child.addClass) {
+                        $child.addClass("has-footer");
+                    }
                 } 
             },
 

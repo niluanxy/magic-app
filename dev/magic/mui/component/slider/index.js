@@ -102,6 +102,7 @@ module.exports = (function() {
                 }
             })
 
+            that.handle.refresh();
             that.resume();      // 初始化播放
         })
 

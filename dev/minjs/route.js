@@ -487,6 +487,7 @@ module.exports = (function() {
                     that.state.push(extend({}, state, {
                         match: match, url: toUrl
                     }));
+
                     history[call](state, state.title, toUrl);
 
                     if (opt.title /* 如果自动更新 title 功能开启 */) {

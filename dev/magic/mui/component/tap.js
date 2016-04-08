@@ -106,7 +106,7 @@ $.ready(function() {
 
             if ((e.touches && e.touches.length > 1) || 
                 (e.type == "mousedown" && ltype != e.type
-                    && this._isDouble(e)) ) {
+                    && this._isDouble(e, 600)) ) {
                 this.startX = null;      this.startY = null;
 
                 return true;
@@ -272,16 +272,19 @@ $.ready(function() {
         /* 修复input 焦点问题 */
         doc[bind]("focus", tap._focus, true)
 
-        doc[bind]("mousedown", tap);
-        doc[bind]("mousemove", tap);
-        doc[bind]("mouseup", tap);
-        doc[bind]("mousecancel", tap);
-
-        doc[bind]("touchstart", tap);
-        doc[bind]("touchmove", tap);
-        doc[bind]("touchend", tap);
-        doc[bind]("touchcancel", tap);
-
+        /* 移动端和PC端采用不同的事件绑定机制 */
+        if (kt === 0) {
+            doc[bind]("touchstart", tap);
+            doc[bind]("touchmove", tap);
+            doc[bind]("touchend", tap);
+            doc[bind]("touchcancel", tap);
+        } else {
+            doc[bind]("mousedown", tap);
+            doc[bind]("mousemove", tap);
+            doc[bind]("mouseup", tap);
+            doc[bind]("mousecancel", tap);
+        }
+        
         doc[bind]("pointerdown", tap);
         doc[bind]("pointermove", tap);
         doc[bind]("pointerup", tap);
