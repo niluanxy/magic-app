@@ -37,9 +37,9 @@
             content  = 'initial-scale=' + scale;
             content += ', maximum-scale='+scale;
 
-            // 微信 和 小米2s 中不能添加此段代码，缩放会异常
-            if (!agent.match(/MicroMessenger/i) &&
-                !agent.match(/mi 2s.*miuibrowser/i)) {
+            if (width > 440 && ratio >= 2) {
+                // screen 默认就为真实分辨率的时候，不要修正 width
+            } else {
                 content += ', user-scalable=no, width='+dwidth;
             }
             
