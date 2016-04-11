@@ -430,7 +430,9 @@ $(function() {
 
     // 检测当前是否运行在 PAGE 层级还是组件层级
     mvue._isRunPage = function(scope) {
-        return scope.$parent.$options.name == "_loadPage";
+        var parent = scope.$el.parentNode;
+
+        return parent.tagName == "MG-VIEW";
     }
 
     // 创建一个 LOAD 完成处理函数
@@ -473,6 +475,7 @@ $(function() {
                 }
             } else {
                 $now.removeClass("hide");
+                clearLoading($now);         // 清除 load 内容
             }
         })
 
@@ -485,6 +488,21 @@ $(function() {
             init = page.resolve;
 
         function _pageReady(params) {
+            var $el = this.$el, $par, fsope;
+
+            /* 修复当前实例的 $parent 实例链 */
+            $par = $el.parentNode;
+            do {
+                if ($par.MG_VUE_CTRL) {
+                    fsope = $par.MG_VUE_CTRL;
+                    break;
+                }
+
+                $par = $par.parentNode;
+            } while ($par.parentNode);
+            fsope = fsope ? fsope : mvue.__VUE__;
+            this.$parent = fsope;
+
             STAT.PAGE_READY = true;
 
             this.$set('params', params || {});
@@ -536,7 +554,7 @@ $(function() {
                     loadDefer.resolve(that);
                 });
 
-                _pageReady.call(this, _transParams(PAGE.PARAMS));
+                _pageReady.call(that, _transParams(PAGE.PARAMS));
 
                 // 绑定数据更新快捷方法
                 that.$refresh = function(params, defer) {
@@ -587,16 +605,18 @@ $(function() {
         // 公用方法注册，利用 VUE 的 mixin 选项实现
         mixins = {
             compiled: function() {
-                var $el  = $(this.$el),
-                    $dom = mvue.__NAVS__.$dom, $child;
+                var $dom = mvue.__NAVS__.$dom, $child;
 
                 if ($dom /* 要插入的 DOM 不为空说明有 footer */) {
-                    $child = $el.append($dom).children("mg-content")
+                    $child = $(this.$el).append($dom)
+                             .children("mg-content");
 
                     if ($child && $child.addClass) {
                         $child.addClass("has-footer");
                     }
-                } 
+                }
+
+                this.$el.MG_VUE_CTRL = this; // 绑定句柄到 DOM
             },
 
             ready: _createReady(page),
