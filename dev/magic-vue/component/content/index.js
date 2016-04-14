@@ -8,7 +8,7 @@ module.exports = (function() {
             scope = $$.getVm(this);
 
             refresh = $el.attr("refresh")   // 默认开启自动刷新
-            opt.refresh = refresh=="true"?"true":"once";
+            opt.refresh = refresh || "once";
             opt.pullRefreshDown = scope[$el.attr("pullRefreshDown")] || null;
             opt.pullRefreshUp   = scope[$el.attr("pullRefreshUp")]   || null;
 
@@ -46,6 +46,9 @@ module.exports = (function() {
                     })
                 })
             }
+
+            $el.removeAttr(["ctrl", "repos", "refresh", "scrollbar",
+                "pullRefreshDown", "pullRefreshUp"]);
         }
     });
 
@@ -57,9 +60,9 @@ module.exports = (function() {
 
             scope = $$.getVm(this);
 
-            refresh = $el.attr("refresh")   // 默认开启自动刷新
-            opt.refresh = refresh=="true"?"true":"once";
-            opt.scrollbars = true;
+            refresh = $el.attr("refresh");
+            opt.refresh = refresh || "once";
+            opt.scrollbars = $el.attr("scrollbar") == "false" ? false : true;
 
             if ($el.attr("scroll-x")) {
                 opt.scrollX = true;
@@ -84,6 +87,9 @@ module.exports = (function() {
                     })
                 })
             }
+
+            $el.removeAttr(["ctrl", "repos", "refresh", "scrollbar",
+                "pullRefreshDown", "pullRefreshUp", "scroll-x"]);
         }
     })
 })();

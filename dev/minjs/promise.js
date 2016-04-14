@@ -21,6 +21,20 @@
     }
 
 
+    Promise.all = function(arr) {
+        var sum = len = arr.length,
+            def = new Promise();
+
+        for(var i=0; i<len; i++) {
+            arr[i].then(function() {
+                if (--sum == 0) def.resolve();
+            })
+        }
+
+        return def;     // 返回一个合并后的 defer
+    }
+
+
     Promise.prototype.then = function(resolve, reject) {
         var status = this.status, value = this.value,
             next   = this._next || (this._next = new Promise());
@@ -54,7 +68,6 @@
     }
 
 
-    Promise.prototype.done =
     Promise.prototype.resolve = function(args) {
         this.value = arguments;
         this.status = "resolved";

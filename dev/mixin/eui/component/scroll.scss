@@ -5,11 +5,13 @@
 @mixin scroll() {
     display: block;
     width: 100%;
+    height: 100%;
     z-index: 1;
     overflow: hidden;
     position: relative;
 
     &.scroll-x {
+        height: auto;
         display: table;
         white-space: nowrap;
     }

@@ -446,11 +446,17 @@ require("extend");      // 原生对象扩展
             ready: require("domready"),
 
             /* promise 的支持 */
-            defer: function() {
-                var promise = require("promise");
+            defer: (function() {
+                var promise = require("promise"), ret;
 
-                return new promise();
-            },
+                ret = function() {
+                    return new promise();
+                }
+
+                ret.all = promise.all;
+
+                return ret;     // 返回操作的对象
+            })(),
 
             /* 函数懒执行方法，用于在初始化后才真正执行方法 */
             callDefer: function(name, scope, defer, call) {
