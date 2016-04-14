@@ -13,6 +13,7 @@
 .button     { @include button(); }
 .tabs       { @include tabs(); }
 .content    { @include content(); }
+.scroll     { @include scroll(); }
 .list       { @include list(); }
 .slider     { @include slider(); }
 .popup		{ @include popup(); }
