@@ -235,6 +235,13 @@ module.exports = (function() {
 
             /* 运行全局的 成功跳转的after 方法 */
             update !== false && isFun(opt.after) && opt.after(last.url, nowUrl, match, that);
+            
+            /* 更新 title 功能开启，且跳转成功，更新 title */
+            if (update !== false && opt.title) {
+                var lastItem = match[match.length-1].item;
+
+                if (lastItem.title) updateTitle(lastItem.title);
+            }
         }
 
         /* 不论是否跳转成功，一定会执行 always 方法 */
@@ -489,12 +496,6 @@ module.exports = (function() {
                     }));
 
                     history[call](state, state.title, toUrl);
-
-                    if (opt.title /* 如果自动更新 title 功能开启 */) {
-                        var lastItem = match[match.length-1].item;
-
-                        if (lastItem.title) updateTitle(lastItem.title);
-                    }
                 }
 
                 return rcall;   // 返回 false，会阻止后续调用 update 方法
