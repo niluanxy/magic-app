@@ -533,7 +533,7 @@ require("extend");      // 原生对象扩展
                 jsonp({ url: url, data: data,
                     callbackName: callname,
                     success: function(data) {
-                        defer.done(data)
+                        defer.resolve(data)
                     }
                 })
 

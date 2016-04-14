@@ -1,18 +1,6 @@
 /* 硬件调用分装方法 */
 
 (function() {
-    // 加载相关方法文件
-    function loadRequire(call) {
-        return function () {
-            require("./camera");        // 图像操作
-            require("./pay");           // 支付操作
-            require("./file");          // 文件操作
-            require("./gps");           // GPS操作
-
-            if (typeof call == "function") call();
-        }
-    }
-
     var $m = window.$plug = {
         runtime  : "web",
         platform : "",
@@ -104,12 +92,24 @@
         /* 初始化加载相关具体方法和执行回调 */
         if ($m.runtime == "cordova") {
             loadRequire(call)();
-        } else if ($m.runtime == "weixin" && weixin) {
+        } else if ($m.runtime == "weixin" && wx) {
             wx.ready(loadRequire(call));
         } else {
             loadRequire(call)();    // 直接加载相关文件
         }
 
         return this;
+    }
+
+    // 加载相关方法文件
+    function loadRequire(call) {
+        return function () {
+            // require("./camera");        // 图像操作
+            require("./pay");           // 支付操作
+            // require("./file");          // 文件操作
+            // require("./gps");           // GPS操作
+
+            if (typeof call == "function") call();
+        }
     }
 })();
