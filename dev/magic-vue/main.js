@@ -607,7 +607,8 @@ $(function() {
             compiled: function() {
                 var $dom = mvue.__NAVS__.$dom, $child;
 
-                if ($dom /* 要插入的 DOM 不为空说明有 footer */) {
+                /* 要插入的 DOM 不为空说明有 footer */
+                if (_OPTION_.loadFoot !== false && $dom) {
                     $child = $(this.$el).append($dom)
                              .children("mg-content");
 
