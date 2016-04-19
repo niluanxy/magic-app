@@ -263,7 +263,7 @@ $(function() {
     function _createLoadHtml(router, match) {
         var last = match[match.length-1].item, html;
             
-        html = '<mg-page class="_load_ hide">'
+        html = '<mg-page class="_load_ viewHide">'
 
         // 判断是否创建 header 部分
         if (last.head != false && _OPTION_.loadHead != false) {
@@ -331,7 +331,7 @@ $(function() {
             LOAD.SHOW = false;
             LOAD.$DOM && LOAD.$DOM.remove();
 
-            el && $(el).removeClass("hide");
+            el && $(el).removeClass("viewHide");
         }
 
         return function(el, delay) {
@@ -398,11 +398,11 @@ $(function() {
         oldCls = "slideOutRight";
         nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";
 
-        $old.removeClass("hide").addClass(oldCls);
-        $now.removeClass("hide").addClass(nowCls)
+        $old.removeClass("viewHide").addClass(oldCls);
+        $now.removeClass("viewHide").addClass(nowCls)
             .once(tsend, function() {
-                $old.removeClass(oldCls).addClass("hide");
-                $now.removeClass(nowCls).removeClass("hide");
+                $old.removeClass(oldCls).addClass("viewHide");
+                $now.removeClass(nowCls).removeClass("viewHide");
             })
     };
 
@@ -458,8 +458,8 @@ $(function() {
                 if (LOAD.SHOW /* 正在显示加载动画 */) {
                     LOAD.$DOM.once(tsend, function(e) {
                         clearLoading($now);
-                        $old && $old.addClass("hide");
-                        $now.removeClass("hide");
+                        $old && $old.addClass("viewHide");
+                        $now.removeClass("viewHide");
                     });
                 } else {
                     nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";
@@ -467,14 +467,14 @@ $(function() {
                     clearLoading($now);      // 清除 load 内容
 
                     if ($old) $old.addClass(oldCls);
-                    $now.removeClass("hide").addClass(nowCls)
+                    $now.removeClass("viewHide").addClass(nowCls)
                     .once(tsend, function() {
                         $now.removeClass(nowCls);
-                        $old && $old.removeClass(oldCls).addClass("hide");
+                        $old && $old.removeClass(oldCls).addClass("viewHide");
                     })
                 }
             } else {
-                $now.removeClass("hide");
+                $now.removeClass("viewHide");
                 clearLoading($now);         // 清除 load 内容
             }
         })
@@ -649,7 +649,7 @@ $(function() {
 
     // 渲染VIEW 对象成DOM元素
     mvue.__renderView = function(view, name) {
-        var tmp = '<'+view+' class="hide"></'+view+'>';
+        var tmp = '<'+view+' class="viewHide"></'+view+'>';
 
         name = name ? name : "_loadPage";
 

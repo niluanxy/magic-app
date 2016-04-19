@@ -23,17 +23,21 @@ module.exports = (function() {
             }
         } else {
             return function(key, val) {
-                var fix; // 修复读取值为null自动转为字符串
+                var val_fix, key_fix; // 修复读取值为null自动转为字符串
+
+                key_fix = $$.__key_prefix + key;
+
                 if (val !== undefined) {
                     val = JSON.stringify(val);
-                    fix = val==null?$$.__key_null:val;
-                    localStorage.setItem(key, fix);
+                    val_fix = val==null?$$.__key_null:val;
+                    
+                    localStorage.setItem(key_fix, val_fix);
                     return val; // 返回设置的值
                 } else {
-                    fix = localStorage.getItem(key);
-                    fix = JSON.parse(fix);
+                    val_fix = localStorage.getItem(key_fix);
+                    val_fix = JSON.parse(val_fix);
 
-                    return fix==$$.__key_null?null:fix;
+                    return val_fix==$$.__key_null?null:val_fix;
                 }
             };
         }

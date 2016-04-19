@@ -114,7 +114,8 @@
                     width: rem($input-radio-size);
                     height: rem($input-radio-size);
                     margin: auto;
-                    @include trans-center;
+
+                    @include absolute-align-center;
                     border-radius: 50%;
                     background-color: $color-positive;
                 }

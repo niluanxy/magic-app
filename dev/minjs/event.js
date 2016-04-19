@@ -4,6 +4,44 @@ module.exports = (function() {
     fixpara = ("target type pageX pageY clientX clientY keyCode keyChar "+
     "offsetX offsetY path timeStamp screenX screenY changedTouches targetTouches").split(" ");
 
+    // 转换 keycode 为相关字符
+    function transKey(code) {
+        var keyChar = undefined;
+
+        if ((code >= 65 && code <= 81) ||
+            (code >= 48 && code <= 57)) {
+
+            keyChar = String.fromCharCode(code);
+        } else {
+            switch (code) {
+                case 8:
+                    keyChar = "DEL";   break;
+                case 9:
+                    keyChar = "TAB";   break;
+                case 13: 
+                    keyChar = "Enter"; break;
+                case 16:
+                    keyChar = "SHIFT"; break;
+                case 17:
+                    keyChar = "CTRL";  break;
+                case 18:
+                    keyChar = "ALT";   break;
+                case 20:
+                    keyChar = "CAPS";  break;
+                case 27:
+                    keyChar = "ESC";   break;
+                case 32:
+                    keyChar = "SPACE"; break;
+                case 91:
+                    keyChar = "WIN";   break;
+                case 110:
+                    keyChar = ".";     break;
+            }
+        }
+
+        return keyChar;
+    }
+
     EventObj = function (src, porp) {
         this.originalEvent = src;
         this.originalData  = src.originalData || [];
@@ -22,12 +60,17 @@ module.exports = (function() {
             this[key] = porp[key];
         }
 
-        /* 修正target对象 */
+        /* 修正 keyChar 对象 */
+        if (!src.keyChar) {
+            this.keyChar = transKey(src.keyCode || src.which);
+        }
+
+        /* 修正 target 对象 */
         if (!this.target && src.originalTarget) {
             this.target = src.originalTarget
         }
 
-        /* 修复path对象，无则自己模拟一个出来 */
+        /* 修复 path 对象，无则自己模拟一个出来 */
         if (!(this.path instanceof Array)) {
             var target = this.target, arr = [];
 
@@ -113,9 +156,10 @@ module.exports = (function() {
         var eve = event instanceof EventObj ? event :
                 new EventObj(event, porp);
 
+        /* 修复 target 对象 */
         if (!eve.target) {
             eve.target = event.target || event.originalTarget || ele;
-        } 
+        }
 
         /* 复制执行数组，修复once事件导致length异常问题 */
         var data = eve.originalData || [],

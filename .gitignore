@@ -7,6 +7,9 @@
 # 过滤 sass 编译生成的临时文件
 /.sass-cache
 
+# 打包生成的目录过滤
+/output
+
 # APP目录忽略设置
 /app/dist/*
 /app/public/main.css

@@ -6,6 +6,10 @@ mg-page, mg-view, .mg-view, .mg-page {
     overflow: hidden;
     position: relative;
 
+    &.viewHide {
+        display: none !important;
+    }
+    
     .transition-none {
         transition-duration: 0s;
     }

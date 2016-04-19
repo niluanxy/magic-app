@@ -6,77 +6,77 @@
     animation-duration: $time;
 
     animation-fill-mode: $mode;
-}
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
     }
 
-    to {
-        opacity: 1;
-    }
-}
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
 
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-    }
-}
-
-@keyframes zoomIn {
-    from {
-        transform: scale3d(.3, .3, .3);
-
-        opacity: 0;
+        to {
+            opacity: 0;
+        }
     }
 
-    50% {
-        opacity: 1;
-    }
-}
+    @keyframes zoomIn {
+        from {
+            transform: scale3d(.3, .3, .3);
 
-@keyframes zoomOut {
-    from {
-        opacity: 1;
-    }
+            opacity: 0;
+        }
 
-    50% {
-        transform: scale3d(.3, .3, .3);
-
-        opacity: 0;
+        50% {
+            opacity: 1;
+        }
     }
 
-    to {
-        opacity: 0;
-    }
-}
+    @keyframes zoomOut {
+        from {
+            opacity: 1;
+        }
 
+        50% {
+            transform: scale3d(.3, .3, .3);
 
-@keyframes slideInRight {
-    from {
-        visibility: visible;
+            opacity: 0;
+        }
 
-        transform: translate3d(100%, 0, 0);
-    }
-
-    to {
-        transform: translate3d(0, 0, 0);
-    }
-}
-
-@keyframes slideInLeft {
-    from {
-        visibility: visible;
-
-        transform: translate3d(-100%, 0, 0);
+        to {
+            opacity: 0;
+        }
     }
 
-    to {
-        transform: translate3d(0, 0, 0);
+
+    @keyframes slideInRight {
+        from {
+            visibility: visible;
+
+            transform: translate3d(100%, 0, 0);
+        }
+
+        to {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            visibility: visible;
+
+            transform: translate3d(-100%, 0, 0);
+        }
+
+        to {
+            transform: translate3d(0, 0, 0);
+        }
     }
 }
