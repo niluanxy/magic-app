@@ -462,14 +462,14 @@ $(function() {
 
                 if (LOAD.SHOW /* 正在显示加载动画 */) {
                     LOAD.$DOM.once(tsend, function(e) {
-                        clearLoading($now);
                         $old && $old.addClass("viewHide");
                         $now.removeClass("viewHide");
+                        clearLoading($now);
                     });
                 } else if (LOAD.FINISH) {
                     // 动画播放完页面直接加载
+                    $old && $old.addClass("viewHide");
                     $now.removeClass("viewHide")
-                    $old && $old.removeClass("viewHide");
                     clearLoading($now);
                 } else {
                     nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";
