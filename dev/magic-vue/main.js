@@ -9,6 +9,8 @@ $(function() {
     window.$$ = mvue = {
         location   : null,       // 全局ROUTER对象
 
+        _OPTION_   : {},         // 全局配置信息
+
         __VUE__    : null,       // 全局VUE对象
         __VIEW__   : null,       // 全局MG-VIEW对象
         __PAGE__   : {
@@ -31,6 +33,7 @@ $(function() {
                         FIRST  : true,          // 第一次加载的时候动画特殊处理
                         START  : 0,             // LOAD动画开始时间
                         SHOW   : false,         // 是否正在显示LOAD动画
+                        FINISH : false,         // 当前动画是否已经加载完
                         PUSH   : true,          // 是否为新建页面的方式
                         HANDLE : null,          // 定时器句柄
                         $DOM   : null,          // DOM对象
@@ -62,7 +65,7 @@ $(function() {
     // APP初始化方法
     mvue.init = function(option, repath) {
         // 修改路由构造参数
-        _OPTION_ = $.extend({
+        mvue._OPTION_ = _OPTION_ = $.extend({
             /* 页面跳转前的回调方法 */
             before : function(lastUrl, nowUrl, match, that) {
                 var mnow  = match[match.length-1],
@@ -299,16 +302,17 @@ $(function() {
             tsend, loadcls;
 
         if ($.runtime == "weixin") {
-            tsend = "webkitTransitionEnd";
+            tsend = "webkitTransitionEnd webkitAnimationEnd";
         } else {
-            tsend = "transitionend";
+            tsend = "transitionend animationend";
         }
 
         loadcls = LOAD.PUSH ? 'slideInRight' : 'slideOutLeft';
         $view.append(_createLoadHtml(router, match));
 
-        LOAD.START = $.getTime();
-        LOAD.$DOM  = $view.find('._load_');
+        LOAD.START  = $.getTime();
+        LOAD.FINISH = false;
+        LOAD.$DOM   = $view.find('._load_');
 
         LOAD.HANDLE = setTimeout(function() {
             if (!mvue.__STATE__.AUTH_BEFORE && !LOAD.PAGEIN) {
@@ -316,7 +320,8 @@ $(function() {
 
                 LOAD.$DOM.addClass(loadcls)
                 .once(tsend, function() {
-                    LOAD.SHOW  = false;
+                    LOAD.SHOW   = false;
+                    LOAD.FINISH = true;
                 })
             }
         }, _OPTION_.loadTime || 100);
@@ -461,6 +466,11 @@ $(function() {
                         $old && $old.addClass("viewHide");
                         $now.removeClass("viewHide");
                     });
+                } else if (LOAD.FINISH) {
+                    // 动画播放完页面直接加载
+                    $now.removeClass("viewHide")
+                    $old && $old.removeClass("viewHide");
+                    clearLoading($now);
                 } else {
                     nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";
                     oldCls = LOAD.PUSH ? "slideOutLeft" : "slideOutRight";
