@@ -194,6 +194,45 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
     }
 }
 
+/*====================================================
+ *  media 屏幕尺寸自适应
+ *====================================================*/
+@mixin media-width($min: null, $max: null) {
+    @if $min != null and $max != null {
+        @media screen and (-webkit-min-device-pixel-ratio: 1) 
+            and (min-width: $min) and (max-width: $max),
+        screen and (min-device-pixel-ratio: 1) and (min-width: $min)
+            and (max-width: $max),
+
+        screen and (-webkit-min-device-pixel-ratio: 2) 
+            and (min-width: $min * 2) and (max-width: $max * 2),
+        screen and (min-device-pixel-ratio: 2) and (min-width: $min * 2)
+            and (max-width: $max * 2) {
+            @content;
+        }
+    } @else if $min != null and $max == null {
+        @media screen and (-webkit-min-device-pixel-ratio: 1) 
+            and (min-width: $min),
+        screen and (min-device-pixel-ratio: 1) and (min-width: $min),
+
+        screen and (-webkit-min-device-pixel-ratio: 2) 
+            and (min-width: $min * 2),
+        screen and (min-device-pixel-ratio: 2) and (min-width: $min * 2) {
+            @content;
+        }
+    } @else if $max !=null and $min == null {
+        @media screen and (-webkit-min-device-pixel-ratio: 1) 
+            and (max-width: $max),
+        screen and (min-device-pixel-ratio: 1) and (max-width: $max),
+
+        screen and (-webkit-min-device-pixel-ratio: 2) 
+            and (max-width: $max * 2),
+        screen and (min-device-pixel-ratio: 2) and (max-width: $max * 2) {
+            @content;
+        }
+    }
+}
+
 // css3 居中
 @mixin vertical-align-center() {
     top: 50%;

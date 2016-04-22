@@ -8,7 +8,7 @@ module.exports = (function() {
     function transKey(code) {
         var keyChar = undefined;
 
-        if ((code >= 65 && code <= 81) ||
+        if ((code >= 65 && code <= 90) ||
             (code >= 48 && code <= 57)) {
 
             keyChar = String.fromCharCode(code);
