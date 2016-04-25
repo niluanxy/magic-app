@@ -69,6 +69,7 @@
     }
 
     .button {
+        color: $bar-default-text;
         font-size: rem($bar-title-font-size);
         line-height: rem($bar-button-height);
         
