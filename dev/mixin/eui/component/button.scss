@@ -3,7 +3,7 @@
 // ========================================================
 @mixin button-style($name, $bg-color, $border-color, $active-bg-color, $active-border-color, $color) {
     &.button-#{""+$name} {
-        color: $color;
+        color: $color !important;
         border-color: $border-color;
         background-color: $bg-color;
 
@@ -78,7 +78,7 @@
         display: inline-block;
         line-height: rem($button-height - $button-border-width * 2) !important;
     }
-    
+
 
     &.icon-right:before {
         margin-left: $button-icon-padding;
@@ -104,7 +104,7 @@
             $button-assertive-active-bg, $button-assertive-active-border, $button-assertive-text);
         }
     }
-    
+
     @at-root {
         .button-block {
             display: block;

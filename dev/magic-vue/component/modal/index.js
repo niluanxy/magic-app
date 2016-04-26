@@ -25,7 +25,7 @@ module.exports = (function() {
                 } else {
                     handle = $(scope.$el).modal($el, option);
                 }
-                
+
                 that._handle = handle;
                 $el.removeAttr(["ctrl", "show", "align"]);
 
@@ -45,7 +45,7 @@ module.exports = (function() {
                     if (_child[0] && scope[ctrl] !== undefined) {
                         handle.view = _child[0];
                     } else {
-                        _view.$on("childPageReady", function() {
+                        _view.$on("pageReady", function() {
                             _child[0]._MODAL_PARENT = scope;
                             _child[0]._MODAL_       = handle;
 

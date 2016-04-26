@@ -5,7 +5,7 @@ $(function() {
 
     var mvue, config = {tables: []}, _OPTION_ = {}
         Router = require("./lib/route.js");
-        
+
     window.$$ = mvue = {
         location   : null,       // 全局ROUTER对象
 
@@ -54,12 +54,12 @@ $(function() {
 
     /**
      * init option 参数说明
-     * 
+     *
      * authBase     全局默认的权限值
      * authPage     不满足权限值的时候跳转验证的页面
      * authCall     用于验证的方法，可以不传
      * authCheck    用于判断是否校验的阀值
-     * 
+     *
      */
 
     // APP初始化方法
@@ -211,7 +211,7 @@ $(function() {
                 set = STAT.AUTH_BEFORE || _OPTION_.home;
                 STAT.AUTH_BEFORE = "";
                 STAT.AUTH_HASRUN = false;
-                
+
                 location.go(set, true);
             }
         }
@@ -265,7 +265,7 @@ $(function() {
     // 创建load动画的html代码
     function _createLoadHtml(router, match) {
         var last = match[match.length-1].item, html;
-            
+
         html = '<mg-page class="_load_ viewHide">'
 
         // 判断是否创建 header 部分
@@ -275,7 +275,7 @@ $(function() {
             // 判断是否需要创建 back 按钮
             var state = history.state || {},
                 slast = router.last.state;
-            if (last.back != false && 
+            if (last.back != false &&
                (slast && slast.id != state.id)) {
                 html += '<mg-back></mg-back>';
             }
@@ -500,6 +500,9 @@ $(function() {
         function _pageReady(params) {
             var $el = this.$el, $par, fsope;
 
+            /* 设置当前实例 包裹容器 的VUE对象 */
+            this.MG_PAGE_WRAPPER = this.$parent;
+
             /* 修复当前实例的 $parent 实例链 */
             $par = $el.parentNode;
             do {
@@ -513,12 +516,29 @@ $(function() {
             fsope = fsope ? fsope : mvue.__VUE__;
             this.$parent = fsope;
 
+            // 只有运行在 page 模式下，才添加导航
+            if (mvue._isRunPage(this)) {
+                var $dom = mvue.__NAVS__.$dom, $child;
+
+                /* 要插入的 DOM 不为空说明有 footer */
+                if (_OPTION_.loadFoot !== false && $dom) {
+                    $child = $(this.$el).append($dom)
+                             .children("mg-content");
+
+                    if ($child && $child.addClass) {
+                        $child.addClass("has-footer");
+                    }
+                }
+            }
+
             STAT.PAGE_READY = true;
 
             this.$set('params', params || {});
             this.$dispatch("childPageReady");   // 向上冒泡事件
             this.$broadcast("pageReady");       // 向下传递事件
-            this.$emit("pageReadyDirect");      // 触发自身事件
+
+            /* 页面包裹容器 上触发页面加载完成事件 */
+            this.MG_PAGE_WRAPPER.$emit("pageReady");
         }
 
         if (typeof init == "function") {
@@ -615,18 +635,6 @@ $(function() {
         // 公用方法注册，利用 VUE 的 mixin 选项实现
         mixins = {
             compiled: function() {
-                var $dom = mvue.__NAVS__.$dom, $child;
-
-                /* 要插入的 DOM 不为空说明有 footer */
-                if (_OPTION_.loadFoot !== false && $dom) {
-                    $child = $(this.$el).append($dom)
-                             .children("mg-content");
-
-                    if ($child && $child.addClass) {
-                        $child.addClass("has-footer");
-                    }
-                }
-
                 this.$el.MG_VUE_CTRL = this; // 绑定句柄到 DOM
             },
 
@@ -773,7 +781,7 @@ $(function() {
                 })(item);
             }
         }
-        
+
         option.$snapshot = function() {
             return $.extend(true, {}, this.state);
         }

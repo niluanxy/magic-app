@@ -19,6 +19,7 @@
 
     &.allact .item.active,
     .item[href].active,
+    .item[link].active,
     .item.canact.active {
         @if ($build-rem == true) {
             background-color: $list-item-default-active-bg;
