@@ -30,7 +30,7 @@ module.exports = (function() {
                 if (val !== undefined) {
                     val = JSON.stringify(val);
                     val_fix = val==null?$$.__key_null:val;
-                    
+
                     localStorage.setItem(key_fix, val_fix);
                     return val; // 返回设置的值
                 } else {
@@ -42,7 +42,7 @@ module.exports = (function() {
             };
         }
     })();
-    
+
 
     $$.keyRemove = function(key) {
         localStorage.removeItem(key);
@@ -53,7 +53,7 @@ module.exports = (function() {
      *=================================================*/
     $$.objParse = function(obj, str, exobj) {
         if (!obj || !str) return undefined;
-        
+
         var key, len, arr, vobj = obj;
         arr = str.split(".");
         len = arr.length - 1;
@@ -85,6 +85,46 @@ module.exports = (function() {
         }
     };
 
+    /**
+     * 清除 getter 和 setter 方法，输出纯净信息
+     * @param  {object} obj [要输出的对象]
+     */
+    $$.log = function(obj, call) {
+        function clear(child) {
+            var ret = {}, type, ftype;
+
+            ftype = typeof child;
+
+            if (ftype == "string"  ||
+                ftype == "number"  ||
+                ftype == "boolean" ||
+                child == null || child == NaN) {
+
+                ret = child; // 值对象直接返回
+            } else {
+                if (child instanceof Array) {
+                    ret = [];
+                }
+
+                for(var key in child) {
+                    type = typeof child[key];
+
+                    if (type == "function") {
+                        break;
+                    } else if (type == "object") {
+                        ret[key] = clear(child[key])
+                    } else {
+                        ret[key] = child[key];
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        call = call ? call : "log";
+        console[call](clear(obj));
+    }
 
     $$.update = function(scope, action, item, ext, find) {
         if (scope && action && scope[item] && ext !== undefined) {

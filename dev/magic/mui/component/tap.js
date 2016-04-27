@@ -1,6 +1,6 @@
 /**
  * 为常用的 button 组件添加点击效果，同时全局增加 tap 事件
- * 
+ *
  * @author      mufeng  <smufeng@gmail.com>
  * @version     0.2     <2016-01-19>
  */
@@ -104,7 +104,7 @@ $.ready(function() {
             ltype = this.lastType;
             this.lastType = e.type;
 
-            if ((e.touches && e.touches.length > 1) || 
+            if ((e.touches && e.touches.length > 1) ||
                 (e.type == "mousedown" && ltype != e.type
                     && this._isDouble(e, 600)) ) {
                 this.startX = null;      this.startY = null;
@@ -129,7 +129,7 @@ $.ready(function() {
                 tagName = $item[0].tagName.toUpperCase();
                 type    = ($item.attr("type") || "").toUpperCase();
 
-                if (tagName == "BUTTON" || (tagName == "INPUT" && 
+                if (tagName == "BUTTON" || (tagName == "INPUT" &&
                     "RADIO CHECKBOX".split(" ").indexOf(type) >= 0) ) {
                     e.preventDefault();
                     break;
@@ -162,7 +162,7 @@ $.ready(function() {
             e.preventDefault(); // 修复微信下拉显示网页地址
 
             // if (!this.moveClear && this._isMove(e, 1)) {
-                
+
             //     // 清除 tap 自定义相关操作
             //     this.moveClear = true;
             //     clearTimeout(this.delayStart);
@@ -251,19 +251,19 @@ $.ready(function() {
     };
 
 
-    /** 
-     * 
+    /**
+     *
      * 事件初始化，同时修复移动端 点击穿透问题，原理如下:
      *
      * 移动端的click都是touch之后，才会模拟触发。触发的顺序如下:
-     * 
+     *
      * touchstart -> touchmove -> touchend ->
      * mousedown  -> mousemove -> mouseenter -> click
-     * 
+     *
      * 在重叠的区域里，被遮盖的元素绑定click，遮盖的元素绑定touch事件，
      * 且touch后遮盖的元素会隐藏的话，就会造成穿透，因为click是在touch
      * 之后延迟触发的，浏览器会误认为是在遮盖的元素上触发了click。
-     * 
+     *
      */
     ;(function() {
         var kt = window.ontouchstart !== undefined ? 0 : 1,
@@ -284,7 +284,7 @@ $.ready(function() {
             doc[bind]("mouseup", tap);
             doc[bind]("mousecancel", tap);
         }
-        
+
         doc[bind]("pointerdown", tap);
         doc[bind]("pointermove", tap);
         doc[bind]("pointerup", tap);
@@ -306,7 +306,7 @@ $.ready(function() {
                         var tar  = e.target,
                             type = $(tar).attr("type");
 
-                        type = type ? type.toUpperCase() : type;    
+                        type = type ? type.toUpperCase() : type;
 
                         if (type && "RADIO CHECKBOX".split(" ").indexOf(type) >= 0) {
                             if (tar.checked === false) {

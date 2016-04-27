@@ -798,6 +798,9 @@ $(function() {
         return store;
     }
 
+    /**
+     * filter 指令注册器，注册后会自动生成命名空间
+     */
     mvue.filter = function(name, fun) {
         Vue.filter(name, fun);
         mvue.filter[name] = fun;

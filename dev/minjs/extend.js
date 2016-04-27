@@ -1,6 +1,6 @@
 /**
  * String 对象添加 hashCode 功能
- * 
+ *
  * @author      mufeng  <smufeng@gmail.com>
  * @version     0.1     <2015-04-26>
  * @link        http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
