@@ -301,9 +301,11 @@ $(function() {
         var $view = $(mvue.__VIEW__), LOAD = mvue.__LOAD__,
             tsend, loadcls;
 
-        if ($.runtime == "weixin") {
+        if (window.onwebkitTransitionEnd !== null) {
             tsend = "webkitTransitionEnd webkitAnimationEnd";
-        } else {
+        } else if (window.onwebkitanimationend !== null) {
+            tsend = "webkitanimationend webkitanimationend";
+        } else if (window.ontransitionend !== null) {
             tsend = "transitionend animationend";
         }
 
@@ -394,9 +396,11 @@ $(function() {
         var $now = $(now), $old = $(old),
             LOAD = mvue.__LOAD__, nowCls, oldCls, tsend;
 
-        if ($.runtime == "weixin") {
+        if (window.onwebkitTransitionEnd !== null) {
             tsend = "webkitTransitionEnd webkitAnimationEnd";
-        } else {
+        } else if (window.onwebkitanimationend !== null) {
+            tsend = "webkitanimationend webkitanimationend";
+        } else if (window.ontransitionend !== null) {
             tsend = "transitionend animationend";
         }
 
@@ -448,9 +452,11 @@ $(function() {
             var LOAD = mvue.__LOAD__, $now = $(scope.$el),
                 $old, nowCls, oldCls, tsend;
 
-            if ($.runtime == "weixin") {
+            if (window.onwebkitTransitionEnd !== null) {
                 tsend = "webkitTransitionEnd webkitAnimationEnd";
-            } else {
+            } else if (window.onwebkitanimationend !== null) {
+                tsend = "webkitanimationend webkitanimationend";
+            } else if (window.ontransitionend !== null) {
                 tsend = "transitionend animationend";
             }
 
