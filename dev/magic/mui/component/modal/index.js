@@ -8,7 +8,7 @@ module.exports = (function() {
 
     Modal.CONFIG = {
         zindex: 100,
-        wrapClass : require("./style.css").modal_wrapper,
+        wrapClass : "modal-wrapper",
         itemClass : "modal-item",
     }
 

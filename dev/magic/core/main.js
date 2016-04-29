@@ -64,7 +64,7 @@ require("extend");      // 原生对象扩展
                 } else if (select instanceof Magic) {
                     return select;
                 }
-                
+
                 return this.length > 0 ? this : null;
             },
 
@@ -102,7 +102,7 @@ require("extend");      // 原生对象扩展
             },
             toggleClass: function(className, set) {
                 this[0] && _UTIL.toggleClass(this[0], className, set);
-                
+
                 return this;
             },
 
@@ -424,6 +424,21 @@ require("extend");      // 原生对象扩展
 
             isFun: _UTIL.isFun,
 
+            slice: function(args, start, end) {
+                var ret = []; start = start || 0;
+
+                for(var i=start; i<args.length; i++) {
+                    if (end && i > end) {
+                        console.log("break")
+                        break;
+                    }
+
+                    ret.push(args[i]);
+                }
+
+                return ret;
+            },
+
             /* 返回一个节流执行的函数 */
             delayCall: _UTIL.delayCall,
 
@@ -496,7 +511,7 @@ require("extend");      // 原生对象扩展
             /* 一个简易的转换json的方法 */
             parseJSON: function(str) {
                 // 去掉首尾括号,方便后续处理
-                str = str.replace(/^\{+/, '');    
+                str = str.replace(/^\{+/, '');
                 str = str.replace(/\}+$/, '');
 
                 var arr = str.split(","), item, key, ret = {};
@@ -520,7 +535,7 @@ require("extend");      // 原生对象扩展
                 data  = data || {};         // data空是创建空对象
 
                 // 如果传入了后台回调方法，则设置，否则默认
-                callname = data.jsonp || "callback";    
+                callname = data.jsonp || "callback";
                 data.jsonp && delete data.jsonp;    // 删除属性
 
                 // 参数过滤，剔除空值

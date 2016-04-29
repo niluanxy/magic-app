@@ -770,11 +770,10 @@ $(function() {
             } else if (type == "string") {
                 store[key] = (function(mutation) {
                     return function(store) {
-                        var dispatch = store.dispatch, args = [mutation];
+                        var dispatch = store.dispatch, args;
 
-                        for(var i=1; i<arguments.length; i++) {
-                            args.push(arguments[i]);
-                        }
+                        args = $.slice(arguments, 1);
+                        args.unshift(mutation);
 
                         return dispatch.apply(undefined, args);
                     }
