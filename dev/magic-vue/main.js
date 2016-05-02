@@ -763,9 +763,44 @@ $(function() {
         if (option.modules) obj.modules = option.modules;
         if (option.middlewares) obj.middlewares = option.middlewares;
 
+        // 设置 数据快照 数据恢复底层方法
+        if (!obj.mutations) obj.mutations = {};
+        obj.mutations._$RECOVER_ = function(state, snapshot) {
+            for(var key in snapshot) {
+                var copy, item = snapshot[key];
+
+                if ($.isArray(item) || $.isObject(item)) {
+                    copy = $.isArray(item) ? [] : {};
+
+                    $.extend(true, copy, snapshot[key]);
+                } else {
+                    copy = item;
+                }
+
+                state[key] = copy;
+            }
+        }
+
         actions = option.actions;
         delete option.actions;
         store = new Vuex.Store(obj);
+
+        // 数据快照 备份和恢复具体方法定义
+        if (!actions) actions   = {};
+        // 设置 数据快照 备份方法
+        actions.$snapshot = function() {
+            return $.extend(true, {}, store.state);
+        }
+        // 设置 数据快照 备份方法
+        actions.$recover = function(snapshot) {
+            if (arguments.length >= 2) {
+                snapshot = arguments[1];
+            }
+
+            if (typeof snapshot == "object") {
+                store.dispatch("_$RECOVER_", snapshot);
+            }
+        }
 
         for(var key in actions) {
             item = actions[key];
@@ -787,13 +822,7 @@ $(function() {
             }
         }
 
-        option.$snapshot = function() {
-            return $.extend(true, {}, this.state);
-        }
 
-        option.$recover = function(snapshot) {
-            this.$set('state', snapshot);
-        }
 
         // 注册为全局的对象
         if (typeof name == "string") {

@@ -422,7 +422,9 @@ require("extend");      // 原生对象扩展
                 return html;    // 返回渲染后的数据
             },
 
-            isFun: _UTIL.isFun,
+            isFun   : _UTIL.isFun,
+            isArray : _UTIL.isArray,
+            isObject: _UTIL.isObject,
 
             slice: function(args, start, end) {
                 var ret = []; start = start || 0;

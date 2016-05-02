@@ -21,6 +21,9 @@ module.exports = (function() {
         return typeof call == "function";
     }
 
+    util.isArray  = isArray;
+    util.isObject = isObject;
+
     /**
      * 按照输入参数返回一个节流函数
      *
@@ -167,7 +170,7 @@ module.exports = (function() {
 
                     // 若设置忽略无效值，则忽略
                     if (pass && copy == undefined) {
-                        continue;   
+                        continue;
                     }
 
                     if (deep && copy && ( isArray(copy) || isObject(copy) ) ) {
@@ -439,7 +442,7 @@ module.exports = (function() {
         return new f();
     };
 
-    
+
     /**
      * 实现一个继承方法，可以重写，调用，覆盖父类方法
      * @param       {Object}  cls - 要继承的父类对象
