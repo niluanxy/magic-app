@@ -43,9 +43,10 @@ module.exports = (function() {
         }
     })();
 
-
     $$.keyRemove = function(key) {
-        localStorage.removeItem(key);
+        var key_fix = $$.__key_prefix + key;
+
+        localStorage.removeItem(key_fix);
     };
 
     /*=================================================
