@@ -9,14 +9,16 @@
 /*********************************************************************
  * coreui 核心UI组件样式输出
  *********************************************************************/
-.bar        { @include bar(); }
-.button     { @include button(); }
-.tabs       { @include tabs(); }
-.content    { @include content(); }
-.scroll     { @include scroll(); }
-.list       { @include list(); }
-.slider     { @include slider(); }
-.popup		{ @include popup(); }
+.bar                { @include bar(); }
+.button             { @include button(); }
+.tabs               { @include tabs(); }
+.content            { @include content(); }
+.scroll             { @include scroll(); }
+.list               { @include list(); }
+.slider             { @include slider(); }
+.popup		        { @include popup(); }
+.modal              { @include modal(); }
+.modal-wrapper      { @include modal-wrapper(); }
 
 
 @include form();			// form   表单组件元素
