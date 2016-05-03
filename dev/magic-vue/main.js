@@ -802,18 +802,41 @@ $(function() {
             }
         }
 
+        // actions 方法绑定到对象上
         for(var key in actions) {
             item = actions[key];
             type = typeof item;
 
             if (type == "function") {
-                store[key] = item;
+                store[key] = (function(call) {
+                    return function(/* store... */) {
+                        var args, _store;
+
+                        if (arguments[0] instanceof Vuex.Store) {
+                            args = $.slice(arguments, 1);
+                        } else {
+                            args = $.slice(arguments);
+                        }
+
+                        _store = store;
+                        args.unshift(_store);
+
+                        return call.apply(undefined, args);
+                    }
+                })(item);
             } else if (type == "string") {
                 store[key] = (function(mutation) {
-                    return function(store) {
-                        var dispatch = store.dispatch, args;
+                    return function(/* store... */) {
+                        var dispatch, args, _store;
 
-                        args = $.slice(arguments, 1);
+                        if (arguments[0] instanceof Vuex.Store) {
+                            args = $.slice(arguments, 1);
+                        } else {
+                            args = $.slice(arguments);
+                        }
+
+                        _store = store;
+                        dispatch = _store.dispatch;
                         args.unshift(mutation);
 
                         return dispatch.apply(undefined, args);
@@ -821,8 +844,6 @@ $(function() {
                 })(item);
             }
         }
-
-
 
         // 注册为全局的对象
         if (typeof name == "string") {
