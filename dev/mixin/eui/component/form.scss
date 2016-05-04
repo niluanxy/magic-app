@@ -169,7 +169,7 @@
                 &:checked,
                 &.checked {
                     &:before {
-                        transform: translate3d(rem($input-toggle-move), 0, 0);
+                        transform: translate3d($input-toggle-move, 0, 0);
                     }
 
                     &:after {
