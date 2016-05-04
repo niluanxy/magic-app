@@ -152,7 +152,7 @@ module.exports = (function() {
         }
 
         // 如果只有一个参数时，合并到自身
-        if (i == len) {
+        if (i === len) {
             target = this;      // 重置复制对象句柄
             i = 0;              // 重置开始复制的对象下标
         }

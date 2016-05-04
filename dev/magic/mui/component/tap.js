@@ -49,7 +49,7 @@ $.ready(function() {
     tap = {
         delay  : 200,
         animate: 240,
-        checkMove : 2,
+        checkMove : 4,
         doubleTime: 300,
         delayClass: 50,
 

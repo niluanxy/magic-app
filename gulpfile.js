@@ -206,7 +206,6 @@ function task_dev_app_pub() {
                         DIR_APP+"dist/";
 
     gulp.src([DIR_APP_PUB+"**/*", "!"+DIR_APP_PUB+"main*",
-              "!"+DIR_APP+"lib/magic*",
               "!"+DIR_APP_PUB+"lib/mixin.scss",
               "!"+DIR_APP_PUB+"css/"])
     .pipe(gulp.dest(fpath+DIR_PUBLIC))
