@@ -61,6 +61,11 @@
         }
     }
 
+    // 修复 flex 子元素 不能 100% 高度
+    .flex-full-height {
+        @include flex-full-height;
+    }
+
     .retina-border {
         border-width: 0 !important;
         @include retina-border-width(all);

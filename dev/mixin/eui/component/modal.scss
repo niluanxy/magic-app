@@ -54,4 +54,17 @@
     &.bottom {
         bottom: 0;
     }
+
+    .header, .bar-header,
+    .footer, .bar-footer, .buttons {
+        flex-shrink: 0;
+    }
+
+    .buttons {
+        display: flex;
+
+        .button {
+            flex: 1;
+        }
+    }
 }

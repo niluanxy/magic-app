@@ -127,6 +127,10 @@ $(function() {
             after : function(lastUrl, nowUrl, match, that) {
                 mvue.__STATE__.ROUTER_AFTER = true;
                 vue.$broadcast("routeChange", nowUrl);
+
+                if (PAGE.BEFORE && PAGE.BEFORE[0]) {
+                    PAGE.BEFORE[0].$broadcast("PAGE_VIEW_HIDE");
+                }
             },
 
             always: function(lastUrl, nowUrl, match, that) {
@@ -541,10 +545,10 @@ $(function() {
 
             this.$set('params', params || {});
             this.$dispatch("childPageReady");   // 向上冒泡事件
-            this.$broadcast("pageReady");       // 向下传递事件
+            this.$broadcast("PAGE_READY");      // 向下传递事件
 
             /* 页面包裹容器 上触发页面加载完成事件 */
-            this.MG_PAGE_WRAPPER.$emit("pageReady");
+            this.MG_PAGE_WRAPPER.$emit("PAGE_READY");
         }
 
         if (typeof init == "function") {

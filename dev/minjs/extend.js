@@ -29,6 +29,41 @@ String.prototype.toUpFirst = function() {
 }
 
 /**
+ * String 对象返回真实的字符长度，修正汉字长度不一样
+ */
+String.prototype.cnLength = function() {
+    var arr = this.match(/[^x00-xff]/ig);
+
+    return this.length + (arr == null ? 0 : arr.length);
+}
+
+/**
+ * String 中文字符串截取函数
+ * @param  {number} len [截取后的总长度，汉字占 2 字节]
+ * @return {string}     [截取后的对象]
+ */
+String.prototype.cnTrim = function(len, end) {
+    var str, reg = /[^\x00-\xff]/g, max = Math.floor(len/2);
+
+    str = this.slice();                         // 复制当前对象
+    end = end != undefined ? end : "...";       // 结尾追加的元素
+
+    if(this.replace(reg, "mm").length <= len) {
+        return str;
+    }
+
+    for(var i = max; i<str.length; i++) {
+        var sub = str.substr(0, i).replace(reg, "mm");
+
+        if(sub.length >= len) {
+            return str.substr(0, i) + end;
+        }
+    }
+
+    return str;
+}
+
+/**
  * Array findBy 工具函数，通过给定的key和值反向查找数据
  * eg: var test = [
  *     {name: "jack", age: 23, work: true},

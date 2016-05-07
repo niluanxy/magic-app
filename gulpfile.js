@@ -165,7 +165,7 @@ function task_dev_magic_js() {
         .pipe(gulp.dest(DIR_APP_PUB + "lib/"))
         .on("finish", function() { defer.resolve(); });
     })
-        
+
 
     return defer.promise;
 }
@@ -229,7 +229,7 @@ function task_dev_app_html() {
             minifyJS: true,
             minifyCSS: true,
             removeComments: true,
-        }) 
+        })
     ))
     .pipe(gulp.dest(fpath))
     .on("finish", function() { defer.resolve() });
@@ -277,7 +277,9 @@ function task_dev_app_css() {
                         newn = release?name:"main.css";
 
                     gulp.src(DIR_APP_PUB+"main.scss")
-                    .pipe(sass())
+                    .pipe(sass({
+                        includePaths: [DIR_APP, DIR_APP+DIR_MODULE]
+                    }))
                     .pipe(autoprefixer())
                     .pipe(px2rem(px2remOptions))
                     .pipe(gulpif(release, minifycss()))
@@ -439,7 +441,7 @@ gulp.task("cordova-create", ["create_base"], function(demo) {
     path = test ? "demo/**/*" : "prod/**/*";
 
     gulp.src(DIR_RESOURCE + "config.xml")
-        .pipe(gulp.dest(DIR_CORDOVA));  
+        .pipe(gulp.dest(DIR_CORDOVA));
 
     gulp.src(DIR_RESOURCE + path)
         .pipe(gulp.dest(DIR_CORDOVA+"resource/"))
@@ -451,7 +453,11 @@ gulp.task("cordova-config", function() {
     var path = DIR_CORDOVA + "platforms/android";
 
     gulp.src(DIR_RESOURCE + "config.xml")
-        .pipe(gulp.dest(DIR_CORDOVA));
+    .pipe(gulp.dest(DIR_CORDOVA))
+    .on("finish", function() {
+        gulp.src(DIR_RESOURCE + "plugins/**/*")
+        .pipe(gulp.dest(DIR_CORDOVA+"plugins"))
+    })
 })
 
 /* 添加android平台 */

@@ -26,7 +26,7 @@ module.exports = (function() {
                     handle = $(scope.$el).modal($el, option);
                 }
 
-                that._handle = handle;
+                that._HANDLE_ = handle;
                 $el.removeAttr(["ctrl", "show", "align"]);
 
                 if (scope[ctrl] !== undefined) {
@@ -36,27 +36,34 @@ module.exports = (function() {
                 if (view && view != "true" && view !== true) {
                     var _name = $$.__makeViewName(view), _child,
                         _view = $$.__renderView(_name, "_loadModal"),
-                        _call = scope[$el.attr("call")];
+                        _call = scope[$el.attr("call")], load = $.defer();
 
                     _view.$appendTo($el[0]);
                     _child = _view.$children;
 
                     // 页面渲染后，将子页面的 句柄 暴露出来
                     if (_child[0] && scope[ctrl] !== undefined) {
-                        handle.view = _child[0];
+                        load.resolve();
                     } else {
-                        _view.$on("pageReady", function() {
-                            _child[0]._MODAL_PARENT = scope;
-                            _child[0]._MODAL_       = handle;
-
-                            if ($.isFun(_call)) {
-                                _child[0]._MODAL_CALL = _call;
-                            }
-
-                            handle.view = _child[0];
-                        })
+                        _view.$on("PAGE_READY", load.resolve);
                     }
+
+                    load.then(function() {
+                        _child[0]._MODAL_PARENT = scope;
+                        _child[0].$parent       = scope;
+                        _child[0]._MODAL_       = handle;
+
+                        if ($.isFun(_call)) {
+                            _child[0]._MODAL_CALL = _call;
+                        }
+
+                        handle.view = _child[0];
+                    })
                 }
+
+                that.$on("PAGE_VIEW_HIDE", function() {
+                    handle.hide();
+                })
             } else {
                 $el.addClass("hide");
             }

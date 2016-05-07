@@ -91,8 +91,12 @@ module.exports = (function() {
     /**
      * 返回一个随机的数字字符串
      */
-    util.getRandom = function() {
-        return (''+Math.random()).replace(/\D/g, '');
+    util.getRandom = function(min, max) {
+        if (min && max && min != max) {
+            return parseInt(Math.random()*(max-min+1)+min,10);
+        } else {
+            return (''+Math.random()).replace(/\D/g, '').replace(/^0*/, '');
+        }
     };
 
     /**

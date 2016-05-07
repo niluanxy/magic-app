@@ -167,12 +167,12 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
 @mixin retina-border($type: all, $color: $border-default-color, $after: false) {
 	// $type: top | bottom
 	// $color: color
-    // $after: true | false  插入元素的伪类名 
-    
-    $inset: before; @if $after == true { $inset: after; }// 
+    // $after: true | false  插入元素的伪类名
+
+    $inset: before; @if $after == true { $inset: after; }//
 
     @include retina-border-content($color, $retina-pixel-ratio);
-    
+
     @if $build-rem == true {
         @each $pos in $type {
             @if $pos == all {
@@ -199,33 +199,33 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
  *====================================================*/
 @mixin media-width($min: null, $max: null) {
     @if $min != null and $max != null {
-        @media screen and (-webkit-min-device-pixel-ratio: 1) 
+        @media screen and (-webkit-min-device-pixel-ratio: 1)
             and (min-width: $min) and (max-width: $max),
         screen and (min-device-pixel-ratio: 1) and (min-width: $min)
             and (max-width: $max),
 
-        screen and (-webkit-min-device-pixel-ratio: 2) 
+        screen and (-webkit-min-device-pixel-ratio: 2)
             and (min-width: $min * 2) and (max-width: $max * 2),
         screen and (min-device-pixel-ratio: 2) and (min-width: $min * 2)
             and (max-width: $max * 2) {
             @content;
         }
     } @else if $min != null and $max == null {
-        @media screen and (-webkit-min-device-pixel-ratio: 1) 
+        @media screen and (-webkit-min-device-pixel-ratio: 1)
             and (min-width: $min),
         screen and (min-device-pixel-ratio: 1) and (min-width: $min),
 
-        screen and (-webkit-min-device-pixel-ratio: 2) 
+        screen and (-webkit-min-device-pixel-ratio: 2)
             and (min-width: $min * 2),
         screen and (min-device-pixel-ratio: 2) and (min-width: $min * 2) {
             @content;
         }
     } @else if $max !=null and $min == null {
-        @media screen and (-webkit-min-device-pixel-ratio: 1) 
+        @media screen and (-webkit-min-device-pixel-ratio: 1)
             and (max-width: $max),
         screen and (min-device-pixel-ratio: 1) and (max-width: $max),
 
-        screen and (-webkit-min-device-pixel-ratio: 2) 
+        screen and (-webkit-min-device-pixel-ratio: 2)
             and (max-width: $max * 2),
         screen and (min-device-pixel-ratio: 2) and (max-width: $max * 2) {
             @content;
@@ -251,4 +251,10 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
 @mixin flex-align-center() {
     justify-content: space-around;
     align-items: center;
+}
+
+// 修复 flex 子对象不是 100% 高度
+@mixin flex-full-height() {
+    display: flex;
+    flex-direction: column;
 }

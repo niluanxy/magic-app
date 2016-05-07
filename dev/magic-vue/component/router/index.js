@@ -8,8 +8,11 @@ module.exports = (function() {
             call  = $el.attr("call");
             scope = $$.getVm(that);
 
-			$el.addClass("button button-clear ion-ios-arrow-left")
-			.on("tap.back", function() {
+            if (!$el.attr("class")) {
+                $el.addClass("button button-clear ion-ios-arrow-left")
+            }
+
+			$el.on("tap.back", function() {
 				var ret = true;		// 回调返回值
 
 				if (typeof scope[call] == "function") {
