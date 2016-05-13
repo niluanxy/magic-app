@@ -32,9 +32,7 @@ String.prototype.toUpFirst = function() {
  * String 对象返回真实的字符长度，修正汉字长度不一样
  */
 String.prototype.cnLength = function() {
-    var arr = this.match(/[^x00-xff]/ig);
-
-    return this.length + (arr == null ? 0 : arr.length);
+    return this.replace(/[^\x00-\xff]/g,"01").length;
 }
 
 /**
