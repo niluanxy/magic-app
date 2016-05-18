@@ -46,9 +46,12 @@ nrm use taobao
 <p>框架内置了以下常用命令，说明如下：</p>
 
 ```CLI
+gulp clean               ## 清空编译后的文件，常用于清理项目
 gulp build               ## 编译整个项目
-gulp build -r            ## 编译项目并压缩，常用于【项目发布】
-                            此命令并不包括 cordova 部分
+gulp build -r            ## 编译项目并压缩，常用于【项目发布】。注意此命
+                            令并不包括 cordova 部分。
+                            最终生成的文件位于 /app/dist 目录下。为保证
+                            文件纯净，建议发布前执行一次清理工作。
 
 gulp dev-mixin           ## 只编译框架 mixin 部分
 

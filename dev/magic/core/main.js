@@ -470,8 +470,11 @@ require("extend");      // 原生对象扩展
                     return new promise();
                 }
 
-                ret.all  = promise.all;
-                ret.when = promise.when;
+                for(var key in promise) {
+                    if (_UTIL.isFun(promise[key])) {
+                        ret[key] = promise[key];
+                    }
+                }
 
                 return ret;     // 返回操作的对象
             })(),

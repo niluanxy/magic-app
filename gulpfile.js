@@ -528,13 +528,15 @@ gulp.task("serve", function() {
     gulp.watch(["dev/minjs/*.js"], ["dev-minjs"])
 
     /* magic 动态刷新任务 */
-    gulp.watch(["dev/magic/core/*.scss", "dev/magic/lib/mixin.scss"], ["dev-magic-css", reload])
+    gulp.watch(["dev/magic/core/*.scss", "dev/magic/lib/mixin.scss"],
+                ["dev-magic-css", reload])
     gulp.watch(["dev/magic/**/*.js", "dev/magic/**/*.scss",
-                "dev/magic/**/*.html", "!dev/magic/core/*.scss", "!dev/magic/lib/mixin.scss"],
-                ["watch-magic-js"])
+                "dev/magic/**/*.html", "!dev/magic/core/*.scss",
+                "!dev/magic/lib/mixin.scss", "!dev/magic/lib/*.js"],
+                ["dev-magic-js", reload])
 
     /* magic-vue 动态刷新任务 */
-    gulp.watch(["dev/magic-vue/**/*"], ["dev-magic-vue"])
+    gulp.watch(["dev/magic-vue/**/*"], ["dev-magic-vue", reload])
 
     /* APP 动态刷新任务 */
     gulp.watch(["app/index.html"], ["dev-app-html", reload])
