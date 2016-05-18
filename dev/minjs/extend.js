@@ -108,7 +108,7 @@ Array.prototype.findIn = function(val) {
 /* 删除数组中指定值 */
 Array.prototype.delBy = function(val, all) {
     for(var i=0; i<this.length; i++) {
-        if (this[i] == val) {
+        if (this[i] === val) {
             this.splice(i, 1);
             if (!all) break;
         }
