@@ -1,6 +1,5 @@
-@import "lib/mixin.scss";
-
-.timer {
+@mixin timer() {
+    width: 100%;
     overflow: hidden;
     background-color: #fff;
 
@@ -15,9 +14,9 @@
         }
 
         .time-item {
-            height: 44px;
+            height: $timer-item-height;
             flex: 1;
-            margin: 88px 10px;
+            margin: $timer-item-height*2 $timer-base-margin;
             text-align: center;
             position: relative;
 
@@ -26,7 +25,7 @@
                 content: " ";
                 display: block;
                 position: absolute;
-                height: 44px;
+                height: $timer-item-height;
                 width: 100%;
                 top: 0; left: 0;
                 border: 1px solid #007aff;
@@ -53,13 +52,12 @@
     }
 
     .bottom {
-        margin: 10px;
-        padding-bottom: 6px;
+        margin: rem($timer-base-margin);
         text-align: right;
 
         .button {
-            padding: 0 12px;
-            margin: 0 6px;
+            padding: 0 rem($timer-button-padding);
+            margin: 0 rem($timer-button-margin);
         }
     }
 }

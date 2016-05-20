@@ -36,6 +36,23 @@
         }
     }
 
+    .iScrollVerticalScrollbar,
+    .iScrollHorizontalScrollbar {
+        position:absolute;
+        z-index:9999;
+
+        .iScrollIndicator {
+            box-sizing: border-box;
+            position: absolute;
+            background: rgba(0,0,0,0.5);
+            border-radius: 3px;
+        }
+
+        &.pointerNone {
+            pointer-events: none;
+        }
+    }
+
     .iScrollVerticalScrollbar {
         width: rem(3px);
 

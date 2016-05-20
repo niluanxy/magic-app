@@ -100,34 +100,6 @@ module.exports = (function() {
     };
 
     /**
-     * 对给定对象绑定事件
-     *
-     * @param       {Element}   el       - 操作对象
-     * @param       {String}    type     - 事件名
-     * @param       {Function}  fn       - 执行函数
-     * @param       {Boolean}   *capture - 是否进行函数捕获
-     * @author      mufeng  <smufeng@gmail.com>
-     * @version     0.1     <2015-04-10>
-     */
-    util.addEvent = function(el, type, fn, capture) {
-        el.addEventListener(type, fn, !!capture);
-    };
-
-    /**
-     * 移除给定对象的指定事件
-     *
-     * @param       {Element}   el       - 操作对象
-     * @param       {String}    type     - 事件名
-     * @param       {Function}  fn       - 执行函数
-     * @param       {Boolean}   *capture - 是否进行函数捕获
-     * @author      mufeng  <smufeng@gmail.com>
-     * @version     0.1     <2015-04-10>
-     */
-    util.removeEvent = function(el, type, fn, capture) {
-        el.removeEventListener(type, fn, !!capture);
-    };
-
-    /**
      * 合并一个或多个对象到目标对象
      *
      * @param       {Object}    deep     - 是否深度复制

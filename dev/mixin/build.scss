@@ -17,6 +17,7 @@
 .list               { @include list(); }
 .slider             { @include slider(); }
 .popup              { @include popup(); }
+.timer              { @include timer(); }
 .modal              { @include modal(); }
 .modal-wrapper      { @include modal-wrapper(); }
 

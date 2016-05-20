@@ -1,9 +1,9 @@
 module.exports = (function() {
-    var Modal = function(element, option) {
+    var Modal = function(element, options) {
         this.$el      = $(element);
         this.$wrapper = null;
         this.isHide   = false;
-        this.option   = $.extend({}, Modal.DEFAULT, option, true);
+        this.options   = $.extend({}, Modal.DEFAULT, options, true);
     };
 
     Modal.CONFIG = {
@@ -15,7 +15,7 @@ module.exports = (function() {
     Modal.DEFAULT = {
         wrap      : true,
         align     : 'bottom',
-        insert    : document.body,
+        insert    : "body",
         autoHide  : true,
         background: false,
     }
@@ -55,7 +55,7 @@ module.exports = (function() {
     }
 
     Modal.prototype.init = function() {
-        var that = this, opt = that.option, $dom;
+        var that = this, opt = that.options, $dom;
 
         that.$wrapper = Modal.createWrapper(opt.insert);
         that.$el = Modal.createItem(opt.wrap, that.$el, opt.background);
@@ -121,12 +121,16 @@ module.exports = (function() {
 
     /* 尝试绑定方法到 magic 框架的全局对象上 */
     if ($ && !$.modal) {
-        $.extend({modal: Modal});
+        $.extend({modal: function(el, options) {
+            var opt = $.extend({}, options);
+
+            return new Modal(el, opt).init();
+        }});
     };
 
     if ($ && $.fn && !$.fn.modal) {
-        $.fn.extend({modal: function(el, option) {
-            var opt = $.extend({}, option);
+        $.fn.extend({modal: function(el, options) {
+            var opt = $.extend({}, options);
 
             opt.insert = this;
 

@@ -12,7 +12,8 @@
 <p>依赖环境初始化只需在 <b>项目根目录</b> 执行以下命令：</p>
 
 ```CLI
-npm install -g gulp cordova webpack
+sudo npm install -g gulp cordova webpack
+
 npm install
 gulp build
 ```
@@ -22,11 +23,11 @@ gulp build
 <p><b>PS：</b>国内的环境问题，安装可能会很慢，所以建议先安装 <b>nrm</b> 工具，替换为 国内淘宝源，可以极大加快下载速度：</p>
 
 ```CLI
-npm install -g nrm
+sudo npm install -g nrm
 nrm use taobao
 ```
 
-<p>安装完成执行 <b>nrm ls</b> ，如果显示以下内容则安装成功：</p>
+<p>安装完成执行 <b>nrm ls</b> ，如果显示类似下面内容则安装成功：</p>
 
 ```CLI
   npm ---- https://registry.npmjs.org/

@@ -1,7 +1,5 @@
-require("./style.css");
-
 module.exports = (function() {
-    var Timer = function(option, time) {
+    var Timer = function(option) {
         this.value = "";                // 存放当前时间的date对象
         this.el    = null;              // 当前DOM控制句柄
         this.modal = null;              // 控制整体弹框
@@ -11,11 +9,16 @@ module.exports = (function() {
         this.options = $.extend({}, Timer.DEFAULT, option, true);
     };
 
+    /**
+     * 默认初始化参数
+     * show: YMD-hm  其中 - 表示分页符，YMDhm 为具体要显示的组件
+     * text: YYYY-MM-DD hh:mm 生成的数据格式为 2016-03-05 23:44
+     */
     Timer.DEFAULT = {
         type  : "mobile",               // 显示模式，移动/桌面
-        show  : "YMD-hm",               // 需要显示的UI模块
-        text  : "YYYY-MM-DD hh:mm",     // 选择框中提示文字的模板
-        format: "YYYY-MM-DD hh:mm",     // 最终输出的内容的模板
+        show  : "YMD",                  // 需要显示的UI模块
+        text  : "YYYY-MM-DD",           // 选择框中提示文字的模板
+        format: "YYYY-MM-DD",           // 最终输出的内容的模板
         filter: "",                     // 数据项过滤器，负数反选，正数正选，~区间
 
         /* values: { Y: [], M: []...}   // 自动追加的参数，存放每个字段的具体可选值 */
@@ -23,27 +26,21 @@ module.exports = (function() {
         min   : '',                     // 最小选择时间，默认为现在前五年
         max   : '',                     // 最大选择时间，默认为现在后五年
 
-        call  : null,                   // 选择后回调，传递三个参数 (type, val, handle)
-
-        confirm : null,                 // 点击确定按钮后的回掉
-        cancel  : null                  // 点击取消按钮后的回掉
-    }
-
-    /* 时间类型的简写和全写互转 */
-    Timer.type = function(find) {
-        var type = {
-            Y: "year", M: "month", D: "day", h: "hour", m: "minute"
-        }
-
-        for (var key in type) {
-            if (key === find) {
-                return type[key];
-            } else if (type[key] === find) {
-                return key;
-            }
-        }
-
-        return "";
+        /**
+         * 每次滚动后回调，传递三个参数
+         * type  : 当前滚动的类型  year month ...
+         * val   : 当前类型的值
+         * handle: 组件句柄
+         */
+        onScroll  : null,
+        /**
+         * 单击 确定或者取消 按钮后的回调，传递三个参数
+         * val   : stirng 类型的当前时间值
+         * value : date   类型的当前时间值
+         * handle: 组件句柄
+         */
+        onConfirm : null,                 // 点击确定按钮后的回掉
+        onCancel  : null                  // 点击取消按钮后的回掉
     }
 
     /* 判断是否为闰年 */
@@ -75,7 +72,7 @@ module.exports = (function() {
 
         /* 强制设置小时为中午，避免 00:00 会记为前一天 */
         date = $.time.format(date, "YYYY-MM-DD");
-        date = $.time.format(date + " 12:00"); 
+        date = $.time.format(date + " 12:00");
 
         var week = (6+date.getUTCDay())%7,
             rets = [], start = Timer.dateAdd(date, -week);
@@ -348,6 +345,50 @@ module.exports = (function() {
         return html;    // 返回最终构建的HTML
     }
 
+    /**
+     * 转会类型值为简写值
+     * @param  {String} type [要转换的类型值]
+     * @return {String}      [转写后的类型简值]
+     *
+     * Y -> Y  year -> Y  month -> M  minute -> m
+     */
+    function transType(type) {
+        var simple = "YMDhm", maps = {
+                year: "Y", month: "M",  day: "D",
+                hour: "h", minute: "m"
+            }, ret = null;
+
+        if (simple.search(type) > -1) {
+            ret = type;
+        } else if(maps[type]) {
+            ret = maps[type];
+        }
+
+        return ret;
+    }
+
+    /**
+     * 返回指定类型的全名
+     * @param  {String} type [要转换的类型值]
+     * @return {String}      [转写后的类型全名]
+     *
+     * Y -> year  month -> month
+     */
+    function transTypeName(type) {
+        var simple = "yearmonthdayhourminute",
+            maps = {
+                Y: "year", M: "month", D: "day",
+                h: "hour", m: "minute"
+            }, ret = null;
+
+        if (simple.search(type) > -1) {
+            ret = type;
+        } else if(maps[type]) {
+            ret = maps[type];
+        }
+
+        return ret;
+    }
 
     /* TODO: min,max功能测试
      * TODO: 过滤器功能测试
@@ -393,30 +434,32 @@ module.exports = (function() {
             vals = Timer.initVals(tmp, opt.filter[tmp], ext);
             vals = Timer.fixVals(tmp, vals, that.value, opt.min, opt.max);
 
-            html = "<div class='time-item' type='"+Timer.type(tmp)+ "'><div class='list'>";
+            html = "<div class='time-item' type='" + transTypeName(tmp)
+                   + "'><div class='list'>";
 
-            scroll[tmp] = $(html+Timer.makeHtml(tmp, vals)+"</div></div>").scroll({
-                                scrollbars: false,
-                                snap      : true
-                            });
+            scroll[tmp] = $(html+Timer.makeHtml(tmp, vals)+"</div></div>")
+                          .scroll({
+                              snap: true,
+                              refresh: true,
+                              scrollbars: false
+                          });
+
             that.page[dir].append(scroll[tmp].wrapper);
         }
 
         /* 定义滚动结束的回调方法 */
         function scrollEnd() {
-            var handle = this, val, $now, $el, type;
+            var handle = this, $now, $el, type;
 
             $el  = $(handle.wrapper);
             type = $el.attr("type");
-            $now = that.nowItem(Timer.type(type));
+            $now = that.typeDom(type);
 
-            val = $now.attr("val");
-            that.update(Timer.type(type), val);     // 更新改变项值
-            that.refresh(Timer.type(type));         // 刷新时间数据
+            that.refreshItem(type);          // 刷新时间数据
 
-            if ($.isFun(opt.call)) {
+            if ($.isFun(opt.onScroll)) {
                 /* 执行时间选择完毕的回调 */
-                opt.call(that.val(), that.value, that);
+                opt.onScroll(type, that.typeVal(type), that);
             }
         };
 
@@ -426,7 +469,7 @@ module.exports = (function() {
 
         /* 创建底部控制按钮 */
         html  = "<div class='bottom'><a class='cancel button button-clear'>取消</a>";
-        html += (show.length>3)?"<a class='toggle button button-clear'>时间</a>":"";
+        html += (show.length>3)?"<a class='toggle button button-clear'>下一项</a>":"";
         html += "<a class='ok button button-clear'>确认</a></div>";
 
         that.el.append(html).appendTo("body");  // 插入到页面中
@@ -435,85 +478,126 @@ module.exports = (function() {
         that.el.on("tap", ".button", function(e) {
             e.stopPropagation();
 
-            var $target = $(e.target), ret;
+            var $target = $(e.target), ret, val = "";
 
             if ($target.hasClass("cancel")) {
-                if ($.isFun(opt.cancel)) {
-                    ret = opt.cancel(that.val(), that.value, that);
+                if ($.isFun(opt.onCancel)) {
+                    ret = opt.onCancel(that.val(), that.value, that);
                 }
             } else if ($target.hasClass("ok")) {
-                if ($.isFun(opt.confirm)) {
-                    ret = opt.confirm(that.val(), that.value, that);
+                that.value = that.showValue();  // 更新当前时间
+
+                if ($.isFun(opt.onConfirm)) {
+                    ret = opt.onConfirm(that.val(), that.value, that);
                 }
+            } else if ($target.hasClass("toggle")) {
+                var page = that.page;
+
+                for(var i=0; i<page.length; i++) {
+                    page[i].toggleClass("hideOut");
+                }
+
+                if (page[0].hasClass("hideOut")) {
+                    $target.text("上一页");
+                } else {
+                    $target.text("下一页");
+                }
+
+                that.refreshItem();
+
+                ret = false;
             }
 
             if (ret !== false) that.hide();
         })
 
-        /* 第一次点击的时候初始化值 */
-        that.el.once("touchstart", function(e) {
-            var scroll = that.el.query(".time-item"),
-                find   = ".item:nth-child(1)";
-
-            if (scroll instanceof Element) {
-                scroll = new Array(scroll);
-            }
-
-            for(var i=0; i<scroll.length; i++) {
-                var $main  = $(scroll[i]),
-                    $first = $main.find(find);
-
-                that.update($main.attr("type"), $first.attr("val"));
-            }
-        })
-
         return this;
     };
 
-    /* 返回给定类型的当前选中的值 */
-    Timer.prototype.itemVal = function(type) {
-        var handle = this.scroll[type], val = 0, $now;
+    /**
+     * 返回 给定类型 当前 值
+     * @param  {String}  type [查找的类型]
+     * @return {String}       [返回值 或 null]
+     *
+     * type: Y, year, Month, day ...
+     */
+    Timer.prototype.typeVal = function(type) {
+        type = transType(type); // 转换为简值
+        var $dom = this.typeDom(type), val = null;
 
-        if (handle /* 有值时才操作 */) {
-            $now = this.nowItem(type);
-            val  = $now.attr("val") || 0;
+        if ($dom /* 有值时才操作 */) {
+            val = $dom.attr("val") || null;
+            if (type == "M" && val) {
+                val = parseInt(val)+1;
+            }
         }
 
         return val;         // 返回选定的值
     }
 
-    /* 返回某个值的当前选中DOM对象 */
-    Timer.prototype.nowItem = function(type) {
-        var handle = this.scroll[type], pos;
+    /**
+     * 返回 给定类型 当前 DOM对象
+     * @param  {String}  type [查找的类型]
+     * @return {Element}      [返回DOM 或 null]
+     *
+     * type: Y - year  M - month D - day 以此类推
+     */
+    Timer.prototype.typeDom = function(type) {
+        type = transType(type); // 转换为简值
+        var handle = this.scroll[type], pos, dom = null;
 
-        pos = handle.currentPage.pageY+1 || 1;
+        if (handle /* 给定类型有DOM对象 */ ) {
+            pos = handle.currentPage.pageY+1 || 1;
+            dom = $(handle.scroller).find(".item:nth-child("+pos+")");
+        }
 
-        return $(handle.scroller).find(".item:nth-child("+pos+")");
+        return dom && dom.length ? dom : null;
+    }
+
+    /**
+     * 返回 给定类型 给定值 的 DOM 序号
+     * @param  {String} type [查找的类型]
+     * @param  {Number} val  [查找的值]
+     * @return {Number}      [查到的 DMO 的 序号]
+     */
+    Timer.prototype.typePos = function(type, val) {
+        type = transType(type); // 转换为简值
+        var handle = this.scroll[type], pos = null, childs;
+
+        if (handle /* 给定类型有DOM对象 */ ) {
+            childs = handle.scroller.children;
+
+            for(var i=0; i<childs.length; i++) {
+                if ($(childs[i]).attr("val") == val) {
+                    pos = i; break;
+                }
+            }
+        }
+
+        return pos;
     }
 
     /* 手动更新某个时间值 */
     Timer.prototype.update = function(type, val) {
-        
+        type = transType(type); // 转换为简值
+        var call, handle = this.scroll[type], pos,
+            fun = {
+                Y: "setFullYear", M: "setMonth", D: "setDate",
+                h: "setHours",    m: "setMinutes"
+            };
 
-        var fun = {
-                Y: "setFullYear",
-                M: "setMonth",
-                D: "setDate",
-                h: "setHours",
-                m: "setMinutes"
-            }, full = {
-                year  : "setFullYear",
-                month : "setMonth",
-                day   : "setDate",
-                hour  : "setHours",
-                minute: "setMinutes"
+        val = type == "M" ? val-1 : val;
+
+        if (handle && (call = fun[type]) && val) {
+            pos = this.typePos(type, val) || 0;
+            // 防止当前不在显示的scroll报错
+            if (handle.pages.length) {
+                handle.goToPage(0, pos, 0);
             }
-
-        if ((fun[type] || full[type]) && val) {
-            var call = fun[type] || full[type];
+            val = this.typeDom(type).attr("val");
 
             /* 修复当前日期大于该月最大日期时，月份更改失败问题 */
-            if (type == "M" || type == "month") {
+            if (type == "M") {
                 var now = this.value,
                     max = Timer.getDays(now.getFullYear(), val);
 
@@ -521,15 +605,29 @@ module.exports = (function() {
             }
 
             this.value[call](parseInt(val));
+            this.refreshItem();
         }
 
         return this.value;  // 返回修改后的值
     }
 
+    /* 获得当前组件显示的 时间值 */
+    Timer.prototype.showValue = function() {
+        var val = "", opt = this.options,
+            find = opt.show.replace("-", '').split('');
+
+        for(var i=0; i<find.length; i++) {
+            val += this.typeVal(find[i]) + " ";
+        }
+
+        return Timer.format(val);
+    }
+
     /* 刷新时间对象的可选值列表 */
-    Timer.prototype.refresh = function(type, date) {
+    Timer.prototype.refreshItem = function(type, date) {
+        type = transType(type); // 转换为简值
         var filter, pos, now, $el, vals,
-            ext, tmp, opt = this.options;
+            ext, tmp, html, opt = this.options;
 
         filter = "YMDhm".split("");    // 获取过滤器数据
         pos = filter.indexOf(type);
@@ -538,8 +636,9 @@ module.exports = (function() {
 
         for (var i=pos+1; i<filter.length; i++) {
             tmp = filter[i];    // 获取当前时间对象类型
-            ext = tmp=="D"?now.getMonth():null;
-            $el = this.el.find(".time-item[type='"+Timer.type(tmp)+"']>.list");
+            ext = tmp=="D"?this.typeVal("M")-1:null;
+            $el = this.el.find(".time-item[type='"
+                  + transTypeName(tmp)+"']>.list");
 
             if ($el[0] /* 当前是否有此对象 */) {
                 vals = Timer.initVals(tmp, filter[tmp], ext);
@@ -547,9 +646,8 @@ module.exports = (function() {
 
                 html = Timer.makeHtml(tmp, vals);
 
-                /* 更新事件数据，同时刷新滚动条 */
-                $el.html(html); this.scroll[tmp].refresh();
-                this.update(tmp, this.itemVal(tmp));
+                $el.html(html);   /* 更新事件数据，同时刷新滚动条 */
+                this.scroll[tmp] && this.scroll[tmp].refresh();
             }
         }
 
@@ -557,11 +655,20 @@ module.exports = (function() {
     };
 
     Timer.prototype.show = function() {
-        this.modal.show();
+        this.modal.show();  // 先显示DOM对象
 
-        var scroll = this.scroll;
-        for(var key in scroll) {
-            scroll[key].refresh();
+        var keys = this.options.show.replace("-", '').split(''),
+            time = this.val("YYYY-M-D-h-m").split("-"), vals;
+
+        vals = {
+            Y: time[0], M: time[1], D: time[2],
+            h: time[3], m: time[4]
+        };
+
+        for(var i=0; i<keys.length; i++) {
+            var type = keys[i], val = vals[type];
+
+            this.update(type, val);
         }
 
         return this;
@@ -582,20 +689,18 @@ module.exports = (function() {
 
     Timer.prototype.destroy = function() {
         this.modal.destroy();   // modal删除
-        this.el.remove();       // 删除自身
     };
 
     /* 尝试绑定方法到 magic 框架的全局对象上 */
     if ($ && !$.timer) {
-        $.extend({timer: function(time, option) {
-            return new Timer(time, option).init();
+        $.extend({timer: function(option) {
+            return new Timer(option).init();
         }});
     };
 
     if ($ && $.fn && !$.fn.timer) {
-        $.fn.extend({timer: function(time, option) {
-
-            return new Timer(time, option).init();
+        $.fn.extend({timer: function(option) {
+            return new Timer(option).init();
         }});
     };
 
