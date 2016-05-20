@@ -4,7 +4,7 @@
 
 
 $tabs-height:                     $block-footer !default;
-$tabs-padding:                     2px !default; 
+$tabs-padding:                     2px !default;
 $tabs-text-font-size:             14px !default;
 $tabs-text-font-size-side-icon:   12px !default;
 
@@ -28,6 +28,6 @@ $tabs-stable-striped:			  $button-stable-active-border !default;
 
 $tabs-positive-bg:                $button-positive-bg !default;
 $tabs-positive-border:            $button-positive-border !default;
-$tabs-positive-text:              $button-positive-text !default;
-$tabs-positive-active:			  $button-positive-active-border !default;
+$tabs-positive-text:              rgba($button-positive-text, 0.4) !default;
+$tabs-positive-active:			  $button-positive-text !default;
 $tabs-positive-striped:			  $button-positive-active-border !default;

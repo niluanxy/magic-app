@@ -13,6 +13,10 @@
         .tab-item {
             color: $color;
             background-color: $bg-color;
+
+            &.actived {
+                color: $color-active;
+            }
         }
 
         &.tabs-striped, &.tabs-striped-top {
@@ -20,11 +24,7 @@
                 background-color: $striped !important;
             }
         }
-
-        &.actived {
-            color: $color-active;
-        }
-    } 
+    }
 }
 
 @mixin tabs($styles: stable positive) {
@@ -145,7 +145,7 @@
             top: 0;
         }
     }
-    
+
     @each $style in $styles {
         @if $style == stable {
             @include tabs-style($style, $tabs-stable-bg, $tabs-stable-border,
