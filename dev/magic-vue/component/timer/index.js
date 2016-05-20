@@ -4,20 +4,28 @@ module.exports = (function() {
             var $el = $(this.el), val = this.expression, scope = this.vm;
 
             if (scope[val] !== undefined /* 值存在的话 */) {
-                var ctrl, date, handle, scroll, confirm, cancel;
+                var ctrl, date, filter, handle, scroll, confirm, cancel;
 
                 ctrl    = $el.attr("ctrl");
                 date    = $el.attr("date");
+                filter  = $el.attr("filter");
                 scroll  = $el.attr("onScroll");
                 confirm = $el.attr("onConfirm");
                 cancel  = $el.attr("onCancel");
+
+                // 不是字符串，就是绑定的对象
+                if (filter.search(":") == -1) {
+                    filter = scope[filter];
+                } else if (filter) {
+                    filter = "{"+filter+"}";
+                }
 
                 handle = $.timer({
                 	format: $el.attr("format"),
                 	show  : $el.attr("show"),
                 	text  : $el.attr("text"),
 
-                	filter: scope[$el.attr("filter")],
+                	filter: filter,
                 	min   : $el.attr("min"),
                 	max   : $el.attr("max"),
 

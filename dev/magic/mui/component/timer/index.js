@@ -3,6 +3,7 @@ module.exports = (function() {
         this.value = "";                // 存放当前时间的date对象
         this.el    = null;              // 当前DOM控制句柄
         this.modal = null;              // 控制整体弹框
+        this.reset = false;             // 每次启动，只执行一次reset操作
         this.page  = [];                // 页面信息
         this.scroll= {};                // 滚动条信息
         this.input = null;              // 绑定的input，可为空
@@ -22,9 +23,6 @@ module.exports = (function() {
         filter: "",                     // 数据项过滤器，负数反选，正数正选，~区间
 
         /* values: { Y: [], M: []...}   // 自动追加的参数，存放每个字段的具体可选值 */
-
-        min   : '',                     // 最小选择时间，默认为现在前五年
-        max   : '',                     // 最大选择时间，默认为现在后五年
 
         /**
          * 每次滚动后回调，传递三个参数
@@ -52,42 +50,6 @@ module.exports = (function() {
         return (year%4==0 && year%100!=0)||(year%100==0 && year%400==0);
     }
 
-    /* 返回给定事件加上某天后的新的时间对象 */
-    Timer.dateAdd = function(date, days) {
-        if (typeof date == "number") {
-            date = new Date(date);
-        }
-
-        var time = date.getTime(), fix;
-        fix = days * 24 * 60 * 60 * 1000;
-
-        return new Date(time+fix);
-    }
-
-    /* 获取给定时间所在的周的第一天，从周一开始算 */
-    Timer.getWeek = function(date, all) {
-        if (typeof date == "number") {
-            date = new Date(date);
-        }
-
-        /* 强制设置小时为中午，避免 00:00 会记为前一天 */
-        date = $.time.format(date, "YYYY-MM-DD");
-        date = $.time.format(date + " 12:00");
-
-        var week = (6+date.getUTCDay())%7,
-            rets = [], start = Timer.dateAdd(date, -week);
-
-        if (all === true) {
-            for (var i=0; i<7; i++) {
-                rets.push(Timer.dateAdd(start, i));
-            }
-        } else {
-            rets.push(start);
-        }
-
-        return all === true ? rets : rets[0];
-    }
-
     /* 通过传入年份和月份，返回该月的天数
      * Tips: 月份从 0 开始 */
     Timer.getDays = function(year, month) {
@@ -101,104 +63,24 @@ module.exports = (function() {
         return days[month];     // 返回对应的月的天数
     }
 
-    /* 运算表达式 */
-    Timer.operat = function(num, str, save) {
-        if (!str || !num || !save) return 0;
-
-        var ope = [], vals = [num, null], snum,
-            pos = 0, chk, dir = 0, cal = [];
-
-        do {
-            chk = str[pos]; snum = "";
-
-            if (!isNaN(chk) /* 当前为数字 */) {
-                snum += chk;        // 尝试循环查找数字
-
-                for(var i=pos+1; i<str.length; i++) {
-                    if (isNaN(str[i])) break;
-                    snum += str[i]; pos = i;
-                }
-
-                snum = parseInt(snum);      // 存放获得的 数字 值
-                chk  = ope[ope.length-1];   // 存放顶层的操作符
-
-                if (["+", "-"].indexOf(chk) > -1) {
-                    vals[dir] += (chk=="+"?1:-1)*snum;
-                    ope.pop();              // 操作后操作符需要弹出栈
-                } else {
-                    vals[dir] = snum;
-                }
-            } else {
-                if (chk == "~") {
-                    vals[++dir] = num;
-                }
-
-                ope.push(chk);
-            }
-        } while (++pos < str.length);
-
-        do {
-            chk = ope.pop();
-
-            if (chk == '~') {
-                for(var i=vals[0]; i<=vals[1]; i++) {
-                    cal.push(i);   // 压入数据
-                }
-
-                vals[0] = vals[1] = null;
-            } else if (chk == '!') {
-                do {
-                    snum = cal.pop();
-
-                    do {
-                        pos = save.indexOf(snum);
-                        if (pos != -1) {
-                            save.splice(pos, 1);
-                        }
-                    } while (pos != -1);
-                } while(snum != undefined);
-            }
-        } while (chk != undefined);
-
-        /* 计算结果加入到原数组中 */
-        vals[0] && save.push(vals[0]);
-        vals[1] && save.push(vals[1]);
-        for(var i = 0; i < cal.length; i++) {
-            save.push(cal[i]);
-        }
-
-        /* 先从小到大排序，然后剔除重复元素 */
-        save.sort(function(a,b){return a>b?1:-1});
-        chk = null; pos = 0; // 用于临时存放数据
-        do {
-            snum = save[pos];
-
-            if (snum == chk) {
-                save.splice(pos, 1);
-            } else {
-                pos++; chk = snum;
-            }
-        } while (save.length && pos < save.length);
-
-        return save[save.length-1];    // 返回最后的值
-    }
-
     /* 通过过滤器生成具体的选择值 */
-    Timer.initVals = function(type, filter, ext) {
+    Timer.initVals = function(type, filter, ext, eyear) {
         /* Y 年    M 月    D 日    h 时    m 分    s 秒 */
 
-        var vals = [], now = new Date(), fil, num;
+        type = transType(type);
+        var vals = [], year, fil, num;
 
+        year = ext || (new Date).getFullYear();
         if (type === 'Y') {
-            vals.push(now.getFullYear());
+            vals.push(year);
         } else if (type === "M") {
             vals = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-        } else if (["D", "h", "m"].indexOf(type) != -1) {
+        } else if (["D", "h", "m", "s"].indexOf(type) != -1) {
             var max; // 存放循环初始化的边界
 
             switch (type) {
                 case "D":
-                    max = Timer.getDays(now.getFullYear(), ext);
+                    max = Timer.getDays(eyear || year, ext);
                     break;
                 case "h":
                     max = 24;
@@ -220,13 +102,27 @@ module.exports = (function() {
         }
 
         /* 有过滤器参数，且无 step 参数才执行 */
-        if (filter && !(type == "m" && ext)) {
-            num = vals[0];  // 当前操作对象
+        if (filter && type == "Y") {
             fil = filter.replace(/[\[|\]|\s]/g, '');
             fil = fil ? fil.split(',') : [];
 
             for(var i=0; i<fil.length; i++) {
-                num = Timer.operat(num, fil[i], vals);
+                var max, min, tmp;
+
+                if (fil[i].length > 1) {
+                    max = vals[vals.length - 1];
+                    min = max+parseInt(fil[i]);
+
+                    if (min > max /* 大小排序 */) {
+                        tmp = max; max = min; min = tmp;
+                    }
+
+                    for(var j=min; j<max; j++) {
+                        vals.push(j);
+                    }
+
+                    vals.sort();    // 从小到大排序
+                }
             }
         }
 
@@ -278,61 +174,6 @@ module.exports = (function() {
         }
     };
 
-    /* 获得给定时间的指定部分的前缀 */
-    Timer.prefix = function(date, type, fix) {
-        var array, prefix = "", pos, rule = {
-            "Y": 0, "M": 1, "D": 2, "h": 3, "m": 4
-        };
-
-        pos   = rule[type] + (fix||0);   // 获取前缀终止位置
-        array = Timer.format(date, "YYYY-MM-DD hh:mm");
-        array = array.replace(/[\-|\s|:]/g, ",").split(",");
-
-        /* 依次将前缀转为字符串 */
-        for (var i=0; i<pos; i++) {
-            prefix += array[i];
-        }
-
-        return prefix;
-    }
-
-    /* 通过给定的最小最大值，来再次修正可选择值列表
-    * TIP: 给定的 vals 值数组必须是从小到大排过序 */
-    Timer.fixVals = function(type, vals, now, min, max) {
-        var select = [], pre, old, tmp,
-            start = 0, end = vals.length-1;
-
-        if (!type || !vals || !(now instanceof Date)) return vals;
-
-        if (min instanceof Date) {
-            old = parseInt(Timer.prefix(min, type, 1));
-            pre = Timer.prefix(now, type);
-            for (var i=0; i<vals.length; i++) {
-                tmp = vals[i]; tmp = (tmp<10?"0":"")+tmp;
-                if (old <= parseInt(pre+tmp)) {
-                    start = i; break;   // 正向查最小值
-                }
-            }
-        }
-
-        if (max instanceof Date) {
-            old = parseInt(Timer.prefix(max, type, 1));
-            for (var i=vals.length-1; i>=0; i--) {
-                tmp = vals[i]; tmp = (tmp<10?"0":"")+tmp;
-                if (old >= parseInt(pre+tmp)) {
-                    end = i; break;     // 反向查最大值
-                }
-            }
-        }
-
-        /* 将筛选结果放入返回数组中 */
-        for (var i=start; i<=end; i++) {
-            select.push(vals[i]);
-        }
-
-        return select;  // 返回最终筛选过的值列表
-    };
-
     /* 根据类型，可选值，返回插入的HTML */
     Timer.makeHtml = function(type, vals) {
         var html = "", fix = type=="M"?1:0;
@@ -353,9 +194,9 @@ module.exports = (function() {
      * Y -> Y  year -> Y  month -> M  minute -> m
      */
     function transType(type) {
-        var simple = "YMDhm", maps = {
+        var simple = "YMDhms", maps = {
                 year: "Y", month: "M",  day: "D",
-                hour: "h", minute: "m"
+                hour: "h", minute: "m", second: "s",
             }, ret = null;
 
         if (simple.search(type) > -1) {
@@ -375,13 +216,13 @@ module.exports = (function() {
      * Y -> year  month -> month
      */
     function transTypeName(type) {
-        var simple = "yearmonthdayhourminute",
+        var simple = "yearmonthdayhourminutesecond",
             maps = {
-                Y: "year", M: "month", D: "day",
-                h: "hour", m: "minute"
+                Y: "year", M: "month",  D: "day",
+                h: "hour", m: "minute", s: "second",
             }, ret = null;
 
-        if (simple.search(type) > -1) {
+        if (type.length > 1 && simple.search(type) > -1) {
             ret = type;
         } else if(maps[type]) {
             ret = maps[type];
@@ -394,14 +235,13 @@ module.exports = (function() {
      * TODO: 过滤器功能测试
      * TODO: 时间和日期同时出现时显示切换，以及提示时间显示
      * TODO: step分钟过滤器功能添加
-     * TODO: input绑定功能设置，vue组件编写 */
+     */
     Timer.prototype.init = function() {
         var that = this, opt = that.options, tmp,
-            dir = 0, show, scroll = that.scroll;
+            dir = 0, show, scroll = that.scroll, $toggle;
 
         that.el = $("<div class='timer'></div>");
-        show = opt.show.match(/[Y|M|D|\-|h|m]/g);
-
+        show = opt.show.match(/[Y|M|D|\-|h|m|s]/g);
 
         /* 创建放置滚动条的容器 */
         that.page[0] = $("<div class='screen'></div>")
@@ -415,10 +255,10 @@ module.exports = (function() {
 
             opt.filter = {}; // 转为对象，方便存取过滤器
             for (var i=0; i<tmp.length; i++) {
-                tmp[i].replace(/[\[|\]|\s]/g, "");
-                vals = tmp[i][1]; // 获取第一个字符
+                var fval = tmp[i].replace(/[\{|\[|\]|\s|\}]/g, ""),
+                    fkey = fval[0];
 
-                opt.filter[vals] = "["+tmp[i].replace(/^.*:/, "")+"]";
+                opt.filter[fkey] = "["+fval.slice(2)+"]";
             }
         }
 
@@ -432,7 +272,6 @@ module.exports = (function() {
             var ext = tmp == "D" ? that.value.getMonth(): null;
 
             vals = Timer.initVals(tmp, opt.filter[tmp], ext);
-            vals = Timer.fixVals(tmp, vals, that.value, opt.min, opt.max);
 
             html = "<div class='time-item' type='" + transTypeName(tmp)
                    + "'><div class='list'>";
@@ -440,7 +279,6 @@ module.exports = (function() {
             scroll[tmp] = $(html+Timer.makeHtml(tmp, vals)+"</div></div>")
                           .scroll({
                               snap: true,
-                              refresh: true,
                               scrollbars: false
                           });
 
@@ -451,11 +289,11 @@ module.exports = (function() {
         function scrollEnd() {
             var handle = this, $now, $el, type;
 
-            $el  = $(handle.wrapper);
-            type = $el.attr("type");
-            $now = that.typeDom(type);
-
-            that.refreshItem(type);          // 刷新时间数据
+            type = $(handle.wrapper).attr("type");
+            type = transType(type);
+            if (type == "M") {
+                that.updateDays(that.typeVal("Y"), that.typeVal("M")-1);
+            }
 
             if ($.isFun(opt.onScroll)) {
                 /* 执行时间选择完毕的回调 */
@@ -474,6 +312,16 @@ module.exports = (function() {
 
         that.el.append(html).appendTo("body");  // 插入到页面中
         that.modal = $.modal(that.el);
+        $toggle = that.el.find(".bottom .toggle");
+
+        (function() {
+            var oldHide = that.modal.hide;
+
+            that.modal.hide = function() {
+                oldHide.call(that.modal);
+                that.togglePage(true);
+            }
+        })();
 
         that.el.on("tap", ".button", function(e) {
             e.stopPropagation();
@@ -491,21 +339,7 @@ module.exports = (function() {
                     ret = opt.onConfirm(that.val(), that.value, that);
                 }
             } else if ($target.hasClass("toggle")) {
-                var page = that.page;
-
-                for(var i=0; i<page.length; i++) {
-                    page[i].toggleClass("hideOut");
-                }
-
-                if (page[0].hasClass("hideOut")) {
-                    $target.text("上一页");
-                } else {
-                    $target.text("下一页");
-                }
-
-                that.refreshItem();
-
-                ret = false;
+                that.togglePage(); ret = false;
             }
 
             if (ret !== false) that.hide();
@@ -513,6 +347,37 @@ module.exports = (function() {
 
         return this;
     };
+
+    Timer.prototype.togglePage = function(start) {
+        var $toggle = this.el.find(".bottom .toggle"),
+            text, sel, start, end, show = this.options.show;
+
+        for(var i=0; i<this.page.length; i++) {
+            if (start == true) {
+                this.page[i].toggleClass("hideOut", i==1);
+            } else {
+                this.page[i].toggleClass("hideOut");
+            }
+        }
+
+        sel  = this.page[0].hasClass("hideOut") ? 1 : 0;
+        text = sel == 1 ? "上一项" : "下一项";
+        $toggle.length && $toggle.text(text);
+
+        if (this.reset == true) {
+            text = show.split("-");
+            if (text && text.length > 1) {
+                text  = text[sel];
+                start = text[0];
+                end   = text[text.length-1];
+                this.resetScroll(start, end);
+            }
+            this.reset = false;
+        }
+
+
+        return this;
+    }
 
     /**
      * 返回 给定类型 当前 值
@@ -577,38 +442,56 @@ module.exports = (function() {
         return pos;
     }
 
-    /* 手动更新某个时间值 */
-    Timer.prototype.update = function(type, val) {
-        type = transType(type); // 转换为简值
-        var call, handle = this.scroll[type], pos,
-            fun = {
-                Y: "setFullYear", M: "setMonth", D: "setDate",
-                h: "setHours",    m: "setMinutes"
-            };
+    /**
+     * 根据当前 value 值，重新设置 scroll 位置
+     * type : 起始设定的对象，无则为从 Y 开始
+     * end  : 终止设定的对象，无则默认设置到 s
+     */
+    Timer.prototype.resetScroll = function(stype, etype) {
+        stype = transType(stype);
+        var start, end, types = "Y-M-D-h-m-s".split("-"),
+            vals  = this.val("YYYY-M-D-h-m-s").split("-");
 
-        val = type == "M" ? val-1 : val;
+        start = types.indexOf(stype);
+        start = start == -1 ? 0 : start;
+        end   = types.indexOf(etype);
+        end   = end == -1 ? types.length : end+1;
 
-        if (handle && (call = fun[type]) && val) {
-            pos = this.typePos(type, val) || 0;
-            // 防止当前不在显示的scroll报错
-            if (handle.pages.length) {
-                handle.goToPage(0, pos, 0);
-            }
-            val = this.typeDom(type).attr("val");
+        for(var i=start; i<end; i++) {
+            var type = types[i], val = vals[i], pos;
 
-            /* 修复当前日期大于该月最大日期时，月份更改失败问题 */
-            if (type == "M") {
-                var now = this.value,
-                    max = Timer.getDays(now.getFullYear(), val);
+            val = type == "M" ? vals[i]-1: vals[i];
+            pos = this.typePos(type, val);
 
-                if (max < now.getDate()) now.setDate(max);
-            }
+            // 如果scroll句柄不存在，退出
+            if (!this.scroll[type]) break;
+            this.scroll[type].goToPage(0, pos, 0);
 
-            this.value[call](parseInt(val));
-            this.refreshItem();
+            if (type == "M") this.updateDays();
         }
 
-        return this.value;  // 返回修改后的值
+        return this;
+    }
+
+    /**
+     * 根据给定的 year month 参数，刷新 day 数据
+     * 注意，month 从0开始的
+     */
+    Timer.prototype.updateDays = function(year, month) {
+        var html, data, $days,
+            vals = this.val("YYYY-M").split("-");
+
+        year  = year != null ? year : vals[0];
+        month = month != null ? month : vals[1]-1;
+
+        data  = Timer.initVals("D", null, month, year);
+        html  = Timer.makeHtml("D", data);
+        $days = this.el.find(".time-item[type='"
+                    + transTypeName("D")+"']>.list");
+
+        if ($days.length && this.scroll.D) {
+            $days.html(html); this.scroll.D.refresh();
+        }
     }
 
     /* 获得当前组件显示的 时间值 */
@@ -623,53 +506,10 @@ module.exports = (function() {
         return Timer.format(val);
     }
 
-    /* 刷新时间对象的可选值列表 */
-    Timer.prototype.refreshItem = function(type, date) {
-        type = transType(type); // 转换为简值
-        var filter, pos, now, $el, vals,
-            ext, tmp, html, opt = this.options;
-
-        filter = "YMDhm".split("");    // 获取过滤器数据
-        pos = filter.indexOf(type);
-        pos = pos == -1 ? 0: pos;
-        now = date instanceof Date ? date : this.value;
-
-        for (var i=pos+1; i<filter.length; i++) {
-            tmp = filter[i];    // 获取当前时间对象类型
-            ext = tmp=="D"?this.typeVal("M")-1:null;
-            $el = this.el.find(".time-item[type='"
-                  + transTypeName(tmp)+"']>.list");
-
-            if ($el[0] /* 当前是否有此对象 */) {
-                vals = Timer.initVals(tmp, filter[tmp], ext);
-                vals = Timer.fixVals(tmp, vals, now, opt.min, opt.max);
-
-                html = Timer.makeHtml(tmp, vals);
-
-                $el.html(html);   /* 更新事件数据，同时刷新滚动条 */
-                this.scroll[tmp] && this.scroll[tmp].refresh();
-            }
-        }
-
-        return this;
-    };
-
     Timer.prototype.show = function() {
+        this.reset = true;
         this.modal.show();  // 先显示DOM对象
-
-        var keys = this.options.show.replace("-", '').split(''),
-            time = this.val("YYYY-M-D-h-m").split("-"), vals;
-
-        vals = {
-            Y: time[0], M: time[1], D: time[2],
-            h: time[3], m: time[4]
-        };
-
-        for(var i=0; i<keys.length; i++) {
-            var type = keys[i], val = vals[type];
-
-            this.update(type, val);
-        }
+        this.resetScroll();
 
         return this;
     };
@@ -707,14 +547,7 @@ module.exports = (function() {
     $.time = {
         isLeap   : Timer.isLeap,                // 判断是否闰年
         getDays  : Timer.getDays,               // 根据传入的年和月，返回天数
-        operat   : Timer.operat,                // 通过运算符生产结果值
         initVals : Timer.initVals,              // 通过过滤器生成指定的值
         format   : Timer.format,                // 格式化时间为指定文本格式
-        prefix   : Timer.prefix,                // 获取时间的事件前缀
-        fixVals  : Timer.fixVals,               // 通过给定的最小最大值，筛选值列表
-        dateAdd  : Timer.dateAdd,               // 给定时间增加指定天数后的新时间
-        getWeek  : Timer.getWeek,               // 返回给定时间所在周的第一天或者全部
-
-        operat   : Timer.operat,                // 通过表达式计算结果
     }
 })();

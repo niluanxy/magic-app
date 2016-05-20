@@ -361,7 +361,7 @@ module.exports = (function() {
      * @version     0.1     <2015-04-10>
      */
     util.toggleClass = function(e, c, set) {
-        if (set != undefined) {
+        if (set !== undefined) {
             // 有 SET 时，为真添加，否则删除
             if (set == true) {
                 util.addClass(e, c);

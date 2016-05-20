@@ -1319,6 +1319,14 @@ var scroll = module.exports = (function (window, document, Math) {
     	goToPage: function (x, y, time, easing) {
     		easing = easing || this.options.bounceEasing;
 
+            /* !!! 原文修改开始 =================== */
+            if (!this.pages.length) {
+                this.refresh();
+            }
+            // 刷新后还无值，退出执行
+            if (!this.pages.length) return;
+            /* !!! 原文修改结束 =================== */
+
     		if ( x >= this.pages.length ) {
     			x = this.pages.length - 1;
     		} else if ( x < 0 ) {
