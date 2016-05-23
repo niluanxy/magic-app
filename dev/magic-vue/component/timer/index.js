@@ -14,7 +14,7 @@ module.exports = (function() {
                 cancel  = $el.attr("onCancel");
 
                 // 不是字符串，就是绑定的对象
-                if (filter.search(":") == -1) {
+                if (filter && filter.search(":") == -1) {
                     filter = scope[filter];
                 } else if (filter) {
                     filter = "{"+filter+"}";
