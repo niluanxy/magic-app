@@ -124,6 +124,8 @@ module.exports = (function() {
                     vals.sort();    // 从小到大排序
                 }
             }
+
+            vals = vals.unique();   // 结果去重操作
         }
 
         return vals;    // 返回最终的可选值数组

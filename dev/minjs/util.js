@@ -277,6 +277,7 @@ module.exports = (function() {
      * @version     0.1     <2015-04-10>
      */
     util.hasClass = function(e, c) {
+        c = c.replace(/\./, '');
         var re = new RegExp("(^|\\s)" + c + "(\\s|$)");
         return re.test(e.className);
     };

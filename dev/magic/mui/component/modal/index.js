@@ -21,7 +21,7 @@ module.exports = (function() {
     }
 
     Modal.checkWrapper = function(el) {
-        var wrapper = $(el).find('.'+Modal.CONFIG.wrapClass);
+        var wrapper = $(el).children('.'+Modal.CONFIG.wrapClass);
 
         return wrapper[0] ? wrapper : null;
     }

@@ -381,21 +381,25 @@ require("extend");      // 原生对象扩展
             },
 
             children: function(cls) {
-                var children = null, tmp;  // 存放子类元素
+                var childs = null, tmp;  // 存放子类元素
                 if (this[0] /* 有对象时执行 */) {
-                    children = this[0].children;
+                    childs = this[0].children;
 
                     if (typeof cls == "string") {
                         tmp = [];   // 临时存放结果
 
-                        tmp = this[0].querySelectorAll(cls)
+                        for(var i=0; i<childs.length; i++) {
+                            if (_UTIL.hasClass(childs[i], cls)) {
+                                tmp.push(childs[i]);
+                            }
+                        }
 
-                        children = tmp;
+                        childs = tmp;
                     }
                 }
 
-                if (children) {
-                    return magic(children[0])
+                if (childs) {
+                    return magic(childs[0])
                 } else {
                     return null;
                 }

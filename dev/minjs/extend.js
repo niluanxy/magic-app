@@ -116,3 +116,18 @@ Array.prototype.delBy = function(val, all) {
 
     return this;
 }
+
+/* 函数去重方法 */
+Array.prototype.unique = function() {
+    var res = [], hash = {};
+    
+    for(var i=0, elem; (elem = this[i]) != null; i++)  {
+        if (!hash[elem])
+        {
+            res.push(elem);
+            hash[elem] = true;
+        }
+    }
+
+    return res;
+}
