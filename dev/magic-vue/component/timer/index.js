@@ -65,7 +65,7 @@ module.exports = (function() {
 
                         return ret;
                     }
-                }, $el.attr("init"))
+                }, $el.attr("init") || "");
 
                 $el.on("tap", function() { handle.show(); })
                 if (scope[ctrl] !== undefined) scope[ctrl] = handle;

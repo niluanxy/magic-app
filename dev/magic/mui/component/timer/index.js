@@ -1,6 +1,6 @@
 module.exports = (function() {
-    var Timer = function(option) {
-        this.value = "";                // 存放当前时间的date对象
+    var Timer = function(option, date) {
+        this.value = date || null;      // 存放当前时间的date对象
         this.el    = null;              // 当前DOM控制句柄
         this.modal = null;              // 控制整体弹框
         this.reset = false;             // 每次启动，只执行一次reset操作
@@ -262,7 +262,18 @@ module.exports = (function() {
             }
         }
 
-        that.value = new Date();  // 获取当前时间
+        // 初始化默认时间值
+        if (that.value == null) {
+            that.value = new Date();
+        } else if (typeof that.value == "string") {
+            tmp = Timer.format(that.value);
+            if (tmp instanceof Date) {
+                that.value = tmp;
+            } else {
+                that.value = new Date();
+            }
+        }
+
         /* 添加每个滚动对象到页面中 */
         for(var i=0; i<show.length; i++) {
             if ((tmp = show[i]) == "-" && dir == 0) {
@@ -533,14 +544,14 @@ module.exports = (function() {
 
     /* 尝试绑定方法到 magic 框架的全局对象上 */
     if ($ && !$.timer) {
-        $.extend({timer: function(option) {
-            return new Timer(option).init();
+        $.extend({timer: function(option, date) {
+            return new Timer(option, date).init();
         }});
     };
 
     if ($ && $.fn && !$.fn.timer) {
-        $.fn.extend({timer: function(option) {
-            return new Timer(option).init();
+        $.fn.extend({timer: function(option, date) {
+            return new Timer(option, date).init();
         }});
     };
 
