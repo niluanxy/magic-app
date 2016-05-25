@@ -65,14 +65,23 @@ module.exports = (function() {
 
                         return ret;
                     }
-                }, $el.attr("init") || "");
+                }, scope[val]);
+
+                // 数据双向绑定
+                scope.$watch(val, function(newVal) {
+                    var set = $.time.date(newVal),
+                        old = handle.value.getTime();
+
+                    // 新时间和原时间不一样才更新数据
+                    if (set && set.getTime() != old) {
+                        handle.value = set;
+                    }
+                })
 
                 $el.on("tap", function() { handle.show(); })
                 if (scope[ctrl] !== undefined) scope[ctrl] = handle;
                 // 初始化数据值
-                Vue.nextTick(function() {
-                    scope[val] = handle.val();
-                })
+                scope[val] = handle.val();
 
                 scope.$on("pageDestroyDirect", function() {
                     handle.destroy();   // 删除自身

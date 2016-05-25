@@ -1,6 +1,6 @@
 module.exports = (function() {
     var Timer = function(option, date) {
-        this.value = date || null;      // 存放当前时间的date对象
+        this.value = Timer.date(date);      // 存放当前时间的date对象
         this.el    = null;              // 当前DOM控制句柄
         this.modal = null;              // 控制整体弹框
         this.reset = false;             // 每次启动，只执行一次reset操作
@@ -131,23 +131,41 @@ module.exports = (function() {
         return vals;    // 返回最终的可选值数组
     }
 
-    /* 时间格式化方法，传入字符串时则生成一个新时间对象 */
-    Timer.format = function(time, format) {
-        if (typeof time == "number") {
-            time = new Date(time);
-        }
-        format = format || "YYYY-MM-DD hh:mm:ss";
+    /**
+     * 通过传入数据，构造一个新的时间对象
+     * date 可为时间戳对象，时间字符串 "2015-12-4"
+     */
+    Timer.date = function(data) {
+        var ret = null, argv;
 
-        if (typeof time == "string") {
-            var argv = time.replace(/[\-|\s|:|\/|\\]/g, ",");
+        if (typeof data == "number") {
+            ret = new Date(data);
+        } else if (data && typeof data == "string") {
+            argv = data.replace(/[\-|\s|:|\/|\\]/g, ",");
             argv = argv.split(",");     // 转为数组格式
 
             for(var i=0; i<argv.length; i++) {
                 argv[i] = parseInt(argv[i]);
             }
 
-            return new Date(argv[0] || 0, (argv[1]-1) || 0, argv[2] || 0,
+            ret = new Date(argv[0] || 0, (argv[1]-1) || 0, argv[2] || 0,
                             argv[3] || 0, argv[4] || 0, argv[5] || 0);
+        } else if (data instanceof Date) {
+            ret = data;
+        }
+
+        return ret;     // 返回 时间对象 或者 null
+    }
+
+    /* 时间格式化方法，传入字符串时则生成一个新时间对象 */
+    Timer.format = function(time, format) {
+        if (typeof time == "number") {
+            time = Timer.date(time);
+        }
+        format = format || "YYYY-MM-DD hh:mm:ss";
+
+        if (typeof time == "string") {
+            return Timer.date(time);
         } else {
             var old = {
                 "M+" : time.getMonth()+1,                 //月份
@@ -478,7 +496,10 @@ module.exports = (function() {
 
             // 如果scroll句柄不存在，退出
             if (!this.scroll[type]) break;
-            this.scroll[type].goToPage(0, pos, 0);
+            // 防止初始化的值不存在
+            if (pos != null) {
+                this.scroll[type].goToPage(0, pos, 0);
+            }
 
             if (type == "M") this.updateDays();
         }
@@ -558,6 +579,7 @@ module.exports = (function() {
     };
 
     $.time = {
+        date     : Timer.date,                  // 构造一个时间对象
         isLeap   : Timer.isLeap,                // 判断是否闰年
         getDays  : Timer.getDays,               // 根据传入的年和月，返回天数
         initVals : Timer.initVals,              // 通过过滤器生成指定的值
