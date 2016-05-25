@@ -53,13 +53,14 @@ $.ready(function() {
         /**
          * checkMove 点击移动判断容错率
          *
+         * checkMoveBad 是针对移动设备
+         *
          * 提高容错率可以提高点击的成功率，但
          * 同时也可能会导致误点几率变大
-         *
-         * 比较好的电容屏建议设置为 4
          * 国产山寨设备建议设置为 20以上
          */
-        checkMove : 40,
+        checkMove: 4,
+        checkMoveBad: 40,
 
         doubleTime: 300,
         delayClass: 50,
@@ -83,6 +84,12 @@ $.ready(function() {
         _isMove: function(e, move) {
             var mv = move ? move : this.checkMove,
                 touch = e.changedTouches, cx, cy;
+
+            // 如果不是精确点击事件，采用加大的值
+            if (e.type.search("mouse") == -1 &&
+                e.type.search("pointer") == -1) {
+                mv = this.checkMoveBad;
+            }
 
             touch = touch && touch[0] ? touch[0] : e;
             cx = Math.abs(touch.pageX - this.startX);
