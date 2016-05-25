@@ -6,6 +6,7 @@ mg-page, mg-view, .mg-view, .mg-page {
     flex: 1;
     overflow: hidden;
     position: relative;
+    background-color: #FFFFFF;
 
     &.viewHide {
         display: none !important;

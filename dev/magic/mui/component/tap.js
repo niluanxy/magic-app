@@ -49,7 +49,18 @@ $.ready(function() {
     tap = {
         delay  : 200,
         animate: 240,
-        checkMove : 4,
+
+        /**
+         * checkMove 点击移动判断容错率
+         *
+         * 提高容错率可以提高点击的成功率，但
+         * 同时也可能会导致误点几率变大
+         *
+         * 比较好的电容屏建议设置为 4
+         * 国产山寨设备建议设置为 20以上
+         */
+        checkMove : 40,
+
         doubleTime: 300,
         delayClass: 50,
 
@@ -159,6 +170,12 @@ $.ready(function() {
         },
 
         _move: $.delayCall(function(e) {
+            // console.log("===================")
+            // console.log("move run")
+            // console.log(e)
+            // console.log(e.timeStamp)
+            // console.log("pageX: "+e.changedTouches[0].pageX+"      "+
+            //             "pageY: "+e.changedTouches[0].pageY);
             e.preventDefault(); // 修复微信下拉显示网页地址
 
             // if (!this.moveClear && this._isMove(e, 1)) {
