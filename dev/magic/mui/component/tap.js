@@ -57,10 +57,10 @@ $.ready(function() {
          *
          * 提高容错率可以提高点击的成功率，但
          * 同时也可能会导致误点几率变大
-         * 国产山寨设备建议设置为 20以上
+         * 国产山寨设备建议设置为 30以上
          */
         checkMove: 4,
-        checkMoveBad: 40,
+        checkMoveBad: 30,
 
         doubleTime: 300,
         delayClass: 50,

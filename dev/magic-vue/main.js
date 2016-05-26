@@ -411,6 +411,22 @@ $(function() {
         oldCls = "slideOutRight";
         nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";
 
+        // back缓存页面，手动触发相关事件
+        if ($now[0].MG_VUE_CTRL) {
+            var $ctrl = $now[0].MG_VUE_CTRL,
+                defer = $.defer();
+
+            if ($.isFun($ctrl.$refresh)) {
+                $ctrl.$refresh(null, defer);
+            } else {
+                defer.resolve();
+            }
+
+            defer.then(function() {
+                $ctrl.$emit("hook:ready");
+            })
+        }
+
         $old.removeClass("viewHide").addClass(oldCls);
         $now.removeClass("viewHide").addClass(nowCls)
             .once(tsend, function() {
@@ -466,19 +482,21 @@ $(function() {
 
             // 只在PAGE模式下运行页面动画处理
             if (mvue._isRunPage(scope)) {
+                var _old = $.defer();
+
                 if (PAGE.BEFORE && PAGE.BEFORE[0]) {
                     $old = $(PAGE.BEFORE[0].$el);
                 }
 
                 if (LOAD.SHOW /* 正在显示加载动画 */) {
                     LOAD.$DOM.once(tsend, function(e) {
-                        $old && $old.addClass("viewHide");
+                        _old.resolve();
                         $now.removeClass("viewHide");
                         clearLoading($now);
                     });
                 } else if (LOAD.FINISH) {
                     // 动画播放完页面直接加载
-                    $old && $old.addClass("viewHide");
+                    _old.resolve();
                     $now.removeClass("viewHide")
                     clearLoading($now);
                 } else {
@@ -490,9 +508,14 @@ $(function() {
                     $now.removeClass("viewHide").addClass(nowCls)
                     .once(tsend, function() {
                         $now.removeClass(nowCls);
-                        $old && $old.removeClass(oldCls).addClass("viewHide");
+                        _old.resolve(oldCls);
                     })
                 }
+
+                _old.then(function(oldCls) {
+                    $old && $old.addClass("viewHide");
+                    $old && oldCls && $old.removeClass(oldCls);
+                })
             } else {
                 $now.removeClass("viewHide");
                 clearLoading($now);         // 清除 load 内容
