@@ -2056,7 +2056,7 @@ if ($ && $.fn && !$.fn.scroll) {
             bindToWrapper : true,
             scrollbars    : true,
             probeType     : 2,
-            preventDefault: true,
+            preventDefault: false,
             refresh       : false,
             mouseWheel    : true,
         }, option);

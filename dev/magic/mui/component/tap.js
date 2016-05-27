@@ -121,6 +121,13 @@ $.ready(function() {
 
             ltype = this.lastType;
             this.lastType = e.type;
+            tagName = e.target.tagName;
+
+            /* 修复移动端input点击焦点不更新的问题 */
+            if (e.target != this.input) {
+                this.input && this.input.blur();        // 刷新焦点
+                this.input = null;
+            }
 
             if ((e.touches && e.touches.length > 1) ||
                 (e.type == "mousedown" && ltype != e.type
@@ -129,9 +136,6 @@ $.ready(function() {
 
                 return true;
             }
-
-            var touch = e.touches ? e.touches[0] : e,
-                tagName, path = fixPath(e);
 
             /* 记录此次点击事件的相关信息，用于方法判断 */
             this.startX = touch.pageX;
@@ -203,17 +207,12 @@ $.ready(function() {
         _end: function(e) {
             var ct, $target = $(e.target), tagName;
 
+            tagName = e.target.tagName;
             ct = $.getTime() - this.startTime;
             this.tapIsStart = false;
 
             if (!this._isMove(e) && ct < this.delay) {
                 $target.trigger("tap");
-
-                /* 修复移动端input点击焦点不更新的问题 */
-                tagName = e.target.tagName.toUpperCase();
-                if (e.target != this.input) {
-                    this.input && this.input.blur();        // 刷新焦点
-                }
 
                 if ("INPUT TEXTAREA".split(" ").indexOf(tagName) >= 0) {
                     this.input = e.target;                  // 更新绑定元素
