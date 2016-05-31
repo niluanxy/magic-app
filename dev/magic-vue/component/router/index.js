@@ -27,8 +27,8 @@ module.exports = (function() {
 
             if ($$._isRunPage(scope)) {
                 /* 如果是首个页面，直接隐藏 back 组件 */
-    			if (router.check(state, "first")) {
-    				var last = router.last.state;
+    			if (!router || router.check(state, "first")) {
+    				var last = router ? router.last.state : null;
 
     				if (!$J || !$J.router) {
     					if ($$.__STATE__.ROUTER_AFTER) {

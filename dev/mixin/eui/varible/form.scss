@@ -14,17 +14,16 @@ $input-check-left:				  $input-inline-size * 0.35 !default;
 $input-check-border-base:         $input-inline-size * 0.075 !default;
 $input-check-border-check:		  $input-inline-size * 0.1 !default;
 
-$input-toggle-width: 			  $input-inline-size * 1.75 !default;
-$input-toggle-height:			  $input-inline-size !default;
-$input-toggle-border:			  $input-inline-size * 0.1 !default;
-$input-toggle-back:				  $color-positive !default;
-$input-toggle-uncheck:			  #ddd !default;
-$input-toggle-unback:			  #fff !default;
-$input-toggle-center:  		      #fff !default;
-$input-toggle-move:               $input-toggle-width - $input-toggle-height;
+$input-switch-padding:            3px !default;
+$input-switch-width: 			  $input-inline-size * 1.65 !default;
+$input-switch-height:			  $input-inline-size !default;
+$input-switch-border:			  $input-inline-size * 0.13 !default;
+$input-switch-back:				  $color-positive !default;
+$input-switch-uncheck:			  #ddd !default;
+$input-switch-center:  		      #fff !default;
+$input-switch-move:               $input-switch-width - $input-switch-height;
 
 $input-radio-size:				  $input-inline-size * 0.35 !default;
-
 
 $input-shadow-vpos:				   2px !default;
 $input-shadow-blur:			       7px !default;

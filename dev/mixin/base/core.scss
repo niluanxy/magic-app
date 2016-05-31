@@ -11,8 +11,20 @@ $font-size-base:                  14px !default;
 $font-size-large:                 18px !default;
 $font-size-small:                 11px !default;
 
+$padding-base-vertical:           6px !default;
+$padding-base-horizontal:         12px !default;
+
+$padding-item-inset:			  12px !default;
+
+$padding-large-vertical:          10px !default;
+$padding-large-horizontal:        16px !default;
+
+$padding-small-vertical:          5px !default;
+$padding-small-horizontal:        10px !default;
+
 $line-height-base:                1.428571429 !default; // 20/14
 $line-height-computed:            floor($font-size-base * $line-height-base) !default; // ~20px
+$line-height-default:             $padding-item-inset*2 + $line-height-computed !default;
 $line-height-large:               1.33 !default;
 $line-height-small:               1.5 !default;
 
@@ -25,17 +37,6 @@ $base-color:                      #000 !default;
 
 $link-color:                      $color-positive !default;
 $link-hover-color:                darken($link-color, 15%) !default;
-
-$padding-base-vertical:           6px !default;
-$padding-base-horizontal:         12px !default;
-
-$padding-item-inset:			  12px !default;
-
-$padding-large-vertical:          10px !default;
-$padding-large-horizontal:        16px !default;
-
-$padding-small-vertical:          5px !default;
-$padding-small-horizontal:        10px !default;
 
 $block-header:                    44px !default;
 $block-footer:                    49px !default;

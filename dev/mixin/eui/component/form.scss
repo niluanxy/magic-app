@@ -33,7 +33,7 @@
             }
 
             // 禁用原生样式，方便后面重置样式
-            &.checkbox, &.radio, &.toggle {
+            &.checkbox, &.radio, &.switch {
                 cursor: pointer;
                 position: relative;
                 background-color: transparent;
@@ -121,10 +121,10 @@
                 }
             }
 
-            &.toggle {
-                width: $input-toggle-width;
-                height: $input-toggle-height;
-                border-radius: $input-toggle-height;
+            &.switch {
+                width: $input-switch-width;
+                height: $input-switch-height;
+                border-radius: $input-switch-height;
                 overflow: hidden;
 
                 &:before, &:after {
@@ -136,12 +136,12 @@
 
                 &:before {
                     z-index: 2;
-                    top: $input-toggle-border;
-                    left: $input-toggle-border;
+                    left: $input-switch-border;
+                    @include vertical-align-center;
                     border-radius: 50%;
-                    width: $input-toggle-height - $input-toggle-border * 2;
-                    height: $input-toggle-height - $input-toggle-border * 2;
-                    background-color: $input-toggle-center;
+                    width: $input-switch-height - $input-switch-border * 2;
+                    height: $input-switch-height - $input-switch-border * 2;
+                    background-color: $input-switch-center;
                     box-shadow: 0 $input-shadow-vpos
                                   $input-shadow-blur
                                   rgba(0, 0, 0, $input-shadow-opacity),
@@ -156,11 +156,12 @@
 
                 &:after {
                     z-index: 1;
-                    width: 100%;
-                    height: 100%;
-                    border: $input-toggle-border solid $input-toggle-uncheck;
-                    border-radius: $input-toggle-height;
-                    background-color: $input-toggle-unback;
+                    left: rem($input-switch-padding);
+                    right: rem($input-switch-padding);
+                    top: rem($input-switch-padding);
+                    bottom: rem($input-switch-padding);
+                    border-radius: $input-switch-height;
+                    background-color: $input-switch-uncheck;
 
                     transition: 0.3s cubic-bezier(0, 1.1, 1, 1.1);
                     transition-property: background-color, border;
@@ -169,12 +170,12 @@
                 &:checked,
                 &.checked {
                     &:before {
-                        transform: translate3d($input-toggle-move, 0, 0);
+                        transform: translate3d($input-switch-move, -50%, 0);
                     }
 
                     &:after {
-                        border-color: $input-toggle-back;
-                        background-color: $input-toggle-back;
+                        border-color: $input-switch-back;
+                        background-color: $input-switch-back;
                     }
                 }
             }

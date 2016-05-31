@@ -205,35 +205,15 @@ $.ready(function() {
         }, 20),
 
         _end: function(e) {
-            var ct, $target = $(e.target), tagName;
+            var ct, $target = $(e.target);
 
-            tagName = e.target.tagName;
             ct = $.getTime() - this.startTime;
             this.tapIsStart = false;
 
             if (!this._isMove(e) && ct < this.delay) {
-                $target.trigger("tap");
-
-                if ("INPUT TEXTAREA".split(" ").indexOf(tagName) >= 0) {
-                    this.input = e.target;                  // 更新绑定元素
-
-                    var type = $target.attr("type");
-
-                    type = type ? type.toUpperCase() : type;
-
-                    if (type && "RADIO CHECKBOX".split(" ").indexOf(type) >= 0) {
-                        if (this.input.checked == true) {
-                            $target.removeClass("checked");
-                        } else {
-                            if (type == "CHECKBOX") {
-                                $target.addClass("checked");
-                            }
-                        }
-                    }
-                }
-
                 this.disClick = false;
                 $target.trigger("click");
+                $target.trigger("tap");
             }
 
             setTimeout(function() {
@@ -318,34 +298,32 @@ $.ready(function() {
         doc[bind]("MSPointerUp", tap);
         doc[bind]("MSPointerCancel", tap);
 
-        /* 修复鼠标点透问题 */
-        if (kt === 0 /* 只有支持 touch 事件时才绑定 */) {
-            $document.on("click", function(e) {
-                if (!tap.disClick &&
-                    (e.timeStamp - tap.startTime) < 300) {
+        $document.on("click", function(e) {
+            if (!tap.disClick &&
+                (e.timeStamp - tap.startTime) < 300) {
 
-                    /* 临时修复 自定义 click 事件无法触发 input 默认点击效果 BUG */
-                    if (e.target.tagName.toUpperCase() == "INPUT") {
-                        var tar  = e.target,
-                            type = $(tar).attr("type");
+                // checkbox radio 元素，点击后value值修复
+                var tar = e.target, $tar = $(tar), type;
 
-                        type = type ? type.toUpperCase() : type;
+                if (tar.tagName == "INPUT") {
+                    type = tar.type.toUpperCase();
 
-                        if (type && "RADIO CHECKBOX".split(" ").indexOf(type) >= 0) {
-                            if (tar.checked === false) {
-                                tar.checked = true;
-                            } else if (type == "CHECKBOX") {
-                                tar.checked = false;
-                            }
+                    if (["RADIO", "CHECKBOX"].findIn(type)) {
+                        if (tar.checked === true) {
+                            $tar.val(false);
+                            $tar.removeClass("checked");
+                        } else if (type === "CHECKBOX") {
+                            $tar.val(true);
+                            $tar.addClass("checked");
                         }
                     }
-
-                    tap.disClick = true;
-                } else {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
                 }
-            }, true);
-        }
+
+                tap.disClick = true;
+            } else {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            }
+        }, true);
     })(window, tap);
 });

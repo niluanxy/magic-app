@@ -4,14 +4,14 @@ module.exports = (function() {
     var _dom = {}; // 定义返回的对象
 
     /**
-     * 检测字符串是否可以创建为 dom 元素 
+     * 检测字符串是否可以创建为 dom 元素
      */
     _dom.check = function(text) {
         if (typeof text === "string") {
             // 去除字符串中的换行符等
             var txt = text.replace(/[\r\n]/g,"");
 
-            if (txt[0] === "<" && 
+            if (txt[0] === "<" &&
              txt[ txt.length - 1 ] === ">" &&
              txt.length >= 3) {
                 return true;
@@ -36,7 +36,7 @@ module.exports = (function() {
             // 修复执行的上下文
             context = context && context.nodeType ? context.ownerDocument || context : document;
             fragment = context.createDocumentFragment();
-            
+
             // 创建一个临时的div对象并插入字符串
             div = fragment.appendChild( context.createElement("div") );
             div.innerHTML = text;
@@ -75,13 +75,13 @@ module.exports = (function() {
         }
 
         return el;
-    }   
+    }
 
     /** 指定元素的前后插入新对象,默认后方 */
     _dom._addIn = function(el, html, before) {
         var parent, dom;
 
-        if ( el && (parent = el.parentNode) && 
+        if ( el && (parent = el.parentNode) &&
             (dom = _dom.make(html)) ) {
             return parent.insertBefore(dom, before ? el : el.nextSibling);
         }
@@ -102,7 +102,7 @@ module.exports = (function() {
     _dom.prepend = function(el, html) {
         var dom;
 
-        if ( el && el.nodeType === 1 && 
+        if ( el && el.nodeType === 1 &&
             (dom = _dom.make(html)) ) {
             el.insertBefore(dom, el.firstChild);
         }
@@ -130,7 +130,7 @@ module.exports = (function() {
         var wrap, parent;
         if ( el && (parent = el.parentNode)
              && (wrap = _dom.make(html)) ) {
-            
+
             wrap = wrap.firstChild;
             wrap = parent.insertBefore(wrap, el);
             _dom.append(wrap, el);
@@ -158,6 +158,29 @@ module.exports = (function() {
         }
 
         return el;
+    }
+
+    /**
+     * 判断给定元素是否在某个元素之下
+     * @param  {[type]} el     [description]
+     * @param  {[type]} parent [description]
+     * @return {[type]}        [description]
+     */
+    _dom.below = function(el, parent) {
+        var result = false;
+
+        if (el && parent) {
+            do {
+                if (el == parent) {
+                    result = true;
+                    break;
+                }
+
+                el = el.parentNode;
+            } while(el)
+        }
+
+        return result;
     }
 
     return _dom;

@@ -288,21 +288,32 @@ module.exports = (function() {
      * @param       {Element}   e - 操作对象
      * @param       {Object}    c - 要检测的类名
      * @param       {Element}   stop - 停止向上查找的元素
-     * @return      {Boolean}   是否含有某个类
+     * @return      {Boolean}   包含检测类名的对象
      * @author      mufeng  <smufeng@gmail.com>
      * @version     0.1     <2016-03-22>
      */
-    util.belowClass = function(e, c, stop) {
-        var now = e, has;
+    util.belowClass = function(e, c, stop, wrap) {
+        var now = e, has, ret = 0;
 
         do {
             has = util.hasClass(now, c);
 
-            if (has) break;
+            if (has) { ret++; break; };
             now = now.parentNode;
         } while(now && (!stop || stop != now))
 
-        return has ? now : false;
+        has = now;
+        now = e.parentNode;
+
+        while (wrap && now && now !== document.body) {
+            if (now == stop) {
+                ret++; break;
+            }
+
+            now = now.parentNode;
+        }
+
+        return wrap ? ret>=2 && has : ret >= 1 && has;
     }
 
     /**
@@ -344,13 +355,19 @@ module.exports = (function() {
      * @version     0.1     <2015-04-10>
      */
     util.removeClass = function(e, c) {
-        if (!util.hasClass(e, c)) {
-            return;
-        }
+        var arrs = c.split(" ");
 
-        var re = new RegExp("(^|\\s)" + c + "(\\s|$)", 'g');
-        e.className = e.className.replace(re, ' ');
-        e.className = e.className.replace(/^\s/, '').replace(/\s$/, '');
+        for(var i=0; i<arrs.length; i++) {
+            var cls = arrs[i];
+
+            if (!util.hasClass(e, cls)) {
+                continue;
+            }
+
+            var re = new RegExp("(^|\\s)" + cls + "(\\s|$)", 'g');
+            e.className = e.className.replace(re, ' ');
+            e.className = e.className.replace(/^\s/, '').replace(/\s$/, '');
+        }
     };
 
     /**
@@ -384,19 +401,30 @@ module.exports = (function() {
      * @author      mufeng  <smufeng@gmail.com>
      * @version     0.1     <2015-04-10>
      */
-    util.offset = function(el) {
-        var left = -el.offsetLeft,
-             top = -el.offsetTop;
+    util.offset = function(elem, trans) {
+        var docElem, win, rect, doc;
 
-        while (el = el.offsetParent) {
-            left -= el.offsetLeft;
-            top  -= el.offsetTop;
-        }
+		if ( !elem ) return;
 
-        return {
-            left: left,
-            top : top
-        };
+		if ( elem == document || !elem.getClientRects().length ) {
+			return { top: 0, left: 0 };
+		}
+
+		rect = elem.getBoundingClientRect();
+
+		// 保证元素处于显示状态
+		if ( rect.width || rect.height ) {
+			doc = elem.ownerDocument;
+			win = window;
+			docElem = doc.documentElement;
+
+			return {
+				top: rect.top + win.pageYOffset - docElem.clientTop,
+				left: rect.left + win.pageXOffset - docElem.clientLeft
+			};
+		}
+
+		return rect;
     };
 
     /**

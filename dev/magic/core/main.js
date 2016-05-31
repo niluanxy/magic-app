@@ -78,23 +78,40 @@ require("extend");      // 原生对象扩展
                 return new magic.fn._init(select, this[0]);
             },
 
+            tag: function() {
+                return this[0] ? this[0].tagName : null;
+            },
+
             /* 对象的类操作的一些方法 */
             hasClass: function(className) {
                 return this[0] ? _UTIL.hasClass(this[0], className) : false;
             },
-            belowClass: function(className, stop) {
-                var $stop = $(stop)[0], ret;
-                if (this[0] && $stop) {
-                    ret = _UTIL.belowClass(this[0], className, $stop);
 
-                    return ret ? $(ret) : false;
+            /**
+             * 判断某个元素是否在某个class之下
+             *
+             * @param  {String}  className [检测的父Class]
+             * @param  {Element} stop      [停止检测的dom对象]
+             * @return {boolean}           [包含检测类名的对象 或 false]
+             */
+            belowClass: function(className, stop, wrap) {
+                var $stop = $(stop)[0] || document, ret = false;
+
+                if (this[0] && $stop) {
+                    ret = _UTIL.belowClass(this[0], className, $stop, wrap);
+
+                    ret = ret ? $(ret) : false;
                 }
+
+                return ret;
             },
+
             addClass: function(className) {
                 this[0] && _UTIL.addClass(this[0], className);
 
                 return this;
             },
+
             removeClass: function(className) {
                 this[0] && _UTIL.removeClass(this[0], className);
 
@@ -125,26 +142,37 @@ require("extend");      // 原生对象扩展
                 return tagname ? tagname.toLocaleLowerCase() : "";
             },
 
-            offset: function() {
-                return this[0] && _UTIL.offset(this[0]) || null;
+            offset: function(trans) {
+                return this[0] && _UTIL.offset(this[0], !trans) || null;
             },
 
             /* 获取表单元素的值 */
             val: function(val) {
-                if (val !== undefined) {
-                    if (this[0]) this[0].value = val;
-                } else {
-                    return this[0] && this[0].value || null;
+                var tagName = this[0] ? this[0].tagName : "", type;
+
+                if (tagName == "INPUT") {
+                    type = this.attr("type").toUpperCase();
+
+                    if (val !== undefined) {
+                        if (["RADIO", "CHECKBOX"].findIn(type)) {
+                            this[0].checked = !!val;
+                            this[0].value   = !!val ? "on" : "off";
+                        } else {
+                            this[0].value = val;
+                        }
+                    }
+
+                    return this[0].value;
                 }
             },
 
             /* 对象的属性操作的一些方法 */
             attr: function(attr, val) {
-                return _UTIL.attr(this[0], attr, val);
+                if (this[0]) return _UTIL.attr(this[0], attr, val);
             },
 
             removeAttr: function(attr) {
-                _UTIL.removeAttr(this[0], attr);
+                if (this[0]) _UTIL.removeAttr(this[0], attr);
 
                 return this;
             },
@@ -573,7 +601,7 @@ require("extend");      // 原生对象扩展
         return magic;   // 返回最后的对象
     })();
 
-    w.$ = Magic;
+    w.$ = w.Magic = Magic;
 })(window, document);
 
 require("../mui/muicore.js");       // 加载核心UI组件

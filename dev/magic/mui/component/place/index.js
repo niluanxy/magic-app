@@ -7,24 +7,76 @@ exports.module = (function(doc, undefined) {
 		'bottom' : 1
 	};
 
-	var Place = function (el, relative, top, left, zindex) {
+    /**
+     * 相对某元素执行定位操作
+     * @param {Element}     el          [要定位的对象]
+     * @param {Element}     relative    [相对定位的元素]
+     * @param {String}      top         [上下定位参数及修正]
+     * @param {String}      left        [左右定位参数及修正]
+     * @param {Number}      zindex      [定位元素的 z-index 值]
+     *
+     * inner 是否在定位元素外插入对象，默认为元素内插入，如果选择元
+     * 素外插入，计算坐标时，会自动加上定位元素的偏移值
+     *
+     * top : ["top offset",  "center offset", "bottom offset"]
+     * left: ["left offset", "center offset", "right offset"]
+     *
+     * 其中 offset 为元素偏移修正，为要定位元素的倍数，说明如下:
+     *
+     * "top -1"  表示在垂直方向，对顶布局，同时便宜定位元素自身高度
+     * 的 -1 倍，即向上偏移定位元素 1.0倍 的高度距离;
+     *
+     * "left 0.5"  表示在平衡方向，对最左布局，同时便宜定位元素自身
+     * 宽度的 0.5 倍，即向右偏移定位元素 0.5倍 的高度距离;
+     *
+     */
+	var Place = function (el, relative, top, left, outer, zindex) {
 		if (!el || !relative || !top || !left) return;
 
+        // 如果是 $ 对象，修复对象
+        el = el[0] ? el[0] : el;
+        relative = relative[0] ? relative[0] : relative;
+
 		zindex = zindex || Place.zindex || 100;
-		relative = $(relative)[0];
+		relative = $(relative)[0] || document.body;
 
-		var parent, offset, $el = $(el), style, place = [], topfix, leftfix,
-			ele = Place.outerRect(el, relative), rel = Place.outerRect(relative);
+		var parent, offset, $el = $(el), style, place = [],
+            topfix, leftfix, rel = Place.outerRect(relative);
 
-		parent = Place.relRoot(relative, true);
-		offset = Place.relOffset(relative);
+        if (outer === true) {
+            parent = Place.relRoot(relative);
+        } else if (outer instanceof Element) {
+            parent = outer;
+        } else {
+            parent = relative;
+        }
+
+        ele = Place.outerRect(el, parent);
+
+        if (parent != document.body && $(parent).css("position") == "static") {
+            $(parent).css("position", "relative");
+        }
 
 		place[0] = top.split(" ");
 		place[1] = left.split(" ");
 
-		offset.top  += OFFSET[place[0][0]] * rel.height;
-		offset.left += OFFSET[place[1][0]] * rel.width;
-		
+        // 如果实际定位的元素不是元素自身，需要修正坐标值
+        if (parent != relative) {
+            var tmp = Place.outerRect(parent);
+            offset = Place.outerRect(relative);
+
+            offset.top  -= tmp.top;
+            offset.left -= tmp.left;
+
+            offset.top  += OFFSET[place[0][0]] * rel.height;
+    		offset.left += OFFSET[place[1][0]] * rel.width;
+        } else {
+            offset = {};
+
+            offset.top  = OFFSET[place[0][0]] * rel.height;
+    		offset.left = OFFSET[place[1][0]] * rel.width;
+        }
+        
 		topfix  = parseFloat(place[0][1]) || 0;
 		leftfix = parseFloat(place[1][1]) || 0;
 
@@ -37,10 +89,22 @@ exports.module = (function(doc, undefined) {
 		$el.appendTo(parent);
 	};
 
+    /**
+     * 获取元素的 尺寸信息
+     * @param  {Object}  el       [要获取的对象信息]
+     * @param  {Element} relative [相对定位的对象]
+     * @return {Object}           [返回的尺寸信息对象]
+     *
+     * 如果 el 为字符串，会自动生成一个临时的对象到容器中来
+     * 获取对象的尺寸信息，此时必须指定 relative 参数
+     *
+     * relative 为要插入的容器，因为有时候插入的元素会收到
+     * 容器CSS的影响，导致尺寸有变化，为空默认为body元素
+     */
 	Place.outerRect = function(el, relative) {
-		relative = relative || document.body;
+		relative = $(relative)[0] || document.body;
 
-		var rect, copy = {}, clone, fix,
+		var rect, copy = {}, clone, fix, docElem, win = window,
 			render = '<div style="position: absolute; visibility: hidden"></div>';
 
 		if (el == document) {
@@ -60,13 +124,16 @@ exports.module = (function(doc, undefined) {
 			} else if (el.getBoundingClientRect) {
 				clone = el.cloneNode(true);
 				rect  = el.getBoundingClientRect();
+                docElem = el.ownerDocument.documentElement;
 			}
-			
-			if (!rect.width && !rect.height) {
+
+			if (!rect.width && !rect.height && relative) {
 				render = $(render).appendTo(relative);
 
-				fix = $(clone).appendTo(render)[0]
-						.getBoundingClientRect();
+                el = $(clone).appendTo(render)[0];
+                $(el).css("position: absolute;");
+				fix = el.getBoundingClientRect();
+                docElem = el.ownerDocument.documentElement;
 
 				render.remove();	// 删除创建的零时节点
 			}
@@ -80,6 +147,9 @@ exports.module = (function(doc, undefined) {
 			copy.width  = fix.width;
 			copy.height = fix.height;
 		}
+
+        copy.top  = copy.top + win.pageYOffset - docElem.clientTop;
+        copy.left = copy.left + win.pageXOffset - docElem.clientLeft;
 
 		return copy;
 	}
@@ -98,15 +168,10 @@ exports.module = (function(doc, undefined) {
 		return relative || document.body;
 	}
 
-	Place.relOffset = function(el) {
-		var style = getComputedStyle(el);
-
-		return {top: parseFloat(style.top), left: parseFloat(style.left)};
-	}
-
 	/* 尝试绑定方法到 magic 框架的全局对象上 */
     if ($ && !$.modal) {
         $.extend({place: Place});
+        $.extend({outerRect: Place.outerRect});
     };
 
     if ($ && $.fn && !$.fn.modal) {
@@ -114,6 +179,10 @@ exports.module = (function(doc, undefined) {
             Place(el, this, top, left, zindex);
 
 			return this;
+        }});
+
+        $.fn.extend({outerRect: function(relative) {
+            return Place.outerRect(this[0], relative);
         }});
     };
 })(document);
