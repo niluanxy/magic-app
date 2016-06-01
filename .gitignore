@@ -7,9 +7,6 @@
 # 过滤 sass 编译生成的临时文件
 /.sass-cache
 
-# 打包生成的目录过滤
-/output
-
 # APP目录忽略设置
 /app/dist/*
 /app/public/main.css
@@ -42,21 +39,14 @@ npm-debug.log
 .idea
 
 # CORDOVA目录忽略文件夹
-/cordova/hooks
-/cordova/plugins/*
-
-# 对 AndroidManifest.xml 修改的文件
-!/cordova/plugins/android.json
-
-/cordova/platforms/platforms.json
-/cordova/platforms/ios/*
-/cordova/platforms/android/*
-
-# AndroidManifest.xml 文件，必须和 android.json 一致
-!/cordova/platforms/android/AndroidManifest.xml
-
-/cordova/www
+/cordova/*
 /config.xml
 /plugins
 /www
 /gen
+
+# 输出目录忽略
+output
+
+# 开发环境相关目录忽略
+.vscode

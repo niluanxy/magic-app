@@ -460,6 +460,11 @@ gulp.task("cordova-config", function() {
     })
 })
 
+gulp.task("cordova-platform", ["cordova-config"], function() {
+    gulp.src(DIR_RESOURCE + "platforms/**/*")
+    .pipe(gulp.dest(DIR_CORDOVA+"platforms"))
+})
+
 /* 添加android平台 */
 gulp.task("cordova-android", ["cordova-config"], shell.task([
     "cordova platform add android"
@@ -484,7 +489,7 @@ gulp.task("cordova-output-android", function() {
     })
 })
 
-gulp.task("cordova-build-android", shell.task([
+gulp.task("cordova-build-android", ["cordova-platform"], shell.task([
     "gulp cordova",
     "cordova build android",
     "gulp cordova-output-android",
@@ -492,14 +497,14 @@ gulp.task("cordova-build-android", shell.task([
 
 
 /* ios 生成 project 文件 */
-gulp.task("cordova-build-ios", shell.task([
+gulp.task("cordova-build-ios", ["cordova-platform"], shell.task([
     "gulp cordova",
     "cordova build ios"
 ], {errorMessage: errmsg, cwd: "cordova"}))
 
 
 /* 直接安装apk到手机上 */
-gulp.task("cordova-run-android", shell.task([
+gulp.task("cordova-run-android", ["cordova-platform"], shell.task([
     "gulp cordova",
     "cordova run android",
     "gulp cordova-output-android",
