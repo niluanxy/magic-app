@@ -1,5 +1,5 @@
 module.exports = (function() {
-    $$.component("mg-dropmenu", {
+    $$.component("mg-dropdown", {
         template: "<slot></slot>",
         ready: function() {
             var $el = $(this.$el), scope = $$.getVm(this),
@@ -14,7 +14,7 @@ module.exports = (function() {
             onSelect = scope[$el.attr("onSelect")];
             onClose  = scope[$el.attr("onClose")];
 
-            handle = $el.dropmenu({
+            handle = $el.dropdown({
                 init: scope[value],
 
                 onSelect: function(newVal) {
@@ -44,7 +44,8 @@ module.exports = (function() {
             // 监控列表数据，刷新后更新内容
             if (scope[data] !== undefined) {
                 scope.$watch(data, function() {
-                    handle.refresh().select();
+                    var old = handle.value;
+                    handle.refresh().select(old);
                 })
             }
 

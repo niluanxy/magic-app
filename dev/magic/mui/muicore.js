@@ -3,7 +3,7 @@ window.$u = {};                             // 定义一个全局的快捷UI对�
 require("./component/place");				// 加载相关工具方法
 require("./component/tap.js");              // 加载常用组件的点击事件
 require("./component/scroll.js");           // 加载滚动UI组件scroll
-require("./component/dropmenu");            // Dropmenu组件
+require("./component/dropdown");            // Dropdown组件
 require("./component/slider");              // 加载轮播UI组件slider
 require("./component/modal");               // 加载Modal模态弹框组件
 require("./component/tip");                 // 加载Tip提示组件

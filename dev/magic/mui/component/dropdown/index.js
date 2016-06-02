@@ -1,21 +1,21 @@
 module.exports = (function() {
-    var Dropmenu = function(el, options) {
+    var Dropdown = function(el, options) {
         this.$el = $(el);
         this.$wrap = null;
 
         this.visible = false;
         this.value   = null;
         this.evename = "";
-        this.options = $.extend({}, Dropmenu.DEFAULT, options);
+        this.options = $.extend({}, Dropdown.DEFAULT, options);
     }
 
-    Dropmenu.DEFAULT = {
+    Dropdown.DEFAULT = {
         onSelect: null,
         onClose : null,
         template: "",
     }
 
-    Dropmenu.prototype.init = function() {
+    Dropdown.prototype.init = function() {
         var that = this, opt = that.options, $el = that.$el, tmp;
 
         that.evename = "tap.dropmenu_"+$.getRandom();
@@ -28,7 +28,7 @@ module.exports = (function() {
         return this;
     }
 
-    Dropmenu.prototype.bindEvent = function() {
+    Dropdown.prototype.bindEvent = function() {
         var that = this, $wrap = that.$wrap, eve,
             $el = that.$el, opt = that.options;
 
@@ -60,7 +60,7 @@ module.exports = (function() {
     /**
      * 刷新 item Dom信息，并重新绑定方法
      */
-    Dropmenu.prototype.refresh = function(wrap) {
+    Dropdown.prototype.refresh = function(wrap) {
         var childs, $wrap, $old;
 
         $old = this.$el.find(".wrap");
@@ -93,7 +93,7 @@ module.exports = (function() {
      * @param  {String}  value   [要选定的值]
      * @param  {Boolean} disCall [是否不触发 select 方法]
      */
-    Dropmenu.prototype.select = function(value, disCall) {
+    Dropdown.prototype.select = function(value, disCall) {
         var items = this.$wrap.query(".item"),
             $find, $val, opt = this.options;
 
@@ -132,7 +132,7 @@ module.exports = (function() {
         return this;
     };
 
-    Dropmenu.prototype.toggle = function(show) {
+    Dropdown.prototype.toggle = function(show) {
         show = show === undefined ? !this.visible : !!show;
         this.$wrap.toggleClass("hide", !show);
         this.visible = show;
@@ -140,11 +140,11 @@ module.exports = (function() {
         return this;
     }
 
-    Dropmenu.prototype.show = function() {
+    Dropdown.prototype.show = function() {
         return this.toggle(true);
     }
 
-    Dropmenu.prototype.hide = function() {
+    Dropdown.prototype.hide = function() {
         var opt = this.options;
 
         // 尝试运行绑定的 close 方法
@@ -155,22 +155,22 @@ module.exports = (function() {
         return this.toggle(false);
     }
 
-    Dropmenu.prototype.destroy = function() {
+    Dropdown.prototype.destroy = function() {
         this.$el.remove();
     }
 
     /* 尝试绑定方法到 magic 框架的全局对象上 */
-    if ($ && !$.dropmenu) {
-        $.extend({dropmenu: function(el, options) {
-            return new Dropmenu(el, options).init();
+    if ($ && !$.dropdown) {
+        $.extend({dropdown: function(el, options) {
+            return new Dropdown(el, options).init();
         }});
     };
 
-    if ($ && $.fn && !$.fn.dropmenu) {
-        $.fn.extend({dropmenu: function(options) {
+    if ($ && $.fn && !$.fn.dropdown) {
+        $.fn.extend({dropdown: function(options) {
             if (!this[0]) return null;
 
-            return new Dropmenu(this[0], options).init();
+            return new Dropdown(this[0], options).init();
         }});
     };
 })();
