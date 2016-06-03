@@ -106,6 +106,14 @@ require("extend");      // 原生对象扩展
                 return ret;
             },
 
+            below: function(parent) {
+                if (this[0] && $(parent)[0]) {
+                    return _UTIL.below(this[0], $(parent)[0]);
+                }
+
+                return false;
+            },
+
             addClass: function(className) {
                 this[0] && _UTIL.addClass(this[0], className);
 

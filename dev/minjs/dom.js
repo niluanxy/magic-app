@@ -160,28 +160,5 @@ module.exports = (function() {
         return el;
     }
 
-    /**
-     * 判断给定元素是否在某个元素之下
-     * @param  {[type]} el     [description]
-     * @param  {[type]} parent [description]
-     * @return {[type]}        [description]
-     */
-    _dom.below = function(el, parent) {
-        var result = false;
-
-        if (el && parent) {
-            do {
-                if (el == parent) {
-                    result = true;
-                    break;
-                }
-
-                el = el.parentNode;
-            } while(el)
-        }
-
-        return result;
-    }
-
     return _dom;
 })();

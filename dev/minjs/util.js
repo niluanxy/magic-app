@@ -293,27 +293,39 @@ module.exports = (function() {
      * @version     0.1     <2016-03-22>
      */
     util.belowClass = function(e, c, stop, wrap) {
-        var now = e, has, ret = 0;
+        var now = e, ret = 0;
 
         do {
-            has = util.hasClass(now, c);
+            if (util.hasClass(now, c)) {
+                ret++; break;
+            };
 
-            if (has) { ret++; break; };
             now = now.parentNode;
         } while(now && (!stop || stop != now))
 
-        has = now;
-        now = e.parentNode;
+        if (wrap && util.below(e.parentNode, stop)) ret++;
 
-        while (wrap && now && now !== document.body) {
-            if (now == stop) {
-                ret++; break;
+        return wrap ? ret>=2 && now : ret >= 1 && now;
+    }
+
+    /**
+     * 判断给定元素是否在某个元素之下
+     * @param  {[type]} el     [description]
+     * @param  {[type]} parent [description]
+     * @return {[type]}        [description]
+     */
+    util.below = function(el, parent) {
+        var now = el, ret = false;
+
+        while (now && parent && now != document.body) {
+            if (now == parent) {
+                ret = true; break;
             }
 
             now = now.parentNode;
         }
 
-        return wrap ? ret>=2 && has : ret >= 1 && has;
+        return now == parent || ret;
     }
 
     /**
