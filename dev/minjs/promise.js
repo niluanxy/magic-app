@@ -29,12 +29,19 @@
         var sum, len, arr,
             def = new Promise();
 
-        arr = arguments;
+        if (arguments[0] instanceof Array) {
+            arr = arguments[0];
+        } else {
+            arr = arguments;
+        }
+
         sum = len = arr.length;
 
         for(var i=0; i<len; i++) {
             arr[i].then(function() {
-                if (--sum == 0) def.resolve();
+                if (--sum == 0) def.resolve.apply(def, arguments);
+            }, function() {
+                def.reject.apply(def, arguments);
             })
         }
 

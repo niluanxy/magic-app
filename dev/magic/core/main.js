@@ -493,6 +493,16 @@ require("extend");      // 原生对象扩展
             /* 返回当前时间的时间戳 */
             getTime: _UTIL.getTime,
 
+            getCode: function(prefix, min, max) {
+                prefix = prefix || "YYYYMMDD";
+
+                var code = $.time.format(new Date(), prefix);
+
+                code = code + (min && max ? $.getRandom(min, max) : "");
+
+                return code;
+            },
+
             /* 返回一个继承了给定父类的所有方法和属性的新对象 */
             inheart: _UTIL.inheart,
 
