@@ -5,7 +5,7 @@
  * @version     0.2     <2016-01-19>
  */
 
-$.ready(function() {
+$(function() {
     var $document = $(document), tap, fastmove, input;
 
 

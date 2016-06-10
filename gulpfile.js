@@ -106,7 +106,7 @@ gulp.task("dev-minjs", task_dev_minjs)
 function task_dev_magic_css() {
     var defer = Q.defer();
 
-    gulp.src(DIR_MAGIC+"core/main.scss")
+    gulp.src(DIR_MAGIC+"main.scss")
     .pipe(sass({
             includePaths: [DIR_MAGIC]
         }))
@@ -122,7 +122,7 @@ gulp.task("dev-magic-css", task_dev_magic_css);
 
 function task_dev_magic_js() {
     var LIB_MINJS = DIR_MAGIC + "lib/minjs/",
-        DIR_CORE  = DIR_MAGIC + "core/";
+        DIR_CORE  = DIR_MAGIC;
 
     var defer = Q.defer();
 
@@ -182,6 +182,12 @@ function task_dev_magic_vue() {
             entry: DIR_SRC+"main.js",
             output: {
                 filename: "magic.vue.js"
+            },
+            resolve: {
+                alias: {
+                    magic : DIR_MAGIC,
+                    mgvue : DIR_MAGIC_VUE,
+                }
             },
             module: {
                 loaders: [
@@ -308,6 +314,7 @@ function task_dev_app_js() {
     var commonsPlugin  = require("webpack/lib/optimize/CommonsChunkPlugin");
     var HtmlWebpackPlugin = require('html-webpack-plugin');
 
+    var LIB_MINJS = DIR_MAGIC + "lib/minjs/";
     var pugls = release ? [new UglifyJsPlugin({
                     sourceMap: false,
                     minimize: true,
@@ -353,14 +360,29 @@ function task_dev_app_js() {
                     loaders: [
                         { test: /\.html$/, loader: "vue-html"},
                         { test: /\.css$/, loader: "style!css" },
+                        { test: /\.scss$/, loader: "style!css!sass!autoprefixer" },
                         { test: /\.(jpg|png|gif)$/, loader: "url-loader?limit=8192&name=../"+DIR_PUBLIC+"img/[name].[ext]" },
                     ]
                 },
                 resolve: {
                     alias: {
-                        module   : DIR_APP + DIR_MODULE,
-                        page     : DIR_APP + "page/",
-                        public   : DIR_APP_PUB,
+                        magic     : DIR_MAGIC,
+                        mgvue     : DIR_MAGIC_VUE,
+
+                        util      : LIB_MINJS + "util.js",
+                        query     : LIB_MINJS + "selector.js",
+                        event     : LIB_MINJS + "event.js",
+                        domready  : LIB_MINJS + "ondomready.js",
+                        dom       : LIB_MINJS + "dom.js",
+                        extend    : LIB_MINJS + "extend.js",
+                        promise   : LIB_MINJS + "promise.js",
+                        jsonp     : LIB_MINJS + "jsonp.js",
+                        templayed : LIB_MINJS + "templayed.js",
+                        route     : LIB_MINJS + "route.js",
+
+                        module    : DIR_APP + DIR_MODULE,
+                        page      : DIR_APP + "page/",
+                        public    : DIR_APP_PUB,
                     }
                 },
                 plugins: pugls,

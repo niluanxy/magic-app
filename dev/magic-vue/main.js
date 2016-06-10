@@ -1,5 +1,3 @@
-require("./lib/magic.js");
-
 $(function() {
     if (!window.$J) window.$J = undefined;
 
@@ -891,11 +889,11 @@ $(function() {
     };
 
     /* 加载常用工具方法 */
-    require("./util/main.js");
+    require("mgvue/util/main.js");
 
     /* 加载默认的核心样式文件和组件 */
-    require("./component/main.js");
+    require("mgvue/component/main.js");
 
     /* 加载默认核心的指令组件 */
-    require("./directive/main.js");
+    require("mgvue/directive/main.js");
 });

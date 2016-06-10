@@ -62,7 +62,12 @@
         var arr, resolve = false, rej,
             defer = new Promise();
 
-        arr = arguments;
+        if (arguments[0] instanceof Array) {
+            arr = arguments[0];
+        } else {
+            arr = arguments;
+        }
+
         rej = arr.length;
 
         for(var i=0; i<arr.length; i++) {
