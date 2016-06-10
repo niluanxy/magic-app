@@ -1,4 +1,4 @@
-$(function() {
+module.exports = (function() {
     if (!window.$J) window.$J = undefined;
 
     var mvue, config = {tables: []}, _OPTION_ = {}
@@ -887,13 +887,4 @@ $(function() {
 
         return mvue.filter;
     };
-
-    /* 加载常用工具方法 */
-    require("mgvue/util/main.js");
-
-    /* 加载默认的核心样式文件和组件 */
-    require("mgvue/component/main.js");
-
-    /* 加载默认核心的指令组件 */
-    require("mgvue/directive/main.js");
-});
+})();

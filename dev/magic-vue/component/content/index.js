@@ -31,7 +31,7 @@ module.exports = (function() {
             }
 
             /* 如果父元素是 mg-page 说明是主内容区域 */
-            if ($el.parent().tagName() == "mg-page") {
+            if ($el.parent().tag() == "mg-page") {
                 $$.__PAGE__.CONTENT = $scroll;
                 scope.$dispatch("pageRender", $scroll);
             }

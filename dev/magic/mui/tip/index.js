@@ -67,7 +67,7 @@ module.exports = (function() {
         return this;
     };
 
-    
+
     Tip.prototype.show = function(text, option) {
         var opt, that = this;   // 定义局部变量
 
@@ -89,7 +89,7 @@ module.exports = (function() {
                 } else {
                     this.backHandle.css("background-color", that.backStyle);
                 }
-                
+
                 that.handle.addClass("has-back");
             } else {
                 that.handle.removeClass("has-back");
@@ -138,16 +138,5 @@ module.exports = (function() {
         $.extend({tip: function(text, option) {
             return new Tip(text, option).init();
         }})
-
-        /* 绑定快捷UI操作方法 */
-        var $tip  = new Tip("").init(),
-            $load = new Tip("", {type: "loading"});
-
-
-        $u.tip = function (text, option) { $tip.show(text, option); }
-        $u.tipHide = function () { $tip.hide(); }
-
-        $u.loading = function () {$load.show();}
-        $u.loadingHide = function() {$load.hide();}
     };
 })();
