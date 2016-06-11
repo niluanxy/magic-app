@@ -47,8 +47,7 @@ module.exports = (function() {
                 })
             }
 
-            $el.removeAttr(["ctrl", "repos", "refresh", "scrollbar",
-                "pullRefreshDown", "pullRefreshUp"]);
+            $el.removeAttr("ctrl repos refresh scrollbar pullRefreshDown pullRefreshUp");
         }
     });
 
@@ -88,8 +87,7 @@ module.exports = (function() {
                 })
             }
 
-            $el.removeAttr(["ctrl", "repos", "refresh", "scrollbar",
-                "pullRefreshDown", "pullRefreshUp", "scroll-x"]);
+            $el.removeAttr("ctrl repos refresh scrollbar pullRefreshDown pullRefreshUp scroll-x");
         }
     })
 })();

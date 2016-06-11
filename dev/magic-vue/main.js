@@ -165,8 +165,8 @@ module.exports = (function() {
             tables = $.extend.apply({}, config.tables);
 
         // NAVS 全局导航组件初始化
-        if (_OPTION_.navTabs && _OPTION_.navTabs.template) {
-            var $navs = $(_OPTION_.navTabs.template), items;
+        if (_OPTION_.navFoot && _OPTION_.navFoot.template) {
+            var $navs = $(_OPTION_.navFoot.template), items;
 
             // 修复 $navs 对象，防止出错
             if ($navs[0] instanceof DocumentFragment) {
@@ -359,13 +359,13 @@ module.exports = (function() {
     // 更新 NAVS 导航的状态
     function navToggle(nowUrl, match) {
         var NAVS = mvue.__NAVS__, items = NAVS.match,
-            show = false, fix, $copy;
+            show = false, fix, $copy, last;
 
-        fix = nowUrl.replace(/^[#|\\|\/]/, '');
+        fix  = nowUrl.replace(/^[#|\\|\/]/, '');
+        last =match[match.length-1].item;
 
         // 明确声明当前页面有自定义 foot 则不渲染
-        if (match && !match[match.length-1].item.foot &&
-            NAVS.$el && items.length) {
+        if (match && last.navFoot && NAVS.$el && items.length) {
 
             $copy = NAVS.$el.clone();
 
@@ -552,9 +552,9 @@ module.exports = (function() {
                 var $dom = mvue.__NAVS__.$dom, $child;
 
                 /* 要插入的 DOM 不为空说明有 footer */
-                if (_OPTION_.loadFoot !== false && $dom) {
+                if (_OPTION_.navFoot && $dom) {
                     $child = $(this.$el).append($dom)
-                             .children("mg-content");
+                                .find("mg-content");
 
                     if ($child && $child.addClass) {
                         $child.addClass("has-footer");

@@ -6,30 +6,49 @@ module.exports = (function() {
 
     function bindReady() {
         var $el = $(this.$el), scope = $$.getVm(this),
-            value, onChange, input = $el[0];
+            value, onChange, disabled, input = $el[0];
 
         value    = $el.attr("value");
+        disabled = $el.attr("disabled");
         onChange = scope[$el.attr("onChange")];
 
         if (scope[value] === undefined) return;
 
-        $el.removeAttr("value");
         $el.val(!!scope[value]);
 
         $el.on("tap", function() {
             var checked = $el.val() == "on";
-            
+
             scope[value] = checked;
             if ($.isFun(onChange)) {
                 onChange(checked);
             }
         })
 
-        scope.$watch(value, function(newVal) {
-            if (($el.val() == "on") != newVal) {
-                toggle($el, newVal);
+        if (scope[disabled] !== undefined) {
+            scope.$watch(disabled, function(newVal) {
+                if (!!newVal == true) {
+                    $el.attr("disabled", "true");
+                } else {
+                    $el.removeAttr("disabled");
+                }
+            })
+
+            if (!!scope[disabled]) {
+                $el.attr("disabled", "true");
+            } else {
+                $el.removeAttr("disabled");
             }
-        })
+        }
+
+        if (scope[value] !== undefined) {
+            scope.$watch(value, function(newVal) {
+                if (($el.val() == "on") != newVal) {
+                    toggle($el, newVal);
+                }
+            })
+        }
+
     }
 
     $$.component("mg-switch", {

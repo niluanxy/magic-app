@@ -205,18 +205,16 @@ module.exports = (function() {
      * @version     0.1                 <2016-03-16>
      */
     util.removeAttr = function(e, attr) {
-        var nType = e.nodeType;
+        var nType = e.nodeType, arrs;
 
         if (nType === 3 || nType === 8 || nType === 2) {
             return; // 忽略掉 文本节点、注释和属性节点
         }
 
-        if (typeof attr == "string") {
-            e.removeAttribute(attr);
-        } else if (attr instanceof Array) {
-            for(var i=0; i<attr.length; i++) {
-                e.removeAttribute(attr[i].toLowerCase())
-            }
+        arrs = attr.split(" ");
+
+        for(var i=0; i<arrs.length; i++) {
+            e.removeAttribute(arrs[i].toLowerCase())
         }
     }
 

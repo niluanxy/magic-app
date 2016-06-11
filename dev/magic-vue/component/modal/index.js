@@ -27,7 +27,7 @@ module.exports = (function() {
                 }
 
                 that._HANDLE_ = handle;
-                $el.removeAttr(["ctrl", "show", "align"]);
+                $el.removeAttr("ctrl show align");
 
                 if (scope[ctrl] !== undefined) {
                     scope[ctrl] = handle;

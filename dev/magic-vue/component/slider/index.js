@@ -30,7 +30,7 @@ module.exports = (function() {
                 })
             }
 
-            $el.removeAttr(["ctrl", "list"]);
+            $el.removeAttr("ctrl list");
         }
     })
 })();

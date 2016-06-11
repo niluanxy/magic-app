@@ -45,7 +45,7 @@ module.exports = (function() {
                 }
             }
 
-            $el.removeAttr(["time", "space", "runing", "end"]);
+            $el.removeAttr("time space runing end");
         }
     });
 })();
