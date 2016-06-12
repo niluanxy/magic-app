@@ -105,12 +105,36 @@ Array.prototype.findIn = function(val) {
     return false;
 }
 
-/* 删除数组中指定值 */
-Array.prototype.delBy = function(val, all) {
+/**
+ * 删除数组中的指定对象
+ *
+ * @param  {Value}   val [要删除的值]
+ * @param  {String}  key [如果是对象，要检测的键名]
+ * @param  {Boolean} all [是否删错所有，默认只删除第一个]
+ * @return {Array}       [处理后的数组对象]
+ */
+Array.prototype.delBy = function(val, key, all) {
     for(var i=0; i<this.length; i++) {
-        if (this[i] === val) {
-            this.splice(i, 1);
-            if (!all) break;
+        if (typeof key == "string") {
+            if (this[i][key] == val) {
+                this.splice(i, 1);
+
+                if (all !== true) {
+                    break;
+                } else {
+                    i--;
+                }
+            }
+        } else {
+            if (this[i] === val) {
+                this.splice(i, 1);
+
+                if (key !== true) {
+                    break;
+                } else {
+                    i--;
+                }
+            }
         }
     }
 
@@ -120,7 +144,7 @@ Array.prototype.delBy = function(val, all) {
 /* 函数去重方法 */
 Array.prototype.unique = function() {
     var res = [], hash = {};
-    
+
     for(var i=0, elem; (elem = this[i]) != null; i++)  {
         if (!hash[elem])
         {

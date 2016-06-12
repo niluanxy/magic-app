@@ -2047,7 +2047,7 @@ var scroll = module.exports = (function (window, document, Math) {
 /* 尝试绑定方法到 magic 框架的全局对象上 */
 if ($ && $.fn && !$.fn.scroll) {
     $.fn.extend({scroll: function(option) {
-        var handle, probe, $el = this.children();     // 存储scroll对象
+        var handle, probe, $el = this;     // 存储scroll对象
 
         probe = (option && (typeof option.pullRefreshUp == "function" ||
         typeof option.pullRefreshDown == "function")) ? 3 : null;
@@ -2170,14 +2170,17 @@ if ($ && $.fn && !$.fn.scroll) {
         }
 
         if (option.refresh) {
-            var $body = $el, last = 0,
+            var $body = $el.children(), elast = 0, blast = 0,
                 bind  = option.refresh === "true" ? "on" : "once";
 
-            $el.parent()[bind]("touchstart", function() {
-                var height = $body.height();
-                if (height != last) {
-                    handle.refresh();      // 强制刷新高度
-                    last = height;          // 更新内容高度
+            $el[bind]("touchstart", function() {
+                var eheight = $el.height();
+                    bheight = $body.height();
+
+                if (eheight != elast || bheight != blast) {
+                    handle.refresh();       // 强制刷新高度
+                    elast = eheight;        // 更新内容高度
+                    blast = bheight;        // 更新容器高度
                 }
             })
         }

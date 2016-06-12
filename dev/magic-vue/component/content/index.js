@@ -44,6 +44,11 @@ module.exports = (function() {
                         $scroll.refresh();
                         if (repos) $scroll.scrollTo(0, 0);
                     })
+
+                    $el.once("touchstart", function() {
+                        $scroll.refresh();
+                        if (repos) $scroll.scrollTo(0, 0);
+                    })
                 })
             }
 
@@ -81,6 +86,11 @@ module.exports = (function() {
             if (scope[refresh] !== undefined) {
                 scope.$watch(refresh, function() {
                     Vue.nextTick(function() {
+                        $scroll.refresh();
+                        if (repos) $scroll.scrollTo(0, 0);
+                    })
+
+                    $el.once("touchstart", function() {
                         $scroll.refresh();
                         if (repos) $scroll.scrollTo(0, 0);
                     })
