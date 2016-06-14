@@ -56,7 +56,7 @@ module.exports = (function() {
      * authBase     全局默认的权限值
      * authPage     不满足权限值的时候跳转验证的页面
      * authCall     用于验证的方法，可以不传
-     * authCheck    用于判断是否校验的阀值
+     * authCheck    用于判断是否登陆的阀值
      *
      */
 

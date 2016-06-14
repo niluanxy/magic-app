@@ -1,64 +1,60 @@
 module.exports = (function() {
-    function toggle($input, state) {
+    function toggleValue($input, state) {
         $input.val(!!state);
         $input.toggleClass("checked", !!state);
     }
 
+    function toggleDisable($input, state) {
+        if (!!state === true) {
+            $input.attr("disabled", "true");
+        } else {
+            $input.removeAttr("disabled");
+        }
+    }
+
     function bindReady() {
         var $el = $(this.$el), scope = $$.getVm(this),
-            value, onChange, disabled, input = $el[0];
+            prop = this._props, $bind = {}, onChange, input = $el[0];
 
-        value    = $el.attr("value");
-        disabled = $el.attr("disabled");
+        if (!prop.value.raw) return;
+
+        $$.objBind(this, "value", $bind);
+        $$.objBind(this, "disabled", $bind);
+
         onChange = scope[$el.attr("onChange")];
-
-        if (scope[value] === undefined) return;
-
-        $el.val(!!scope[value]);
+        $el.val(!!$bind.value);
 
         $el.on("tap", function() {
-            var checked = $el.val() == "on";
+            $bind.value = $el.val() == "on";
 
-            scope[value] = checked;
-            if ($.isFun(onChange)) {
-                onChange(checked);
+            if ($.isFun(onChange)) onChange($bind.value);
+        })
+
+        this.$watch("value", function(newVal) {
+            if (($el.val() == "on") != newVal) {
+                toggleValue($el, newVal);
             }
         })
 
-        if (scope[disabled] !== undefined) {
-            scope.$watch(disabled, function(newVal) {
-                if (!!newVal == true) {
-                    $el.attr("disabled", "true");
-                } else {
-                    $el.removeAttr("disabled");
-                }
+        if (prop.disabled.raw) {
+            this.$watch("disabled", function(newVal) {
+                toggleDisable($el, newVal);
             })
 
-            if (!!scope[disabled]) {
-                $el.attr("disabled", "true");
-            } else {
-                $el.removeAttr("disabled");
-            }
+            toggleDisable($el, $bind.disabled);
         }
-
-        if (scope[value] !== undefined) {
-            scope.$watch(value, function(newVal) {
-                if (($el.val() == "on") != newVal) {
-                    toggle($el, newVal);
-                }
-            })
-        }
-
     }
 
     $$.component("mg-switch", {
         replace : true,
+        props: ["value", "disabled"],
         template: '<input type="checkbox" class="switch"/>',
         ready: bindReady,
     });
 
     $$.component("mg-checkbox", {
         replace : true,
+        props: ["value", "disabled"],
         template: '<input type="checkbox" class="checkbox"/>',
         ready: bindReady,
     });

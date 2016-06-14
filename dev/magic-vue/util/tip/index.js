@@ -1,4 +1,4 @@
-module.exports = (function() {
+module.exports = $(function() {
     var $tip = $.tip(), $loading = $.tip('', {type: "loading"});
 
     $$.tip = function(text, option) {
@@ -20,4 +20,4 @@ module.exports = (function() {
     $$.loadingHide = function() {
         $loading.hide();
     }
-})();
+});

@@ -86,6 +86,37 @@ module.exports = (function() {
         }
     };
 
+    $$.objBind = function(obj, key, bind, bkey) {
+        if (!obj || !key || !bind) return;
+
+        bkey = bkey || key;
+
+        Object.defineProperty(bind, bkey, {
+            get: function() {
+                return obj[key];
+            },
+
+            set: function(val) {
+                var calls = bind.$calls;
+                obj[key] = val;
+
+                if (calls && calls.findBy) {
+                    var watch = calls.findBy("name", bkey);
+                    watch && watch.call && watch.call.call(bind, val);
+                }
+            }
+        });
+
+        if (!$.isFun(bind.$watch)) {
+            var $calls = bind.$calls = [];
+            bind.$watch = function(value, fun) {
+                $calls.push({ name: value, call: fun });
+            }
+        }
+
+        return bind;
+    }
+
     /**
      * 清除 getter 和 setter 方法，输出纯净信息
      * @param  {object} obj [要输出的对象]
@@ -125,27 +156,5 @@ module.exports = (function() {
 
         call = call ? call : "log";
         console[call](clear(obj));
-    }
-
-    $$.update = function(scope, action, item, ext, find) {
-        if (scope && action && scope[item] && ext !== undefined) {
-            var edit = scope[item];
-
-            if (action == "del" && edit[ext]) {
-                edit.splice(ext, 1);
-            } else if (action == "add") {
-                edit.push(ext);
-            } else if (action == "edit", find) {
-                for(var i=0; i<edit.length; i++) {
-                    if (edit[i][find] == ext[find]) {
-                        $.extend(edit[i], ext);
-                        break;  // 跳出后续的循环
-                    }
-                }
-            }
-
-            /* 更改数据，出发框架自动更新 */
-            scope[item] = null; scope[item] = edit;
-        }
     }
 })();

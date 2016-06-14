@@ -237,6 +237,7 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
 @mixin vertical-align-center() {
     top: 50%;
     transform: translateY(-50%);
+    transform-style: preserve-3d;
 }
 
 // css3 上下左右绝对居中
@@ -244,6 +245,7 @@ $retina-pixel-ratio: 2 !default; // 缩放系数
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    transform-style: preserve-3d;
 }
 
 

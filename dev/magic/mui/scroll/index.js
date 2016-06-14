@@ -1868,25 +1868,9 @@ var scroll = module.exports = (function (window, document, Math) {
     		if ( this.scroller.hasHorizontalScroll && this.scroller.hasVerticalScroll ) {
     			utils.addClass(this.wrapper, 'iScrollBothScrollbars');
     			utils.removeClass(this.wrapper, 'iScrollLoneScrollbar');
-
-    			if ( this.options.defaultScrollbars && this.options.customStyle ) {
-    				if ( this.options.listenX ) {
-    					this.wrapper.style.right = '8px';
-    				} else {
-    					this.wrapper.style.bottom = '8px';
-    				}
-    			}
     		} else {
     			utils.removeClass(this.wrapper, 'iScrollBothScrollbars');
     			utils.addClass(this.wrapper, 'iScrollLoneScrollbar');
-
-    			if ( this.options.defaultScrollbars && this.options.customStyle ) {
-    				if ( this.options.listenX ) {
-    					this.wrapper.style.right = '2px';
-    				} else {
-    					this.wrapper.style.bottom = '2px';
-    				}
-    			}
     		}
 
     		var r = this.wrapper.offsetHeight;	// force refresh
@@ -2047,7 +2031,7 @@ var scroll = module.exports = (function (window, document, Math) {
 /* 尝试绑定方法到 magic 框架的全局对象上 */
 if ($ && $.fn && !$.fn.scroll) {
     $.fn.extend({scroll: function(option) {
-        var handle, probe, $el = this;     // 存储scroll对象
+        var handle, probe, $el = this.children();
 
         probe = (option && (typeof option.pullRefreshUp == "function" ||
         typeof option.pullRefreshDown == "function")) ? 3 : null;
@@ -2170,17 +2154,17 @@ if ($ && $.fn && !$.fn.scroll) {
         }
 
         if (option.refresh) {
-            var $body = $el.children(), elast = 0, blast = 0,
+            var $wrap = $el.parent(), elast = 0, wlast = 0,
                 bind  = option.refresh === "true" ? "on" : "once";
 
             $el[bind]("touchstart", function() {
                 var eheight = $el.height();
-                    bheight = $body.height();
+                    wheight = $wrap.height();
 
-                if (eheight != elast || bheight != blast) {
+                if (eheight != elast || wheight != wlast) {
                     handle.refresh();       // 强制刷新高度
                     elast = eheight;        // 更新内容高度
-                    blast = bheight;        // 更新容器高度
+                    wlast = wheight;        // 更新容器高度
                 }
             })
         }
