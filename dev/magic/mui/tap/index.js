@@ -45,7 +45,6 @@ $(function() {
     }
     $._ui_clearActive = clearActive;
 
-
     tap = {
         delay  : 200,
         animate: 240,
@@ -75,7 +74,7 @@ $(function() {
 
         startX: 0,
         startY: 0,
-        startTime: 0,
+        startTime: null,
 
         _focus: function(e) {
             this.input = e.target;
@@ -98,30 +97,18 @@ $(function() {
             return !!(cx >= mv || cy >= mv);
         },
 
-        // 用于检测两次的点击事件是否可能为点透现象
-        _isDouble: function(e, time) {
-            var mt, testMove, ct;
+        _isOne: function(now, old) {
+            var reg = /^mouse|touch|pointer/;
 
-            testMove = !this._isMove(e);
+            old = old.match(reg);
+            now = now.match(reg);
 
-            if (time !== false) {
-                mt = parseInt(time);
-                mt = isNaN(mt) ? this.doubleTime : mt;
-                ct = $.getTime() - this.startTime;
-
-                return (ct < mt) && testMove;
-            } else {
-                return testMove;
-            }
+            return old && now && old[0] == now[0];
         },
 
         _start: function(e) {
-            var touch = e.touches ? e.touches[0] : e,
-                tagName, path = fixPath(e), ltype;
-
-            ltype = this.lastType;
-            this.lastType = e.type;
-            tagName = e.target.tagName;
+            var touch = e.touches ? e.touches[0] : e, ct,
+                tagName, path = fixPath(e), ltype = this.lastType;
 
             /* 修复移动端input点击焦点不更新的问题 */
             if (e.target != this.input) {
@@ -129,13 +116,18 @@ $(function() {
                 this.input = null;
             }
 
+            ct = $.getTime() - this.startTime;
+
             if ((e.touches && e.touches.length > 1) ||
-                (e.type == "mousedown" && ltype != e.type
-                    && this._isDouble(e, 600)) ) {
+                (!this._isOne(e.type, ltype) && ct < 600) ) {
                 this.startX = null;      this.startY = null;
 
                 return true;
             }
+
+            this.lastType = e.type;
+            tagName = e.target.tagName;
+            $(e.target).trigger("tapstart");
 
             /* 记录此次点击事件的相关信息，用于方法判断 */
             this.startX = touch.pageX;
@@ -143,7 +135,6 @@ $(function() {
             this.startTime = $.getTime();
             this.target    = e.target;
             this.moveClear = false;
-            this.tapIsStart= true;
 
             // 修复 BUTTON元素 出现点击两次的问题
             for (var i = 0; i<path.length; i++) {
@@ -181,12 +172,10 @@ $(function() {
         },
 
         _move: $.delayCall(function(e) {
-            // console.log("===================")
-            // console.log("move run")
-            // console.log(e)
-            // console.log(e.timeStamp)
-            // console.log("pageX: "+e.changedTouches[0].pageX+"      "+
-            //             "pageY: "+e.changedTouches[0].pageY);
+            // 创建 tapmove 事件
+            if (this.startX != null) {
+                $(e.target).trigger("tapmove");
+            }
             e.preventDefault(); // 修复微信下拉显示网页地址
 
             // if (!this.moveClear && this._isMove(e, 1)) {
@@ -208,7 +197,10 @@ $(function() {
             var ct, $target = $(e.target);
 
             ct = $.getTime() - this.startTime;
-            this.tapIsStart = false;
+
+            if (this.startX != null) {
+                $target.trigger("tapend");
+            }
 
             if (!this._isMove(e) && ct < this.delay) {
                 this.disClick = false;
@@ -275,18 +267,15 @@ $(function() {
         /* 修复input 焦点问题 */
         doc[bind]("focus", tap._focus, true)
 
-        /* 移动端和PC端采用不同的事件绑定机制 */
-        if (kt === 0) {
-            doc[bind]("touchstart", tap);
-            doc[bind]("touchmove", tap);
-            doc[bind]("touchend", tap);
-            doc[bind]("touchcancel", tap);
-        } else {
-            doc[bind]("mousedown", tap);
-            doc[bind]("mousemove", tap);
-            doc[bind]("mouseup", tap);
-            doc[bind]("mousecancel", tap);
-        }
+        doc[bind]("touchstart", tap);
+        doc[bind]("touchmove", tap);
+        doc[bind]("touchend", tap);
+        doc[bind]("touchcancel", tap);
+
+        doc[bind]("mousedown", tap);
+        doc[bind]("mousemove", tap);
+        doc[bind]("mouseup", tap);
+        doc[bind]("mousecancel", tap);
 
         doc[bind]("pointerdown", tap);
         doc[bind]("pointermove", tap);

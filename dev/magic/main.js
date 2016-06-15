@@ -67,6 +67,11 @@
     };
 
     rootMagic.fn = rootMagic.prototype = Magic.prototype = {
+        constructor: Magic,
+
+        // 原型有splice属性,对象会变为类数组对象
+        splice: [].splice,
+
         /* 简单的查询方法，返回标准的dom对象 */
         query: function(select) {
             return _QUERY(select, this[0]);
