@@ -127,7 +127,7 @@ $(function() {
 
             this.lastType = e.type;
             tagName = e.target.tagName;
-            $(e.target).trigger("tapstart");
+            $(e.target).trigger("tapstart", e);
 
             /* 记录此次点击事件的相关信息，用于方法判断 */
             this.startX = touch.pageX;
@@ -171,10 +171,10 @@ $(function() {
             }
         },
 
-        _move: $.delayCall(function(e) {
+        _move: function(e) {
             // 创建 tapmove 事件
             if (this.startX != null) {
-                $(e.target).trigger("tapmove");
+                $(e.target).trigger("tapmove", e);
             }
             e.preventDefault(); // 修复微信下拉显示网页地址
 
@@ -191,7 +191,7 @@ $(function() {
             //         clearActive($item);
             //     }
             // }
-        }, 20),
+        },
 
         _end: function(e) {
             var ct, $target = $(e.target);
@@ -199,7 +199,7 @@ $(function() {
             ct = $.getTime() - this.startTime;
 
             if (this.startX != null) {
-                $target.trigger("tapend");
+                $target.trigger("tapend", e);
             }
 
             if (!this._isMove(e) && ct < this.delay) {

@@ -7,18 +7,14 @@
     overflow: hidden;
     position: relative;
 
-    .slider_scroll {
+    .wrapper {
         font-size: 0;
-        display: inline;
-        height: 100%;
+        display: table;
+        width: 100%;
         position: relative;
         white-space: nowrap;
 
-        &.hasInit {
-            display: block;
-        }
-    
-        .slider-item {
+        &.hasInit .slider-item {
             display: inline-block;
         }
     }
@@ -40,7 +36,7 @@
         }
     }
 
-    .slider-points {
+    .points {
         z-index: 1;
         text-align: center;
         width: 100%;

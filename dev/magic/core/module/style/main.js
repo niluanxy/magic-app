@@ -58,7 +58,7 @@ module.exports = (function() {
         if (val && parseFloat(val) >= 0) {
             this.css("height", parseFloat(val)+"px");
         } else {
-            return this.css("height").replace("px", '');
+            return this[0].getBoundingClientRect().height;
         }
     };
 
@@ -68,7 +68,7 @@ module.exports = (function() {
         if (val && parseFloat(val) >= 0) {
             this.css("width", parseFloat(val)+"px");
         } else {
-            return this.css("width").replace("px", '');
+            return this[0].getBoundingClientRect().width;
         }
     };
 

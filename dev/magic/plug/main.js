@@ -83,7 +83,7 @@
                 });
 
                 wx.error(function (res) {
-                    $u.tip("初始化失败，"+res.errMsg, { show: 3000 });
+                    $$.tip("初始化失败，"+res.errMsg, { show: 3000 });
                     $m.runtime = "web"; loadRequire(call)();
                 })
             })

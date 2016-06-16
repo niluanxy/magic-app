@@ -15,7 +15,7 @@ module.exports = (function () {
                 fail     : failCall
             })
         } : function () {
-            $u.tip("操作失败，微信支付初始化失败！")
+            $$.tip("操作失败，微信支付初始化失败！");
         };
 
     /* 调用支付宝进行支付 */

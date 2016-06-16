@@ -2,7 +2,8 @@ module.exports = (function() {
     var eveData = [], eveUUID = 1, EventObj, Event = {}, fixpara;
 
     fixpara = ("target type pageX pageY clientX clientY keyCode keyChar "+
-    "offsetX offsetY path timeStamp screenX screenY changedTouches targetTouches").split(" ");
+               "offsetX offsetY path timeStamp screenX screenY touches "+
+               "altKey ctrlKey shiftKey changedTouches targetTouches").split(" ");
 
     // 转换 keycode 为相关字符
     function transKey(code) {
@@ -18,7 +19,7 @@ module.exports = (function() {
                     keyChar = "DEL";   break;
                 case 9:
                     keyChar = "TAB";   break;
-                case 13: 
+                case 13:
                     keyChar = "Enter"; break;
                 case 16:
                     keyChar = "SHIFT"; break;
@@ -175,7 +176,7 @@ module.exports = (function() {
             if (item.name.search(eve.type) === 0 &&
                 checkIn(eve.target, item.select)) {
 
-                data[0].originalType = item.name; 
+                data[0].originalType = item.name;
                 item.call.apply(ele, data);
             }
 
@@ -192,7 +193,7 @@ module.exports = (function() {
      * @param capture   是否绑定到传播阶段
      *
      * TODO: 优化性能，所有事件都委托在 document 对象上
-     * 
+     *
      */
     Event.bind = function (ele, types, select, call, capture) {
         var handle, events, eveName, evePre;
@@ -285,10 +286,12 @@ module.exports = (function() {
      * 手动触发对象的指定时间
      * @param ele       要操作的对象
      * @param types     要触发的事件名
+     * @param event     原来的event事件
      * @param data      触发时传递的参数,可多个
      */
-    Event.trigger = function (ele, types /* data... */) {
-        var handle, events, eveName, evePre, creEvent, data = [];
+    Event.trigger = function (ele, types /* event data... */) {
+        var handle, events, eveName, evePre, oldEvent = {},
+            args = arguments, creEvent, data = [], pos = 2;
 
         if (!ele || ele.nodeType === 3 || ele.nodeType === 8 || !types) {
             return false;   // 参数不正确则直接退出后续执行
@@ -298,10 +301,19 @@ module.exports = (function() {
         handle = eveData[ele.$_uuid];
 
         /* 创建传递的参数列表 */
-        for(var i=2; i<arguments.length; i++) {
-            data.push(arguments[i]);
+        if (args[2] && args[2].target) {
+            args[2].target = "_CheckEvent_";
+
+            // 利用event对象只能读值来判断
+            if (args[2].target != "_CheckEvent_") {
+                oldEvent = args[2];
+                pos = 3;
+            }
         }
 
+        for(; pos<args.length; pos++) {
+            data.push(arguments[pos]);
+        }
 
         for (var i = 0; i < events.length; i++) {
             eveName = events[i];  evePre = getfix(eveName);
@@ -310,6 +322,10 @@ module.exports = (function() {
             creEvent.initEvent(evePre, true, true);
             creEvent.originalData = data;
             creEvent.originalTarget = ele;
+
+            for(var key in oldEvent) {
+                creEvent[key] = oldEvent[key];
+            }
 
             /* 如果当前元素绑定了句柄，且有事件空间，则手动冒泡 */
             if (handle && handle[evePre] && eveName.indexOf(".") > 0) {
