@@ -62,13 +62,16 @@ $(function() {
         checkMoveBad: 30,
 
         doubleTime: 300,
-        delayClass: 50,
+        delayClass: 80,
+
+        /* 为true会在移动后，清除元素class */
+        moveClear: true,
+        hasClear : false,
 
         input: null,
         target: null,
         lastType: "",
         disClick: false,
-        moveClear: false,
         delayStart: null,
         tapIsStart: false,
 
@@ -85,8 +88,7 @@ $(function() {
                 touch = e.changedTouches, cx, cy;
 
             // 如果不是精确点击事件，采用加大的值
-            if (e.type.search("mouse") == -1 &&
-                e.type.search("pointer") == -1) {
+            if (!move && !e.type.match(/^mouse|pinter/)) {
                 mv = this.checkMoveBad;
             }
 
@@ -104,6 +106,26 @@ $(function() {
             now = now.match(reg);
 
             return old && now && old[0] == now[0];
+        },
+
+        _addActive: function(e) {
+            var path = fixPath(e);
+
+            for (var i = 0; i<path.length; i++) {
+                var $item = $(path[i]);
+
+                if (checkClass($item)) {
+                    $item.addClass("active");
+                }
+            }
+        },
+
+        _clearActive: function(e) {
+            var path = fixPath(e);
+
+            for(var i = 0; i<path.length; i++) {
+                clearActive($(path[i]));
+            }
         },
 
         _start: function(e) {
@@ -134,7 +156,7 @@ $(function() {
             this.startY = touch.pageY;
             this.startTime = $.getTime();
             this.target    = e.target;
-            this.moveClear = false;
+            this.hasClear  = false;
 
             // 修复 BUTTON元素 出现点击两次的问题
             for (var i = 0; i<path.length; i++) {
@@ -149,48 +171,32 @@ $(function() {
                 }
             }
 
-            // this.delayStart = setTimeout(function() {
-            //     /* 给按钮类的组件添加点击样式 */
-            //     for (var i = 0; i<path.length; i++) {
-            //         var $item = $(path[i]);
-            //         tagName = $item[0].tagName.toUpperCase();
-
-            //         if (checkClass($item)) {
-            //             $item.addClass("active");
-            //         }
-            //     }
-            // }, this.delayClass);
-
-            for (var i = 0; i<path.length; i++) {
-                var $item = $(path[i]);
-                tagName = $item[0].tagName.toUpperCase();
-
-                if (checkClass($item)) {
-                    $item.addClass("active");
-                }
+            if (this.moveClear) {
+                this.delayStart = setTimeout(function() {
+                    /* 给按钮类的组件添加点击样式 */
+                    tap._addActive(e);
+                }, this.delayClass);
+            } else {
+                tap._addActive(e);
             }
         },
 
         _move: function(e) {
+            e.preventDefault(); // 修复微信下拉显示网页地址
+
             // 创建 tapmove 事件
             if (this.startX != null) {
                 $(e.target).trigger("tapmove", e);
             }
-            e.preventDefault(); // 修复微信下拉显示网页地址
 
-            // if (!this.moveClear && this._isMove(e, 1)) {
+            if (this.moveClear && !this.hasClear && this._isMove(e)) {
+                // 清除 tap 自定义相关操作
+                clearTimeout(this.delayStart);
 
-            //     // 清除 tap 自定义相关操作
-            //     this.moveClear = true;
-            //     clearTimeout(this.delayStart);
-
-            //     // 清除事件中相关的元素的激活类
-            //     var path = fixPath(e), $item;
-            //     for(var i = 0; i<path.length; i++) {
-            //         $item = $(path[i]);
-            //         clearActive($item);
-            //     }
-            // }
+                // 清除事件中相关的元素的激活类
+                tap._clearActive(e);
+                this.hasClear = true;
+            }
         },
 
         _end: function(e) {
@@ -209,12 +215,8 @@ $(function() {
             }
 
             setTimeout(function() {
-                var path = fixPath(e);
-                for(var i = 0; i<path.length; i++) {
-                    var $item = $(path[i]);
-                    clearActive($item);
-                }
-            }, this.delayClass);
+                tap._clearActive(e);
+            }, this.delayClass*1.2);
         },
 
         handleEvent: function (e) {

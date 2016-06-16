@@ -190,11 +190,13 @@
 
         stat = "resolved" ==  this.status ? "res" : "rej";
 
-        for(var i=0; i<calls.length; i++) {
-            var now = calls[i], type = now.type;
+        if (calls && calls.length) {
+            for(var i=0; i<calls.length; i++) {
+                var now = calls[i], type = now.type;
 
-            if (type == stat || type == "don") {
-                now.call.apply(this, args);
+                if (type == stat || type == "don") {
+                    now.call.apply(this, args);
+                }
             }
         }
 
