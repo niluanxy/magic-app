@@ -171,9 +171,13 @@ $(function() {
                 }
             }
 
+            // 清除上一次的状态，解决双击问题
+            clearTimeout(this.delayStart);
+            this._clearActive(e);
+
+            // 给按钮类的组件添加点击样式
             if (this.moveClear) {
                 this.delayStart = setTimeout(function() {
-                    /* 给按钮类的组件添加点击样式 */
                     tap._addActive(e);
                 }, this.delayClass);
             } else {
