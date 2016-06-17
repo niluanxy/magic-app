@@ -273,15 +273,17 @@ $(function() {
         /* 修复input 焦点问题 */
         doc[bind]("focus", tap._focus, true)
 
-        doc[bind]("touchstart", tap);
-        doc[bind]("touchmove", tap);
-        doc[bind]("touchend", tap);
-        doc[bind]("touchcancel", tap);
-
-        doc[bind]("mousedown", tap);
-        doc[bind]("mousemove", tap);
-        doc[bind]("mouseup", tap);
-        doc[bind]("mousecancel", tap);
+        if (kt === 0) {
+            doc[bind]("touchstart", tap);
+            doc[bind]("touchmove", tap);
+            doc[bind]("touchend", tap);
+            doc[bind]("touchcancel", tap);
+        } else {
+            doc[bind]("mousedown", tap);
+            doc[bind]("mousemove", tap);
+            doc[bind]("mouseup", tap);
+            doc[bind]("mousecancel", tap);
+        }
 
         doc[bind]("pointerdown", tap);
         doc[bind]("pointermove", tap);
