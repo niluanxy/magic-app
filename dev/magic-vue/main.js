@@ -18,8 +18,9 @@ module.exports = (function() {
 
                         HANDLE : null,          // 当前页面 句柄数组
                         BEFORE : null,          // 旧页面 句柄数组
+                        BACKCACHE: false,       // 旧页面返回是否缓存形式
                      },
-        __CACHE__  : null,       // 全局页面缓存
+        __CACHE__  : null,                      // 全局页面缓存
 
         __NAVS__   : {
                         $el    : null,          // 导航栏对象
@@ -189,6 +190,14 @@ module.exports = (function() {
         }
 
         mvue.location = new Router(tables, _OPTION_).init(repath);
+
+        (function() {
+            var _backOld = mvue.location.back;
+            mvue.location.back = function(cache) {
+                mvue.__PAGE__.BACKCACHE = cache === true;
+                _backOld();
+            }
+        })();
 
         /* 返回到登陆页面的方法 */
         mvue.location.authRepath = function(set, togo) {
@@ -395,7 +404,7 @@ module.exports = (function() {
 
     // 绑定动画效果
     function backAnimate(now, old, call) {
-        var $now = $(now), $old = $(old),
+        var $now = $(now), $old = $(old), backCache,
             LOAD = mvue.__LOAD__, nowCls, oldCls, tsend;
 
         if (window.onwebkitTransitionEnd !== null) {
@@ -405,12 +414,13 @@ module.exports = (function() {
         } else if (window.ontransitionend !== null) {
             tsend = "transitionend animationend";
         }
+        backCache = mvue.__PAGE__.BACKCACHE;
 
         oldCls = "slideOutRight";
         nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";
 
         // back缓存页面，手动触发相关事件
-        if ($now[0].MG_VUE_CTRL) {
+        if ($now[0].MG_VUE_CTRL && !backCache) {
             var $ctrl = $now[0].MG_VUE_CTRL,
                 defer = $.defer();
 

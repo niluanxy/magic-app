@@ -3,10 +3,11 @@ module.exports = (function() {
         template: "<slot></slot>",
         ready: function() {
             var that = this, $el = $(this.$el), state = history.state,
-            	router = $$.location, call, scope, hasBack = false;
+            	router = $$.location, call, scope, hasBack = false, cache;
 
             call  = $el.attr("call");
             scope = $$.getVm(that);
+            cache = $el.attr("backCache");
 
             if (!$el.attr("class")) {
                 $el.addClass("button button-clear ion-ios-arrow-left")
@@ -21,7 +22,7 @@ module.exports = (function() {
 
 				if (ret !== false && !hasBack) {
 					hasBack = true;
-                    router.back();
+                    router.back(cache == "true");
 				}
 			})
 
