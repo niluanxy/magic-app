@@ -194,7 +194,9 @@ module.exports = (function() {
         (function() {
             var _backOld = mvue.location.back;
             mvue.location.back = function(cache) {
-                mvue.__PAGE__.BACKCACHE = cache === true;
+                if (cache !== undefined) {
+                    mvue.__PAGE__.BACKCACHE = cache === true;
+                }
                 _backOld();
             }
         })();
@@ -415,6 +417,7 @@ module.exports = (function() {
             tsend = "transitionend animationend";
         }
         backCache = mvue.__PAGE__.BACKCACHE;
+        mvue.__PAGE__.BACKCACHE = false;
 
         oldCls = "slideOutRight";
         nowCls = LOAD.PUSH ? "slideInRight" : "slideInLeft";

@@ -22,11 +22,13 @@ module.exports = (function() {
 
 				if (ret !== false && !hasBack) {
 					hasBack = true;
-                    router.back(cache == "true");
+                    router.back();
 				}
 			})
 
             if ($$._isRunPage(scope)) {
+                $$.__PAGE__.BACKCACHE = cache == "true";
+
                 /* 如果是首个页面，直接隐藏 back 组件 */
     			if (!router || router.check(state, "first")) {
     				var last = router ? router.last.state : null;
