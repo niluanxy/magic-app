@@ -67,6 +67,8 @@ module.exports = (function() {
             refresh = $el.attr("refresh");
             opt.refresh = refresh || "once";
             opt.scrollbars = $el.attr("scrollbar") == "false" ? false : true;
+            opt.pullRefreshDown = scope[$el.attr("pullRefreshDown")] || null;
+            opt.pullRefreshUp   = scope[$el.attr("pullRefreshUp")]   || null;
 
             if ($el.attr("scroll-x")) {
                 opt.scrollX = true;

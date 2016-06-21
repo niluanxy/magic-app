@@ -73,6 +73,7 @@ $(function() {
         lastType: "",
         disClick: false,
         delayStart: null,
+        delayDefer: null,
         tapIsStart: false,
 
         startX: 0,
@@ -174,37 +175,40 @@ $(function() {
             // 清除上一次的状态，解决双击问题
             clearTimeout(this.delayStart);
             this._clearActive(e);
+            this.delayDefer = $.defer();
 
             // 给按钮类的组件添加点击样式
             if (this.moveClear) {
                 this.delayStart = setTimeout(function() {
                     tap._addActive(e);
+                    tap.delayDefer.resolve();
                 }, this.delayClass);
             } else {
                 tap._addActive(e);
+                tap.delayDefer.resolve();
             }
         },
 
-        _move: function(e) {
+        _move: $.delayCall(function(e) {
             e.preventDefault(); // 修复微信下拉显示网页地址
 
             // 创建 tapmove 事件
-            if (this.startX != null) {
+            if (tap.startX != null) {
                 $(e.target).trigger("tapmove", e);
             }
 
-            if (this.moveClear && !this.hasClear && this._isMove(e)) {
+            if (tap.moveClear && !tap.hasClear && tap._isMove(e)) {
                 // 清除 tap 自定义相关操作
-                clearTimeout(this.delayStart);
+                clearTimeout(tap.delayStart);
 
                 // 清除事件中相关的元素的激活类
                 tap._clearActive(e);
-                this.hasClear = true;
+                tap.hasClear = true;
             }
-        },
+        }, 20),
 
         _end: function(e) {
-            var ct, $target = $(e.target);
+            var ct, $target = $(e.target), delay = $.defer();
 
             ct = $.getTime() - this.startTime;
 
@@ -218,9 +222,19 @@ $(function() {
                 $target.trigger("tap");
             }
 
-            setTimeout(function() {
-                tap._clearActive(e);
-            }, this.delayClass*1.2);
+            if (this.delayDefer.status != "pending") {
+                delay.resolve();
+            } else {
+                this.delayDefer.then(function() {
+                    delay.resolve();
+                })
+            }
+
+            delay.then(function() {
+                setTimeout(function() {
+                    tap._clearActive(e);
+                }, tap.delayClass*1.4);
+            });
         },
 
         handleEvent: function (e) {
