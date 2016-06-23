@@ -76,7 +76,7 @@ exports.module = (function(doc, undefined) {
             offset.top  = OFFSET[place[0][0]] * rel.height;
     		offset.left = OFFSET[place[1][0]] * rel.width;
         }
-        
+
 		topfix  = parseFloat(place[0][1]) || 0;
 		leftfix = parseFloat(place[1][1]) || 0;
 
@@ -169,12 +169,12 @@ exports.module = (function(doc, undefined) {
 	}
 
 	/* 尝试绑定方法到 magic 框架的全局对象上 */
-    if ($ && !$.modal) {
+    if ($ && !$.place) {
         $.extend({place: Place});
         $.extend({outerRect: Place.outerRect});
     };
 
-    if ($ && $.fn && !$.fn.modal) {
+    if ($ && $.fn && !$.fn.place) {
         $.fn.extend({place: function(el, top, left, zindex) {
             Place(el, this, top, left, zindex);
 

@@ -1,0 +1,20 @@
+@mixin tip() {
+    display: inline-block;
+    position: absolute;
+    color: $tip-text-color;
+    @include absolute-align-center;
+    border-radius: $tip-border-radius;
+    padding: rem($tip-padding-vertical) rem($tip-padding-horizontal);
+    background-color: $tip-back-color;
+
+    .text {
+        font-size: 1.2em;
+        line-height: 1.5;
+    }
+
+    .icon {
+        font-size: $tip-icon-font-size;
+        font-weight: 700;
+        margin-bottom: rem($tip-icon-margin);
+    }
+}

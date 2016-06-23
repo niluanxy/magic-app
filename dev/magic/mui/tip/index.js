@@ -1,136 +1,93 @@
-require("./style.css");
-
 module.exports = (function() {
     var Tip = function(text, options) {
-        this.text        = text || '';
-        this.handle      = null;
-        this.textHandle  = null;
-        this.backHandle  = null;
-        this.spinHandle  = null;
-        this.backStyle   = "";
+        this.$el     = null;
+        this.$back   = null;
 
-        this.delayHandle = null;
-        this.hideHandle  = null;
+        this.text    = text || '';
+        this.delay   = null;
         this.options = $.extend({}, Tip.DEFAULT, options, true);
     }
 
     Tip.DEFAULT = {
-        type     : 'toast',
-        back     : false,
-        shortTime: 300,            // 默认设置的两个时间
-        longTime : 800,
-        show     : 1400,           // 默认显示时间
-        live     : false,          // 是否永久显示
-        delay    : 0               // 默认延迟显示时间
+        icon  : "",             // 图标类型
+        show  : 1400,           // 默认显示时间
+        live  : false,          // 是否永久显示
+        modal : false,          // 是否模态方式
+        delay : 0,              // 默认延迟显示时间
+
+        insertTo : "body",      // 插入到那个元素
+        wrapClass: "tip",       // 最外层的类名
+        textClass: "text",      // 显示内容的类名
+        iconClass: "icon",      // 图标元素的类名
     }
 
-    // 转换字符串为具体的时间值
-    Tip.fixTime = function (opt, key) {
-        if (typeof opt[key] == "string") {
-            var key = opt.delay + "Time",
-                def = Tip.DEFAULT[key];
+    // 创建元素内容区域 DOM
+    Tip.make = function(text, icon, opt) {
+        var $html = $('<div class="'+opt.wrapClass+'"></div>');
+        $html.append('<span class="'+opt.textClass+'">'+text+'</span>');
+        if (icon) $html.insertBefore('<i class="'+opt.iconClass+' '+icon+'"></i>');
 
-            opt[key] = def ? def : opt[key];
-        }
-        opt[key] = parseInt(opt[key]) || 0;
-    }
-
-    // 清楚对象上的延时操作
-    Tip.clearHandle = function(obj) {
-        clearTimeout(obj.delayHandle);
-        clearTimeout(obj.hideHandle);
-    }
+        return $html;
+    };
 
     Tip.prototype.init = function() {
-        var opt = this.options, html, cls;
-        cls  = "tip_"+$.getRandom();
-        html = "<div class='tip hide has-back' id='"+cls+"'>"
-                + "<div class='tip-show'>"+this.text+"</div>"
-                + "<div class='tip-back'></div></div>";
+        var that = this, opt = this.options, $dom, handle, $back;
 
-        $("body").append(html);     // 添加到页面中
-        this.handle = $("#"+cls);
-        this.textHandle = this.handle.find(".tip-show");
-        this.backHandle = this.handle.find(".tip-back");
+        $dom   = Tip.make(that.text, opt.icon, opt);
+        $back  = $('<div class="back"></div>');
+        handle = $.popup($dom, {insertTo: opt.insertTo});
 
-        if (opt.type == "loading") {
-            opt.live = true; // loading 类型一直显示
-        }
-        $("#"+cls).on("tap", function(e) {
-            e.preventDefault();     // 终止默认动作
-        })
+        handle.$el.append($dom).append($back);
 
-
-        // 将默认背景色存储下来，用于后续显示默认背景色
-        this.backStyle = this.backHandle.css("background-color");
+        this.$el   = $dom;
+        this.$back = $back;
+        this.$el._POPUP_ = handle;
 
         return this;
     };
 
+    Tip.prototype.show = function(text, icon, option) {
+        var that = this, handle = that.$el._POPUP_, txt, opt;
 
-    Tip.prototype.show = function(text, option) {
-        var opt, that = this;   // 定义局部变量
-
-        // 尝试当只有一个参数且为对象时修正参数
-        if (option === undefined && typeof text == 'object') {
-            option = text;  text = undefined;       // 修正变量
+        if (icon && typeof icon != "string" && !option) {
+            option = icon; icon = null;
         }
+        opt = $.extend({}, that.options, option || {}, true);
 
-        opt = $.extend({}, that.options, option, true);   // 合并选项
+        txt  = text || that.text;
+        icon = icon || that.options.icon;
 
-        Tip.fixTime(opt, "delay");      // 转换延时时间值
-        Tip.fixTime(opt, "show");       // 转换显示时间值
-        Tip.clearHandle(this);          // 清除可能的延时动作
+        that.$el.html(Tip.make(txt, icon, opt).html());
+        opt.modal ? that.$back.show() : that.$back.hide();
 
-        this.delayHandle = setTimeout(function() {
-            if (opt.back !== false /* 是否显示背景 */) {
-                if (typeof opt.back == "string") {
-                    that.backHandle.css("background-color", opt.back)
-                } else {
-                    this.backHandle.css("background-color", that.backStyle);
-                }
+        clearTimeout(that.delay);
+        that.delay = setTimeout(function() {
+            handle.show();
 
-                that.handle.addClass("has-back");
-            } else {
-                that.handle.removeClass("has-back");
+            if (!opt.live) {
+                that.delay = setTimeout(function() {
+                    handle.hide();
+                }, opt.show);
             }
-
-            that.handle.toggleClass("has-loading", opt.type == 'loading');
-            if (typeof text == "string") that.textHandle.html(text);
-            if (that.options.type == "loading") {
-                that.spinHandle = that.textHandle.spinner({
-                    color: "#FFF"
-                });
-            }
-            that.handle.removeClass("hide").addClass("show");
-        }, opt.delay);
-
-        if (!opt.live && opt.show > 0) {
-            that.hideHandle = setTimeout(function() {
-                that.hide();
-            }, opt.delay + opt.show);
-        }
+        }, opt.delay || 0);
 
         return this;
     };
 
-    Tip.prototype.hide = function() {
-        Tip.clearHandle(this);          // 清除可能的延时动作
-        this.handle.removeClass("show").addClass("hide");
-        if (this.options.type == "loading") {
-            var span = this.spinHandle;
-            span && span.stop();
-        }
+    Tip.prototype.hide = function(delay) {
+        var handle = this.$el._POPUP_;
+
+        clearTimeout(this.delay);
+        this.delay = setTimeout(function() {
+            handle.hide();
+        }, delay || 0);
 
         return this;
     };
 
     Tip.prototype.destroy = function() {
-        this.handle.remove();
-        if (this.options.type == "loading") {
-            var span = this.spinHandle;
-            span && span.stop();
-        }
+        this.$el._POPUP_.destroy();
+        clearTimeout(this.delay);
     };
 
     /* 尝试绑定方法到 magic 框架的全局对象上 */

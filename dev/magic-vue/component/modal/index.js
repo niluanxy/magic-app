@@ -15,9 +15,9 @@ module.exports = (function() {
                 clen = $el.children.length;
 
                 option = {
-                    align     : $el.attr("align"),
-                    autoHide  : false,
-                    background: true,
+                    align    : $el.attr("align"),
+                    autoHide : false,
+                    backShow : true,
                 };
 
                 if (mroot /* 为真说明要在根元素上弹框 */) {

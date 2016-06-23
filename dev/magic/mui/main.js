@@ -5,6 +5,7 @@ require("./tap");                   // 加载常用组件的点击事件
 require("./scroll");                // 加载滚动UI组件scroll
 require("./dropdown");              // Dropdown组件
 require("./slider");                // 加载轮播UI组件slider
+require("./popup");                 // 加载默认弹框事件
 require("./modal");                 // 加载Modal模态弹框组件
 require("./tip");                   // 加载Tip提示组件
 require("./confirm");               // 加载confirm组件

@@ -1,5 +1,5 @@
 module.exports = (function() {
-    var style = {}, _UTIL = require("util");
+    var style = {}, _HIDE = {}, _UTIL = require("util");
 
     /* 对象的类操作的一些方法 */
     style.hasClass = function(className) {
@@ -39,6 +39,35 @@ module.exports = (function() {
 
     style.offset = function(trans) {
         return this[0] && _UTIL.offset(this[0], !trans) || null;
+    };
+
+    // 显示元素，会尝试恢复元素 display 属性
+    style.show = function(display) {
+        if (this.css("display") == "none") {
+            var hdid = this[0]._HIDE_ID_,
+                show = display || _HIDE[hdid];
+
+            show = !show || show == "none" ? "block" : show;
+
+            this.css("display", show);
+        }
+
+        return this;
+    };
+
+    // 隐藏元素，会保存元素 display 属性
+    style.hide = function() {
+        var hdid = this[0]._HIDE_ID_;
+
+        if (!hdid) {
+            hdid = _UTIL.getTime();
+            this[0]._HIDE_ID_ = hdid;
+        }
+
+        _HIDE[hdid] = this.css("display");
+        this.css("display", "none");
+
+        return this;
     };
 
     style.css = function(attr, val) {

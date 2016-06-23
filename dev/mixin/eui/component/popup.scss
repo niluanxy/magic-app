@@ -1,91 +1,36 @@
 // popup 弹框组件
 
+@mixin popup($prefix: pop-) {
+    .#{$prefix}wrapper {
+        display: none;
+    	width: 100%;
+    	height: 100%;
+    	top: 0; left: 0;
+        pointer-events: none;
+    	position: absolute;
 
-@mixin popup() {
-	display: none;
-	position: absolute;
-	top: 0; left: 0;
-	bottom: 0; right: 0;
-	justify-content: center;
-	align-items: center;
-	z-index: $z-index-modal;
-	
-	&.zoomIn, &.zoomOut {
-		display: flex;
-	}
+        .#{$prefix}item {
+    		width: 100%;
+    		height: 100%;
+    		overflow: hidden;
+    		display: none;
+            // 让点击事件传到后面去
+            pointer-events: none;
+    		position: absolute;
 
-	&.zoomIn {
-		&:after {
-			@include animate(fadeIn, .25s);
-		}
+            >* {
+                // 恢复元素默认的点击效果
+                pointer-events: auto;
+            }
 
-		.wrapper {
-			@include animate(zoomIn, .25s);
-		}
-	}
-
-	&.zoomOut {
-		&:after {
-			opacity: 0;
-			@include animate(fadeOut, .45s);
-		}
-
-		.wrapper {
-			opacity: 0;
-			@include animate(zoomOut, .45s);
-		}
-	}
-
-	.wrapper {
-		width: $popup-wrapper-width;
-		z-index: 10;
-		display: flex;
-		flex-direction: column;
-		border-radius: rem($popup-radius);
-		text-align: center;
-		overflow: hidden;
-		background-color: $popup-wrapper-back;
-
-		.head {
-			font-size: rem($popup-font-large);
-			font-weight: 700;
-			padding: rem($popup-padding + 4) rem($popup-padding) 0 rem($popup-padding);
-			padding-bottom: 0;
-
-			& + .body {
-				padding-top: rem($popup-padding - 4);
-			}
-		}
-
-		.body {
-			padding: rem($popup-padding - 2) rem($popup-padding);
-			line-height: rem($popup-body-line-height);
-		}
-
-		.buttons {
-			height: rem($popup-buttons-height);
-			display: flex;
-			@include retina-border(top);
-
-			.button {
-				flex: 1;
-				font-size: rem($popup-font-large);
-				border-radius: 0;
-				line-height: rem($popup-buttons-height);
-				border-width: 0;
-				border-left-width: 1px;
-				color: $button-positive-border;
-
-				&:first-child {
-					border-left-width: 0;
-				}
-
-				&.active
-				&:active, {
-					box-shadow: none;
-					background-color: $popup-buttons-active-bg;
-				}
-			}
-		}
-	}
+    		.back {
+    			width: 100%;
+    			height: 100%;
+                z-index: -1;
+                top: 0; left: 0;
+                position: absolute;
+    			background-color: $modal-item-back;
+    		}
+    	}
+    }
 }

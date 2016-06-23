@@ -15,9 +15,11 @@
         // 如果传入的是一个函数，则添加一个自执行函数
         if (typeof select === "function") {
             return _READYCALL(select);
-        } else if (typeof select === "string") {
-            this.length = 0;    // 默认无元素
+        }
 
+        this.length = 0;    // 默认无元素
+
+        if (typeof select === "string") {
             // 判断是否为创建DOM的字符串
             if (_DOM.check(select)) {
                 var make = _DOM.make(select);

@@ -2,7 +2,7 @@
  * 为常用的 button 组件添加点击效果，同时全局增加 tap 事件
  *
  * @author      mufeng  <smufeng@gmail.com>
- * @version     0.2     <2016-01-19>
+ * @version     0.4     <2016-06-21>
  */
 
 $(function() {
