@@ -1,9 +1,9 @@
 module.exports = $(function() {
-    var $tip = $.tip(), $loading = $.tip('', {type: "loading"});
+    var $tip = $.tip();
 
-    $$.tip = function(text, option) {
-        if (!text) return;
-        $tip.show(text, option);
+    $$.tip = function() {
+        if (!arguments[0]) return;
+        $tip.show.apply($tip, arguments);
     };
 
     $$.error = function(text, option) {
@@ -11,13 +11,25 @@ module.exports = $(function() {
         $tip.show(text, $.extend({show: 2000}, option));
     }
 
-    $$.tipHide = function() { $tip.hide(); };
+    $$.tipHide = function() {
+        $tip.hide.apply($tip, arguments);
+    };
 
-    $$.loading = function() {
-        $loading.show();
+    Vue.prototype.$tip = function() {
+        var that = this, $tip;
+
+        $tip = that._VUI_TIP_;
+        if (!$tip) {
+            $tip = $.tip("", {insertTo: that.$el});
+            that._VUI_TIP_ = $tip;
+        }
+
+        $tip.show.apply($tip, arguments);
     }
 
-    $$.loadingHide = function() {
-        $loading.hide();
+    Vue.prototype.$tipHide = function() {
+        var $tip = this._VUI_TIP_;
+
+        if ($tip) $tip.hide.apply($tip, arguments);
     }
 });
