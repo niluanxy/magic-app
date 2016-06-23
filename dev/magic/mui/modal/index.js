@@ -1,4 +1,6 @@
 module.exports = (function() {
+    require("../popup/");    // 加载依赖文件
+
     var Modal = function(element, options) {
         this.$el      = $(element);
         this.options  = $.extend({}, Modal.DEFAULT, options, true);

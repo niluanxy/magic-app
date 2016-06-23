@@ -10,7 +10,7 @@
  * coreui 核心UI组件样式输出
  *********************************************************************/
 .bar                { @include bar(); }
-.button             { @include button(); @include button-ext(); }
+.button             { @include button(); }
 .tabs               { @include tabs(); }
 .content            { @include content(); }
 .scroll             { @include scroll(); }
@@ -18,7 +18,7 @@
 .tip                { @include tip(); }
 .slider             { @include slider(); }
 .timer              { @include timer(); }
-.modal              { @include modal();  @include modal-ext(); }
+.modal              { @include modal(); }
 .dropmenu           { @include dropmenu(); }
 
 @include popup();           // popup  弹框容器组件

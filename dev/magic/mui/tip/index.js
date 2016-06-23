@@ -1,4 +1,6 @@
 module.exports = (function() {
+    require("../popup/");    // 加载依赖文件
+
     var Tip = function(text, options) {
         this.$el     = null;
         this.$back   = null;
@@ -15,7 +17,8 @@ module.exports = (function() {
         modal : false,          // 是否模态方式
         delay : 0,              // 默认延迟显示时间
 
-        insertTo : "body",      // 插入到那个元素
+        insertTo : "body",      // 插入到哪个元素
+
         wrapClass: "tip",       // 最外层的类名
         textClass: "text",      // 显示内容的类名
         iconClass: "icon",      // 图标元素的类名
