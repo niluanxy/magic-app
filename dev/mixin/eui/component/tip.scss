@@ -2,6 +2,7 @@
     display: inline-block;
     position: absolute;
     color: $tip-text-color;
+    fill: #ffffff;
     @include absolute-align-center;
     border-radius: $tip-border-radius;
     padding: rem($tip-padding-vertical) rem($tip-padding-horizontal);
@@ -15,6 +16,23 @@
     .icon {
         font-size: $tip-icon-font-size;
         font-weight: 700;
-        margin-bottom: rem($tip-icon-margin);
+        width: 60px;
+        height: 60px;
+        margin: 0 auto;
+        display: block;
+        fill: #ffffff;
+        background-size: 100% 100%;
+
+        &.loading {
+            background-image: url($tip-svg-loading);
+        }
+
+        &.success {
+            background-image: url($tip-svg-success);
+        }
+
+        &.error {
+            background-image: url($tip-svg-error);
+        }
     }
 }
