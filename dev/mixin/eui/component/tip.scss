@@ -14,10 +14,8 @@
     }
 
     .icon {
-        font-size: $tip-icon-font-size;
-        font-weight: 700;
-        width: 60px;
-        height: 60px;
+        width: rem($tip-icon-size);
+        height: rem($tip-icon-size);
         margin: 0 auto;
         display: block;
         fill: #ffffff;
