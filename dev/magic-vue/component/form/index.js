@@ -13,13 +13,17 @@ module.exports = (function() {
     }
 
     function bindReady() {
-        var $el = $(this.$el), scope = $$.getVm(this),
-            prop = this._props, $bind = {}, onChange, input = $el[0];
+        var $el = $(this.$el), scope = $$.getVm(this), vmScrope,
+            prop = this._props, $bind = {}, onChange, input = $el[0], value, disabled;
 
         if (!prop.value.raw) return;
 
-        $$.objBind(this, "value", $bind);
-        $$.objBind(this, "disabled", $bind);
+        vmScope = this._scope || scope;
+        value   = prop.value.raw;
+        disabled= prop.disabled.raw;
+
+        $$.objBind(vmScope, value, $bind, "value");
+        $$.objBind(vmScope, disabled, $bind, "disabled");
 
         onChange = scope[$el.attr("onChange")];
         $el.val(!!$bind.value);
@@ -30,14 +34,14 @@ module.exports = (function() {
             if ($.isFun(onChange)) onChange($bind.value);
         })
 
-        this.$watch("value", function(newVal) {
+        vmScope.$watch(value, function(newVal) {
             if (($el.val() == "on") != newVal) {
                 toggleValue($el, newVal);
             }
         })
 
-        if (prop.disabled.raw) {
-            this.$watch("disabled", function(newVal) {
+        if (disabled) {
+            vmScope.$watch(disabled, function(newVal) {
                 toggleDisable($el, newVal);
             })
 

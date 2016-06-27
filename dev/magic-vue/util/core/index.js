@@ -91,6 +91,19 @@ module.exports = (function() {
 
         bkey = bkey || key;
 
+        if (key.match(/^.+\..+$/)) {
+            var arrs = key.split(".");
+
+            for(var i=0; i<arrs.length-1; i++) {
+                var key = arrs[i];
+                obj = obj[key];
+            }
+
+            key = arrs[i];
+        } else {
+            key = key.replace(".", '');
+        }
+
         Object.defineProperty(bind, bkey, {
             get: function() {
                 return obj[key];
