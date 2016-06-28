@@ -15,7 +15,7 @@
                 agent = window.navigator.userAgent.toLowerCase();
 
             // 检测是运行在移动端还是桌面端环境
-            isPhone = /iP(hone|od|ad)/ig.test(agent) 
+            isPhone = /iP(hone|od|ad)/ig.test(agent)
                         || /Android/ig.test(agent) || false;
 
             // 如果检测到是移动端才执行设置，PC端忽略设置
@@ -42,7 +42,7 @@
             } else {
                 content += ', user-scalable=no, width='+dwidth;
             }
-            
+
             meta.setAttribute("content", content);
             head.appendChild(meta); // 插入到页面中
 
@@ -53,11 +53,19 @@
                 resizeEvt = 'orientationchange' in win ? 'orientationchange' : 'resize',
                 ratio = win.devicePixelRatio,
                 recalc = function () {
-                    var clientWidth = docEl.clientWidth, base;
+                    var clientWidth = docEl.clientWidth, base, change;
+
+                    change = Math.abs(clientWidth-screen.width);
                     if (!clientWidth) return;
 
                     base = isPhone ? win.devicePixelRatio || (clientWidth / width) : 1;
-                    docEl.style.fontSize = font * base + 'px';
+
+                    // 如果浏览器视窗大小没变化，则应用默认字体大小
+                    if (change < 20) {
+                        docEl.style.fontSize = font + 'px';
+                    } else {
+                        docEl.style.fontSize = font * base + 'px';
+                    }
                 };
 
             if (!doc.addEventListener) return;
