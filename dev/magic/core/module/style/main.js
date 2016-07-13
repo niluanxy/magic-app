@@ -76,9 +76,40 @@ module.exports = (function() {
         if (val == undefined) {
             return getComputedStyle(this[0])[attr];
         } else {
-            return this[0].style[attr] = val;
+            this[0].style[attr] = val;
+
+            return this;
         }
     };
+
+    // 删除元素的内联样式信息
+    style.removeCss = function(name) {
+        if (this[0] && this[0].attributes) {
+            var attr = this[0].attributes, style;
+
+            for(var i=0; i<attr.length; i++) {
+                if (attr[i].name == "style") {
+                    style = attr[i]; break;
+                }
+            }
+
+            name = name.split(" ");
+
+            for(var i=0; i<name.length; i++) {
+                if (style && style.value) {
+                    var reg = new RegExp(name[i]+':.*;');
+                    style.value = style.value.replace(reg, '');
+
+                    if (style.value == "") {
+                        this[0].removeAttribute('style');
+                        break;
+                    }
+                }
+            }
+        }
+
+        return this;
+    }
 
     /* 简单的获取元素的高度和宽度 */
     style.height = function(val) {

@@ -15,14 +15,15 @@
 .content            { @include content(); }
 .scroll             { @include scroll(); }
 .list               { @include list(); }
+.tip                { @include tip(); }
 .slider             { @include slider(); }
-.popup              { @include popup(); }
 .timer              { @include timer(); }
 .modal              { @include modal(); }
 .modal-wrapper      { @include modal-wrapper(); }
 .dropmenu           { @include dropmenu(); }
 
-
+@include view();            // view   视图容器元素
+@include popup();           // popup  弹框容器组件
 @include form();			// form   表单组件元素
 @include text();			// text   文字样式代码
 @include tools();			// tools  常用工具样式类

@@ -1,9 +1,31 @@
-module.exports = (function() {
-    var eveData = [], eveUUID = 1, EventObj, Event = {}, fixpara;
+module.exports = (function(win) {
+    var eveData = [], eveUUID = 1, EventObj, Event = {}, fixpara, fixevent;
 
     fixpara = ("target type pageX pageY clientX clientY keyCode keyChar "+
                "offsetX offsetY path timeStamp screenX screenY touches "+
                "altKey ctrlKey shiftKey changedTouches targetTouches").split(" ");
+
+    fixevent = {
+        transitionend: (function() {
+                if (win.onwebkitTransitionEnd !== null) {
+                    return "webkitTransitionEnd";
+                } else if (win.onwebkitanimationend !== null) {
+                    return "webkitanimationend";
+                } else if (win.ontransitionend !== null) {
+                    return "transitionend";
+                }
+            })(),
+
+        animationend: (function() {
+                if (win.onwebkitAnimationEnd !== null) {
+                    return "webkitAnimationEnd";
+                } else if (win.onwebkitanimationend !== null) {
+                    return "webkitanimationend";
+                } else if (win.onanimationend !== null) {
+                    return "animationend";
+                }
+            })(),
+    };
 
     // 转换 keycode 为相关字符
     function transKey(code) {
@@ -41,6 +63,10 @@ module.exports = (function() {
         }
 
         return keyChar;
+    }
+
+    function transEvent(name) {
+        return fixevent[name] || name;
     }
 
     EventObj = function (src, porp) {
@@ -196,7 +222,7 @@ module.exports = (function() {
      *
      */
     Event.bind = function (ele, types, select, call, capture) {
-        var handle, events, eveName, evePre;
+        var handle, events, eveName, evePre, eveOld;
 
         if (ele.nodeType === 3 || ele.nodeType === 8 || arguments.length < 3) {
             return false;   // 参数不齐全直接退出后续执行
@@ -218,7 +244,11 @@ module.exports = (function() {
         events = types.split(" ");          // 尝试分割事件列表
 
         for (var i = 0; i < events.length; i++) {
-            eveName = events[i]; evePre = getfix(eveName);
+            eveName = events[i];
+            eveOld  = getfix(eveName);
+            evePre  = transEvent(eveOld);
+
+            eveName = eveName.replace(eveOld, evePre);
 
             var handleNow = handle[evePre];
 
@@ -253,7 +283,7 @@ module.exports = (function() {
      * @param types     要移除的事件名
      */
     Event.unbind = function (ele, types, capture) {
-        var handle, events, eveName, evePre, typeRun;
+        var handle, events, eveName, evePre, eveOld, typeRun;
 
         if (!ele || !ele.$_uuid || !types ||
             !(handle = eveData[ele.$_uuid])) return false;
@@ -261,7 +291,11 @@ module.exports = (function() {
         events = types.split(" ");
 
         for (var i = 0; i < events.length; i++) {
-            eveName = events[i]; evePre = getfix(eveName);
+            eveName = events[i];
+            eveOld  = getfix(eveName);
+            evePre  = transEvent(eveOld);
+
+            eveName = eveName.replace(eveOld, evePre);
 
             /* 如果事件不存在，直接跳过 */
             if (!handle || !handle[evePre]) continue;
@@ -382,4 +416,4 @@ module.exports = (function() {
 
 
     return Event;
-})();
+})(window);

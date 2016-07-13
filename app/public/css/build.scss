@@ -21,6 +21,7 @@
 .modal              { @include modal(); }
 .dropmenu           { @include dropmenu(); }
 
+@include view();            // view   核心容器组件
 @include popup();           // popup  弹框容器组件
 @include form();            // form   表单组件元素
 @include input-ext();       // input  输入框扩展

@@ -6,10 +6,10 @@ module.exports = (function() {
     	this.table   = table;			// 路由表信息
     	this.state   = [];				// 状态信息
         this.last    = {};              // 上一次的路由地址
-        this.statpos = 0;               // 记录路由的状态位置
         this.evetype = "";              // 触发事件的方式
+        this.evestop = false;           // 是否停止后续的方法执行
   		this.options = extend({}, Route.DEFAULT, options, true);
-    };
+    }, STAT_POS = 0;
 
     /**
      * table 参数说明
@@ -56,7 +56,7 @@ module.exports = (function() {
 
             for(var key in item) {
                 if (undef && item[key] === undefined) {
-                    continue;    
+                    continue;
                 }
 
                 obj[key] = item[key];
@@ -82,6 +82,39 @@ module.exports = (function() {
         item.textContent = title;
     }
 
+    /* 初始化路由表，设置每个项正确的 正则表达式 */
+    tableFix = function(table, regexp) {
+        var params = new RegExp(regexp, "g");       // 获得参数匹配正则语句
+
+        for (var key in table) {
+            if (key.search("/") == 0) {
+
+                /* 修正格式(只传了on方法) */
+                if (isFun(table[key])) {
+                    table[key] = { on: table[key]}
+                }
+
+                /* 添加对应项具体的正则语句 */
+                table[key].__match = key.replace(params, "([^/]*)");
+                tableFix(table[key], regexp);   // 递归循环处理子项目，直到全部处理完
+            }
+        }
+
+        return table;
+    }
+
+    // 添加新的对象到旧的路由表上去
+    addTables = function(old, add) {
+        for(var key in add) {
+            if (key[0] === "/") {
+                if (!old[key]) old[key] = {};
+                addTables(old[key], add[key]);
+            } else {
+                old[key] = add[key];
+            }
+        }
+    }
+
     Route.DEFAULT = {
     	home     : "/home",				// 默认首页
         title    : true,                // 如果有title信息，是否自动更新
@@ -96,36 +129,12 @@ module.exports = (function() {
         regexp   : ":[^/-]*",           // 参数匹配正则语句，用于匹配参数信息
     }
 
-    /* 执行给定对象的执行方法，forward 为 true 反向执行 */
-    Route.prototype._exec = function(tables, key, ext) {
-        var len  = tables.length - 1, last = tables[len], ret,
-            type = this.options.recurse, back = type == "backward";   // 方法是否反向调用
-
-        if (type === false /* 只执行最后一个对象 */) {
-            if (isFun(last.item[key])) {
-                ret = last.item[key](last.para, ext);
-            }
-        } else {
-            for (var i = back?len:0; back?i>=0:i<=len; back?i--:i++) {
-                var now = tables[i], item = tables[i].item;
-
-                if (isFun(item[key])) {
-                    ret = item[key](now.para, ext);
-                }
-
-                if (ret === false) break; // 返回 false 则终止程序执行
-            }
-        }
-
-        return ret;     // 返回最后执行的结果
-    }
-
     /* 路由初始化方法，repath 为 true，则跳到首页 */
     Route.prototype.init = function(repath) {
         var that = this, opt = that.options;
 
         /* 初始化项目的路由匹配规则 */
-        that.table = Route.prefix(that.table, opt.regexp);
+        that.table = tableFix(that.table, opt.regexp);
         that._bind();            // 绑定全局事件
 
         if (opt.authPage) opt.authPage = that.geturl(opt.authPage);
@@ -133,7 +142,7 @@ module.exports = (function() {
         if (repath || !that.fire())  {
             var to = opt.notpage || opt.home;
             that.go(to, true, false, true);
-        } else {
+        } else if (repath !== false) {
             var url = that.geturl();
             that.go(url, true, false, true);
         }
@@ -141,25 +150,13 @@ module.exports = (function() {
         return that;
     }
 
-    /* 初始化路由表，设置每个项正确的 正则表达式 */
-    Route.prefix = function(table, regexp) {
-        var params = new RegExp(regexp, "g");       // 获得参数匹配正则语句
+    /* 动态的添加一个路由表信息 */
+    Route.prototype.when = function(table) {
+        var adds = tableFix(table, this.options.regexp), result = [];
 
-        for (var key in table) {
-            if (key.search("/") == 0) {
-                
-                /* 修正格式(只传了on方法) */
-                if (isFun(table[key])) {
-                    table[key] = { on: table[key]}
-                }
+        addTables(this.table, adds);
 
-                /* 添加对应项具体的正则语句 */
-                table[key].__match = key.replace(params, "([^/]*)");
-                Route.prefix(table[key], regexp);   // 递归循环处理子项目，直到全部处理完
-            }
-        }
-
-        return table;
+        return this;
     }
 
     /* 尝试匹配给定URL的路由信息 */
@@ -210,32 +207,63 @@ module.exports = (function() {
     	return url.length == 0 && result.length ? result : null;
     }
 
+    // 停止当前路由后续的方法回调
+    Route.prototype.stop = function() {
+        this.evestop = true;
+    }
+
+    /* 执行给定对象的执行方法，forward 为 true 反向执行 */
+    Route.prototype._exec = function(tables, key, ext) {
+        var len  = tables.length - 1, last = tables[len], ret,
+            type = this.options.recurse, back = type == "backward";   // 方法是否反向调用
+
+        if (type === false /* 只执行最后一个对象 */) {
+            if (isFun(last.item[key])) {
+                ret = last.item[key](last.para, ext, tables, this);
+            }
+        } else {
+            for (var i = back?len:0; back?i>=0:i<=len; back?i--:i++) {
+                var now = tables[i], item = tables[i].item;
+
+                if (isFun(item[key]) && !this.evestop) {
+                    ret = item[key](now.para, ext, tables, this);
+                }
+
+                if (ret === false) break; // 返回 false 则终止程序执行
+            }
+        }
+
+        return ret;     // 返回最后执行的结果
+    }
+
     /* 手动触发指定页面的事件方法，match 参数必须给定 */
     Route.prototype._trigger = function(nowUrl, match, exbefore, exon) {
         if (!match) return false;   // 参数不足直接退出
 
-        var that = this, opt = that.options, last = that.last, rcall, update;
+        var that = this, opt = that.options, last = that.last, update;
 
-        if (isFun(opt.before)) rcall = opt.before(last.url, nowUrl, match, that);
+        that.evestop = false;   // 调用前，重置时间终止标志
+
+        if (isFun(opt.before)) opt.before(last.url, nowUrl, match, that);
 
         // 尝试调用 before后 的回调，如果返回 false，会中止后面页面的回调
-        if (isFun(exbefore)) update = exbefore(rcall);     
+        if (isFun(exbefore)) update = exbefore(that.evestop);
 
         /* 如果 before 返回 false，回退到上个页面 */
-        if (rcall !== false) {
-            if (last && last.match) rcall = that._exec(last.match, "leave", match);
+        if (that.evestop !== true) {
+            if (last && last.match) that._exec(last.match, "leave", match);
 
             /* 如果上个页面的 leave 返回 false ，中止本次跳转 */
-            if (rcall !== false) rcall = that._exec(match, "before", last.match);
+            if (that.evestop !== true) that._exec(match, "before", last);
 
             /* 如果 before 返回 false，中止本次跳转 */
-            if (rcall !== false) rcall = that._exec(match, "on", last.match);
+            if (that.evestop !== true) that._exec(match, "on", last);
 
-            if (isFun(exon)) update = exon(rcall);         // 尝试调用 on后 的回调
+            if (isFun(exon)) update = exon(that.evestop);         // 尝试调用 on后 的回调
 
             /* 运行全局的 成功跳转的after 方法 */
             update !== false && isFun(opt.after) && opt.after(last.url, nowUrl, match, that);
-            
+
             /* 更新 title 功能开启，且跳转成功，更新 title */
             if (update !== false && opt.title) {
                 var lastItem = match[match.length-1].item;
@@ -247,7 +275,7 @@ module.exports = (function() {
         /* 不论是否跳转成功，一定会执行 always 方法 */
         isFun(opt.always) && opt.always(last.url, nowUrl, match, that);
 
-        update !== false && that.update(that.geturl(), match);
+        update !== false && that.update(that.geturl());
     }
 
     /* 全局绑定事件，监控页面前进后退等操作 */
@@ -255,29 +283,30 @@ module.exports = (function() {
         var that = this, opt = that.options, last = that.last, start, change;
 
         window.addEventListener("popstate", function(e) {
-            var state = history.state, call, nowUrl = that.geturl(),
+            var state = history.state, nowUrl = that.geturl(), act,
                 lstate = last.state, islast = that.check(state, "last");
 
-            that.evetype = "popstate";
+            if (state && state.id) {
+                act = lstate.id > state.id ? "back" : "forward";
+            }
+            that.evetype = act == "back" ? "popstate" : "pushstate";
 
             if (state && state.clear === true && !islast) {
-                call = lstate.id > state.id ? "back" : "forward";
-                history[call]();    // 略过 无记录 标记的 URL且当前项不是最后状态
+                history[act]();    // 略过 无记录 标记的 URL且当前项不是最后状态
             } else if (nowUrl != last.url) {
-                that._trigger(nowUrl, that.fire(), function(rcall) {
-                    if (rcall === false) {
-                        // before 执行失败则回退到上个页面
+                if (act == "back") that.state.pop();   // 删除最后一个元素
+
+                that._trigger(nowUrl, that.fire(), function(callStop) {
+                    // before 执行失败则回退到上个页面
+                    if (callStop === true) {
                         that.replace(lstate, lstate.title, last.url);
                     }
                 })
             }
-
-            that.evetype = "";      // 重置状态
         });
 
-
         var doc = document, bind = "addEventListener", bindPoint;
-        
+
         bindPoint = {
             target: null,
             startX: 0,
@@ -335,7 +364,7 @@ module.exports = (function() {
                     if (e.touches && e.touches.length > 1) return;
 
                     cx = Math.abs(point.pageX - this.startX);
-                    cy = Math.abs(point.pageY - this.startY); 
+                    cy = Math.abs(point.pageY - this.startY);
                     ct = getTime() - this.startTime;
                     hasUrl = e.target.getAttribute("link");
 
@@ -405,7 +434,7 @@ module.exports = (function() {
                 case "last" :
                     ret = state.id == tables[len].id;
                     break;
-                case "first" : 
+                case "first" :
                     ret = state.id == tables[0].id;
                     break;
             }
@@ -415,12 +444,12 @@ module.exports = (function() {
     }
 
     /* 更新当前记录信息 */
-    Route.prototype.update = function(url, match, state) {
+    Route.prototype.update = function(url, state) {
         /* 更新当前路由的 last 记录信息 */
         url = this.geturl(url);     // 修正格式
 
         this.last.url   = url   || this.geturl();
-        this.last.match = match || this.fire();
+        this.last.match = this.fire();
         this.last.state = state || history.state;
     }
 
@@ -481,29 +510,34 @@ module.exports = (function() {
             state.title = end && end.title ? end.title : ""; // 标题
             state.clear = clear || end.clear;          // 是否无记录模式
 
-            that._trigger(toUrl, match, null, function(rcall) {
+            that._trigger(toUrl, match, null, function(callStop) {
                 /* 进行具体的页面跳转，记录状态等动作 */
-                if (rcall !== false) {
+                if (callStop !== true) {
                     if (last && last.state && last.state.id < that.state.length) {
-                        that.statpos = last.state.id;
+                        STAT_POS = last.state.id;
                         that.state = that.state.slice(0, last.state.id);
                     }
 
-                    state.id = ++that.statpos;      // 记录当前路由的序列ID
+                    state.id = ++STAT_POS;      // 记录当前路由的序列ID
 
-                    that.state.push(extend({}, state, {
-                        match: match, url: toUrl
-                    }));
+                    var addState = extend({}, state, {
+                            match: match, url: toUrl
+                        });
+
+                    // replace 模式，直接替换最后一条记录
+                    if (replace && that.state.length) {
+                        var last = that.state.length-1;
+
+                        that.state[last] = addState
+                    } else {
+                        that.state.push(addState);
+                    }
 
                     history[call](state, state.title, toUrl);
                 }
-
-                return rcall;   // 返回 false，会阻止后续调用 update 方法
             })
         }
 
-        that.evetype = "";      // 清楚事件跳转的状态信息
-            
         return that;
     };
 

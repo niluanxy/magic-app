@@ -1,4 +1,3 @@
-require("./view");              // VIEW组件
 require("./content");           // CONTENT组件
 require("./header");			// HEADER组件
 require("./footer");			// FOOTER组件
@@ -10,7 +9,6 @@ require("./slider");            // SLIDER组件
 require("./dropdown");          // DROPDOWN组件
 require("./confirm");           // CONFIRM组件
 require("./select");            // SELECT组件
-require("./router");			// 路由返回组件
 require("./lefter");            // LEFTER倒计时组件
 require("./expand");			// EXPAND展开收缩控件
 require("./timer");				// TIMER时间选择控件

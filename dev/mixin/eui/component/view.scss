@@ -1,0 +1,86 @@
+@mixin view() {
+    mg-view {
+        height: 100%;
+        position: relative;
+
+        > .wrapper {
+            z-index: 10;
+
+            &.slideInRight, &.slideInLeft {
+                z-index: 20;
+            }
+
+            &.hasNavBar > mg-page {
+                height: auto; top: 0;
+                position: absolute;
+                bottom: rem($tabs-height);
+            }
+
+            &.slideInRight {
+                @include animate(slideInRight, $view-wrapper-animate-time, forwards);
+            }
+
+            &.slideInLeft {
+                @include animate(slideInLeft, $view-wrapper-animate-time, forwards);
+            }
+
+            &.slideOutRight {
+                @include animate(slideOutRight, $view-wrapper-animate-time, forwards);
+            }
+
+            &.slideOutLeft {
+                @include animate(slideOutLeft, $view-wrapper-animate-time, forwards);
+            }
+
+            > .loader {
+                z-index: 1;
+                pointer-events: none;
+
+                .spiner {
+                    width: rem($tip-icon-size);
+                    height: rem($tip-icon-size);
+                    background-size: 100% 100%;
+                    border-radius: $tip-border-radius;
+                    background-color: $tip-back-color;
+                    position: absolute;
+                    background-image: url($tip-svg-loading);
+                    @include absolute-align-center;
+                }
+
+                &.fadeOut, .spiner.fadeOut {
+                    @include animate(fadeOut, $view-loader-hide-time, forwards);
+                }
+            }
+        }
+    }
+
+    mg-view, mg-page,
+    mg-view > .wrapper,
+    mg-view > .wrapper > .loader {
+        width: 100%;
+        display: block;
+        overflow: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    mg-view > .wrapper,
+    mg-view > .wrapper > .loader {
+        top: 0; left: 0;
+        bottom: 0; right: 0;
+        position: absolute;
+    }
+
+    mg-page {
+        display: block;
+        z-index: 10;
+        width: 100%;
+        height: 100%;
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+
+        &.viewShow {
+            @include animate(fadeIn, $view-page-show-time, forwards);
+        }
+    }
+}

@@ -187,6 +187,7 @@ function task_dev_magic_vue() {
                 alias: {
                     magic : DIR_MAGIC,
                     mgvue : DIR_MAGIC_VUE,
+                    route : DIR_MINJS + "route.js",
                 }
             },
             module: {

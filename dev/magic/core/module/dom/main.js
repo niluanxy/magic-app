@@ -24,7 +24,7 @@ module.exports = (function() {
         return -1;  // 默认返回 -1
     };
 
-    /* 设置或读取元素的内联HTML内容 */
+    /* 设置或读取元素的 内联HTML 内容 */
     dom.html = function(html) {
         if (!this[0]) return this;
 
@@ -33,6 +33,18 @@ module.exports = (function() {
             return this;
         } else {
             return this[0].innerHTML;
+        }
+    };
+
+    /* 设置或读取元素的 外部HTML 内容 */
+    dom.outerHtml = function(html) {
+        if (!this[0]) return this;
+
+        if (html != undefined /* 有值时设置值并返回自身 */) {
+            this[0].outerHTML = html;
+            return this;
+        } else {
+            return this[0].outerHTML;
         }
     };
 
@@ -57,7 +69,8 @@ module.exports = (function() {
         if (text instanceof Magic) {
             text = text[0];
         }
-        this[0] = _DOM.append(this[0], text);
+        _DOM.append(this[0], text);
+
         return this;
     };
 

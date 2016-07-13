@@ -1,5 +1,5 @@
 module.exports = $(function() {
-    var $tip = $.tip();
+    var $$ = window.mvue, $tip = $.tip();
 
     $$.tip = function() {
         if (!arguments[0]) return;

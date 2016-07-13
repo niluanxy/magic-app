@@ -30,6 +30,24 @@ module.exports = (function() {
         return ret;
     };
 
+    /* 60 fps 动画调用方法 */
+    util.rafCall = (function() {
+        var w = window, raf = w.requestAnimationFrame  ||
+            w.webkitRequestAnimationFrame  ||
+            w.mozRequestAnimationFrame     ||
+            w.oRequestAnimationFrame       ||
+            w.msRequestAnimationFrame      ||
+            function (callback) { w.setTimeout(callback, 1000 / 60); };
+
+        return function(call) {
+            var args = util.slice(arguments, 1);
+
+            raf(function() {
+                call.apply(null, args);
+            })
+        };
+    })();
+
     /* 返回一个节流执行的函数 */
     util.delayCall = _UTIL.delayCall;
 

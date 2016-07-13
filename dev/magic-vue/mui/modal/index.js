@@ -2,17 +2,19 @@ module.exports = (function() {
     $$.component("mg-modal", {
         template: "<slot></slot>",
         ready: function() {
-            var that = this, $el = $(this.$el),
-                scope, view, clen, ctrl, show, handle, mroot, option;
+            var that = this, $el = $(this.$el), paras, scope,
+                view, clen, ctrl, show, handle, mroot, option;
 
             ctrl  = $el.attr("ctrl");
             show  = $el.attr("show");
             scope = $$.getVm(that);
             mroot = $el.attr("root") == "true";
+            paras = $el.attr("params");
 
             if (scope[ctrl] !== undefined || scope[show] !== undefined) {
-                view = $el.attr("view");
-                clen = $el.children.length;
+                view  = $el.attr("view");
+                clen  = $el.children.length;
+                paras = scope[paras] || {};
 
                 option = {
                     align    : $el.attr("align"),
@@ -21,9 +23,9 @@ module.exports = (function() {
                 };
 
                 if (mroot /* 为真说明要在根元素上弹框 */) {
-                    handle = $($$.__VIEW__).modal($el, option);
+                    handle = $$._WRAP_.modal($el, option);
                 } else {
-                    handle = $(scope.$el).modal($el, option);
+                    handle = scope.MG_PAGE.wrapper.modal($el, option);
                 }
 
                 that._HANDLE_ = handle;
@@ -34,34 +36,33 @@ module.exports = (function() {
                 }
 
                 if (view && view != "true" && view !== true) {
-                    var _name = $$.__makeViewName(view), _child,
-                        _view = $$.__renderView(_name, "_loadModal"),
+                    var _view = $$.renderView(view, $el, paras),
                         _call = scope[$el.attr("call")], load = $.defer();
 
-                    _view.$appendTo($el[0]);
-                    _child = _view.$children;
-
                     // 页面渲染后，将子页面的 句柄 暴露出来
-                    if (_child[0] && scope[ctrl] !== undefined) {
-                        load.resolve();
+                    if (_view.$children[0] && scope[ctrl] !== undefined) {
+                        load.resolve(_view.$children[0]);
                     } else {
-                        _view.$on("PAGE_READY", load.resolve);
+                        _view.$on("mgViewRender", function(childScope) {
+                            load.resolve(childScope);
+                        });
                     }
 
-                    load.then(function() {
-                        _child[0]._MODAL_PARENT = scope;
-                        _child[0].$parent       = scope;
-                        _child[0]._MODAL_       = handle;
+                    load.then(function(childScope) {
+                        childScope._MODAL_PARENT = scope;
+                        // 弹框会修改DOM结构，手动修复 $parent 对象
+                        childScope.$parent       = scope;
+                        childScope._MODAL_       = handle;
 
                         if ($.isFun(_call)) {
-                            _child[0]._MODAL_CALL = _call;
+                            childScope._MODAL_CALL = _call;
                         }
 
-                        handle.view = _child[0];
+                        handle.view = childScope;
                     })
                 }
 
-                that.$on("PAGE_VIEW_HIDE", function() {
+                that.$on("mgViewHide", function() {
                     handle.hide();
                 })
             } else {
