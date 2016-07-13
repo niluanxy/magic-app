@@ -352,9 +352,14 @@ module.exports = (function(win, doc) {
             $$.emit("routeOn", $wshow, $whide, nowMatch, $route);
 
             // 如果已经有插入的实例对象，则为缓存，手动调用相关方法
-            if ($show && $show.$emit && $$.refreshView) {
-                $show.$refresh && $show.$refresh(params);
-                $$.vmCall($show, "ready");
+            if ($show && $show.$emit) {
+                if ($$.refreshView) {
+                    $show.$refresh && $show.$refresh(params);
+                    $show.$emit("hook:ready");
+                }
+
+                $show.$emit("mgViewShow");
+                $show.$broadcast("mgViewShow");
             }
 
             // 创建要插入的新对象，并直接渲染
