@@ -41,30 +41,31 @@ module.exports = (function() {
         return (new Date()).getTime();
     }
 
+    var extend = $.extend;
     /* 最后一项为真时，表示忽略无效的值 */
-    function extend(/* ... */) {
-        var argv = arguments, obj = argv[0],
-            len = argv.length, undef = false;
-
-        if (argv[len-1] === true) {
-            undef = true;
-            len -= 1;
-        }
-
-        for(var i=1; i<len; i++) {
-            var item = argv[i];
-
-            for(var key in item) {
-                if (undef && item[key] === undefined) {
-                    continue;
-                }
-
-                obj[key] = item[key];
-            }
-        }
-
-        return obj;
-    }
+    // function extend(/* ... */) {
+    //     var argv = arguments, obj = argv[0],
+    //         len = argv.length, undef = false;
+    //
+    //     if (argv[len-1] === true) {
+    //         undef = true;
+    //         len -= 1;
+    //     }
+    //
+    //     for(var i=1; i<len; i++) {
+    //         var item = argv[i];
+    //
+    //         for(var key in item) {
+    //             if (undef && item[key] === undefined) {
+    //                 continue;
+    //             }
+    //
+    //             obj[key] = item[key];
+    //         }
+    //     }
+    //
+    //     return obj;
+    // }
 
     /* 更新页面的 title 属性 */
     function updateTitle(title) {
@@ -278,6 +279,127 @@ module.exports = (function() {
         update !== false && that.update(that.geturl());
     }
 
+    // Route.prototype._bindClick = function() {
+    //     var doc = document, bind = "addEventListener", bindPoint;
+    //
+    //     bindPoint = {
+    //         target: null,
+    //         startX: 0,
+    //         startY: 0,
+    //         startTime: 0,
+    //
+    //         _getTag: function(obj) {
+    //             return obj.tagName.toUpperCase();
+    //         },
+    //
+    //         _getLink: function(e) {
+    //             var target = e.target, tag;
+    //
+    //             while(target.parentNode) {
+    //                 tag = this._getTag(target);
+    //
+    //                 if (tag == "A" || tag == "BUTTON") {
+    //                     return target;
+    //                 }
+    //
+    //                 target = target.parentNode;
+    //             }
+    //
+    //             return null;
+    //         },
+    //
+    //         _start: function(e) {
+    //             if (this._getLink(e)) {
+    //                 var point = e.changedTouches ? e.changedTouches[0] : e, now;
+    //
+    //                 now = getTime();
+    //
+    //                 if ( (e.touches && e.touches.length > 1)
+    //                     || (now - this.startTime < this.delay) ) {
+    //                     this.startX = null;
+    //                     this.startY = null;
+    //
+    //                     return true;
+    //                 }
+    //
+    //                 this.startX = point.pageX;
+    //                 this.startY = point.pageY;
+    //                 this.target    = e.target;
+    //                 this.startTime = getTime();
+    //             }
+    //         },
+    //
+    //         _end: function(e) {
+    //             var link = this._getLink(e);
+    //
+    //             if (link /* 自身或者父元素是 A 元素才跳转 */) {
+    //                 var point = e.changedTouches ? e.changedTouches[0] : e,
+    //                     cx, cy, ct, delay = 300, hasUrl;
+    //
+    //                 if (e.touches && e.touches.length > 1) return;
+    //
+    //                 cx = Math.abs(point.pageX - this.startX);
+    //                 cy = Math.abs(point.pageY - this.startY);
+    //                 ct = getTime() - this.startTime;
+    //                 hasUrl = e.target.getAttribute("link");
+    //
+    //                 if (hasUrl && cx<5 && cy < 5 && ct < delay
+    //                     && this.target == e.target) {
+    //
+    //                     this._go(e);
+    //                 }
+    //             }
+    //         },
+    //
+    //         _go: function(e) {
+    //             var link = this._getLink(e), url;
+    //
+    //             if (link && (url = link.getAttribute("link")) ) {
+    //
+    //                 e.preventDefault();
+    //                 e.stopPropagation();
+    //
+    //                 that.go(url);  // 跳转新页面相关动作
+    //             }
+    //         },
+    //
+    //         handleEvent: function(e) {
+    //             switch ( e.type ) {
+    //                 case 'touchstart':
+    //                 case 'pointerdown':
+    //                 case 'MSPointerDown':
+    //                     this._start(e);
+    //                     break;
+    //                 case 'touchend':
+    //                 case 'pointerup':
+    //                 case 'MSPointerUp':
+    //                 case 'touchcancel':
+    //                 case 'pointercancel':
+    //                 case 'MSPointerCancel':
+    //                     this._end(e);
+    //                     break;
+    //                 case 'click':
+    //                     this._go(e);
+    //                     break;
+    //             }
+    //         }
+    //     }
+    //
+    //     doc[bind]("click", bindPoint);
+    //
+    //     doc[bind]("touchstart", bindPoint);
+    //     doc[bind]("touchend", bindPoint);
+    //     doc[bind]("touchcancel", bindPoint);
+    //
+    //     doc[bind]("pointerdown", bindPoint);
+    //     doc[bind]("pointerup", bindPoint);
+    //     doc[bind]("pointercancel", bindPoint);
+    //
+    //     doc[bind]("MSPointerDown", bindPoint);
+    //     doc[bind]("MSPointerUp", bindPoint);
+    //     doc[bind]("MSPointerCancel", bindPoint);
+    // }
+
     /* 全局绑定事件，监控页面前进后退等操作 */
     Route.prototype._bind = function() {
         var that = this, opt = that.options, last = that.last, start, change;
@@ -305,124 +427,20 @@ module.exports = (function() {
             }
         });
 
-        var doc = document, bind = "addEventListener", bindPoint;
+        // 监控元素的点击事件，如果有 link 跳转
+        $(document).on("tap", function(e) {
+            var tar = e.target, link;
 
-        bindPoint = {
-            target: null,
-            startX: 0,
-            startY: 0,
-            startTime: 0,
-
-            _getTag: function(obj) {
-                return obj.tagName.toUpperCase();
-            },
-
-            _getLink: function(e) {
-                var target = e.target, tag;
-
-                while(target.parentNode) {
-                    tag = this._getTag(target);
-
-                    if (tag == "A" || tag == "BUTTON") {
-                        return target;
-                    }
-
-                    target = target.parentNode;
-                }
-
-                return null;
-            },
-
-            _start: function(e) {
-                if (this._getLink(e)) {
-                    var point = e.changedTouches ? e.changedTouches[0] : e, now;
-
-                    now = getTime();
-
-                    if ( (e.touches && e.touches.length > 1)
-                        || (now - this.startTime < this.delay) ) {
-                        this.startX = null;
-                        this.startY = null;
-
-                        return true;
-                    }
-
-                    this.startX = point.pageX;
-                    this.startY = point.pageY;
-                    this.target    = e.target;
-                    this.startTime = getTime();
-                }
-            },
-
-            _end: function(e) {
-                var link = this._getLink(e);
-
-                if (link /* 自身或者父元素是 A 元素才跳转 */) {
-                    var point = e.changedTouches ? e.changedTouches[0] : e,
-                        cx, cy, ct, delay = 300, hasUrl;
-
-                    if (e.touches && e.touches.length > 1) return;
-
-                    cx = Math.abs(point.pageX - this.startX);
-                    cy = Math.abs(point.pageY - this.startY);
-                    ct = getTime() - this.startTime;
-                    hasUrl = e.target.getAttribute("link");
-
-                    if (hasUrl && cx<5 && cy < 5 && ct < delay
-                        && this.target == e.target) {
-
-                        this._go(e);
+            while(tar != document.body) {
+                if (tar.tagName == "A") {
+                    if (link = tar.getAttribute("link")) {
+                        that.go(link); break;
                     }
                 }
-            },
 
-            _go: function(e) {
-                var link = this._getLink(e), url;
-
-                if (link && (url = link.getAttribute("link")) ) {
-
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    that.go(url);  // 跳转新页面相关动作
-                }
-            },
-
-            handleEvent: function(e) {
-                switch ( e.type ) {
-                    case 'touchstart':
-                    case 'pointerdown':
-                    case 'MSPointerDown':
-                        this._start(e);
-                        break;
-                    case 'touchend':
-                    case 'pointerup':
-                    case 'MSPointerUp':
-                    case 'touchcancel':
-                    case 'pointercancel':
-                    case 'MSPointerCancel':
-                        this._end(e);
-                        break;
-                    case 'click':
-                        this._go(e);
-                        break;
-                }
+                tar = tar.parentNode;
             }
-        }
-
-        doc[bind]("click", bindPoint);
-
-        doc[bind]("touchstart", bindPoint);
-        doc[bind]("touchend", bindPoint);
-        doc[bind]("touchcancel", bindPoint);
-
-        doc[bind]("pointerdown", bindPoint);
-        doc[bind]("pointerup", bindPoint);
-        doc[bind]("pointercancel", bindPoint);
-
-        doc[bind]("MSPointerDown", bindPoint);
-        doc[bind]("MSPointerUp", bindPoint);
-        doc[bind]("MSPointerCancel", bindPoint);
+        })
     }
 
     /* 判断给定的URL状态是不是当前状态表的最后一项 */
