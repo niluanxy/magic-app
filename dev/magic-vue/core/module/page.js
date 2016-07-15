@@ -348,12 +348,10 @@ module.exports = (function(win, doc) {
             $hide  = $cache[last];
             $whide = $hide ? $hide.$wrap : null;
 
-            // 必选先执行 routeOn 回调，保证 loader 插入到页面中
-            $$.emit("routeOn", $wshow, $whide, nowMatch, $route);
-
             // 如果已经有插入的实例对象，则为缓存，手动调用相关方法
             if ($show && $show.$emit) {
                 if ($$.refreshView) {
+                    $show.$set("params", params);
                     $show.$refresh && $show.$refresh(params);
                     $show.$emit("hook:ready");
                 }
@@ -361,6 +359,9 @@ module.exports = (function(win, doc) {
                 $show.$emit("mgViewShow");
                 $show.$broadcast("mgViewShow");
             }
+
+            // 必选先执行 routeOn 回调，保证 loader 插入到页面中
+            $$.emit("routeOn", $wshow, $whide, nowMatch, $route);
 
             // 创建要插入的新对象，并直接渲染
             if (!$show) $$.renderView(cname, $wshow, params);

@@ -38,7 +38,7 @@ module.exports = (function(win) {
      * @return {[type]}         [description]
      */
     $$.init = function(option, repath) {
-        var $route = $$.location, fire,
+        var $route = $$.location, fire, backOld,
             rouopt = $.extend($route.options, rouext, option || {}, true);
 
         $config.common      = option || {};
@@ -51,6 +51,13 @@ module.exports = (function(win) {
             $route.go(rouopt.home, true, false, true);
         } else if (!$route.state.length) {
             $route.go(fire, true, false, true);
+        }
+
+        // 覆盖返回方法，添加缓存选项
+        backOld = $route.back;
+        $route.back = function(cache) {
+            $$.refreshView = !!cache;
+            backOld.call($$.route);
         }
 
         // 路由对象创建完成后触发一个事件
@@ -100,7 +107,7 @@ module.exports = (function(win) {
 				}
 
 				if (ret !== false && !hasBack) {
-                    hasBack = true; router.back();
+                    hasBack = true; router.back(cache == 'true');
                 }
 			})
 
