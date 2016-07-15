@@ -56,7 +56,7 @@ module.exports = (function(win) {
         // 覆盖返回方法，添加缓存选项
         backOld = $route.back;
         $route.back = function(cache) {
-            $$.refreshView = !!cache;
+            $$.refreshView = !cache;
             backOld.call($$.route);
         }
 
