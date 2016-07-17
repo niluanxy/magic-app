@@ -23,7 +23,7 @@ $(function() {
 			})
 		},
 	}).init({
-		authBase: 2,					// 所有的页面都要登陆
+		authBase: 1,					// 所有的页面都要登陆
 		authPage: "/user/auth",			// 需要验证的页面跳转的地址
-	},true);
+	}, true);
 })

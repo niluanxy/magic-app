@@ -21,10 +21,9 @@
 .modal              { @include modal(); }
 .dropmenu           { @include dropmenu(); }
 
-@include view();            // view   核心容器组件
+@include view();            // view   视图容器元素
 @include popup();           // popup  弹框容器组件
-@include form();            // form   表单组件元素
-@include input-ext();       // input  输入框扩展
+@include form();			// form   表单组件元素
 @include text();			// text   文字样式代码
 @include tools();			// tools  常用工具样式类
 @include flex-layout();		// flex   布局组件样式
