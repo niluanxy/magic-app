@@ -58,13 +58,25 @@ module.exports = (function() {
                             childScope._MODAL_CALL = _call;
                         }
 
+                        handle.view = childScope;
+
+                        var showOld = handle.show,
+                            hideOld = handle.hide;
+
+                        handle.show = function() {
+                            childScope.$emit("mgViewShow");
+                            showOld.call(handle);
+                        }
+
+                        handle.hide = function() {
+                            childScope.$emit("mgViewHide");
+                            hideOld.call(handle);
+                        }
+
                         // 监听 ui_back 事件，发生则隐藏自身
                         childScope.$on("_ui_back", function() {
                             handle.hide();
-                            childScope.$emit("mgViewHide");
                         })
-
-                        handle.view = childScope;
                     })
                 }
 
