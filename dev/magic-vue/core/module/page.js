@@ -163,7 +163,7 @@ module.exports = (function(win, doc) {
                 var $parent = this.$parent, mgpage, $wrap;
 
                 // 如果是采用容器插入渲染，执行相关的初始化操作
-                if ($parent && $parent.MG_PAGE && !this.MG_PAGE) {
+                if ($parent && $parent.$options.name == "mgRender") {
                     mgpage = $parent.MG_PAGE;
                     $wrap  = mgpage.wrapper;
 
@@ -232,7 +232,7 @@ module.exports = (function(win, doc) {
 
         var tmp = '<'+view+'></'+view+'>', ret;
 
-        ret = new Vue({ template: tmp });
+        ret = new Vue({ template: tmp, name: "mgRender" });
 
         $wrap[0].MG_PAGE = ret.MG_PAGE = {
             params : paras,
