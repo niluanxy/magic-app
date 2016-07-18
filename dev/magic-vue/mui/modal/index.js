@@ -58,6 +58,12 @@ module.exports = (function() {
                             childScope._MODAL_CALL = _call;
                         }
 
+                        // 监听 ui_back 事件，发生则隐藏自身
+                        childScope.$on("_ui_back", function() {
+                            handle.hide();
+                            childScope.$emit("mgViewHide");
+                        })
+
                         handle.view = childScope;
                     })
                 }

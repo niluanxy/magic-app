@@ -78,6 +78,7 @@
         flex: 1;
         overflow: hidden;
         position: relative;
+        background-color: #fff;
 
         &.viewShow {
             @include animate(fadeIn, $view-page-show-time, forwards);
