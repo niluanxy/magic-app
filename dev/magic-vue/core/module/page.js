@@ -351,8 +351,9 @@ module.exports = (function(win, doc) {
             // 如果已经有插入的实例对象，则为缓存，手动调用相关方法
             if ($show && $show.$emit) {
                 if ($$.refreshView) {
-                    $show.$set("params", params);
-                    $show.$refresh && $show.$refresh(params);
+                    var fixpara = _transParams(params);
+                    $show.$set("params", fixpara);
+                    $show.$refresh && $show.$refresh(fixpara);
                     $show.$emit("hook:ready");
                 }
 
