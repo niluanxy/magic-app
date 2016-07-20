@@ -9,7 +9,6 @@ require("./popup");                 // 加载默认弹框事件
 require("./modal");                 // 加载Modal模态弹框组件
 require("./tip");                   // 加载Tip提示组件
 require("./confirm");               // 加载confirm组件
-require("./spinner");               // 加载Loading组件
 require("./select");                // 加载select组件
 require("./timer");                 // 加载timer时间组件
 require("./lefter");                // 加载倒计时组件
