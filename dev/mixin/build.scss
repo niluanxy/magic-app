@@ -19,7 +19,6 @@
 .slider             { @include slider(); }
 .timer              { @include timer(); }
 .modal              { @include modal(); }
-.modal-wrapper      { @include modal-wrapper(); }
 .dropmenu           { @include dropmenu(); }
 
 @include view();            // view   视图容器元素
