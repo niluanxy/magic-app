@@ -90,8 +90,8 @@ gulp.task("dev-mixin", task_dev_mixin);
 function task_dev_minjs() {
     var defer = Q.defer();
 
-    gulp.src(DIR_MINJS+"route.js")
-    .pipe(gulp.dest(DIR_MAGIC_VUE+"lib/"));
+    // gulp.src(DIR_MINJS+"route.js")
+    // .pipe(gulp.dest(DIR_MAGIC_VUE+"lib/"));
 
     gulp.src(DIR_MINJS+"*.js")
     .pipe(gulp.dest(DIR_MAGIC+"lib/minjs/"))
@@ -161,7 +161,7 @@ function task_dev_magic_js() {
                     ]
                 }
             })
-        .pipe(gulp.dest(DIR_MAGIC_VUE+"lib/"))
+        // .pipe(gulp.dest(DIR_MAGIC_VUE+"lib/"))
         .pipe(gulp.dest(DIR_APP_PUB + "lib/"))
         .on("finish", function() { defer.resolve(); });
     })

@@ -28,7 +28,7 @@ $(function() {
 
         /* 转换为数组，便于后面操作 */
         cls  = (cls || "").split(" ");
-        find = (test || "button item tab-item").split(" ");
+        find = (test || "button item tab-item btn").split(" ");
 
         for (var i=0; i<find.length; i++) {
             if (cls.indexOf(find[i]) >= 0) return true;

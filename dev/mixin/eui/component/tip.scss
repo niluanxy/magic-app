@@ -3,6 +3,7 @@
     position: absolute;
     color: $tip-text-color;
     fill: #ffffff;
+    word-break: break-all;
     @include absolute-align-center;
     border-radius: $tip-border-radius;
     padding: rem($tip-padding-vertical) rem($tip-padding-horizontal);

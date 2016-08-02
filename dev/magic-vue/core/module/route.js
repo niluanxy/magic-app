@@ -84,7 +84,7 @@ module.exports = (function(win) {
     $$.component("mg-back", {
         template: "<slot></slot>",
         ready: function() {
-            var that = this, $el = $(this.$el), hasBack,
+            var that = this, $el = $(this.$el),
             	router = $$.location, call, scope, cache;
 
             call  = $el.attr("call");
@@ -95,21 +95,12 @@ module.exports = (function(win) {
                 $el.addClass($config.backButtonClass);
             }
 
-            scope.$on("mgViewShow", function() {
-                hasBack = false; // 重置状态
-            })
-
-			$el.on("tap.back", function() {
+			$el.on("tap.back", $.delayCall(function() {
 				var ret = true;		// 回调返回值
 
-				if (typeof scope[call] == "function") {
-					ret = scope[call]();
-				}
-
-				if (ret !== false && !hasBack) {
-                    hasBack = true; router.back(cache == 'true');
-                }
-			})
+				if ($.isFun(scope[call])) ret = scope[call]();
+				if (ret !== false) router.back(cache == 'true');
+			}, 1200));
 
             if ($$.isRunPage(scope)) {
                 $$.refreshView = !(cache == "true");

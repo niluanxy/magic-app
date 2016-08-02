@@ -26,34 +26,6 @@ module.exports = (function(win, doc) {
     }
 
     /**
-     * 尝试给页面添加私有的 style 命名空间
-     */
-    function addStyle(page) {
-        var head, rhead = /^\<mg\-page[^\>]*\>/,
-            style = page.style, tmp = page.template;
-
-        // 尝试对页面添加私有的 class 名字
-        if (style && style.page && tmp && (head = tmp.match(rhead)) ) {
-            var mat, fix, rcls = /class\=[\'|"].*[\'|"]/;
-
-            head = head[0]; style = style.page;
-            mat  = head.match(rcls);
-
-            if (mat) {
-                mat = mat[0].replace(/[\'|\"]/, '"');
-                fix = mat.replace(/\"$/, ' '+style+'"');
-
-                head = head.replace(rcls, fix);
-            } else {
-                style = ' class="'+style+'">';
-                head  = head.replace(/\>$/, style);
-            };
-
-            page.template = tmp.replace(rhead, head);
-        }
-    }
-
-    /**
      * 如果页面没有 resolve 方法，初始化操作
      */
     function pageDefaultInit(_params) {
@@ -145,8 +117,6 @@ module.exports = (function(win, doc) {
     function commonView(page) {
         var old = page.data, mixins;
 
-        addStyle(page); // 添加私有类名空间
-
         // 采用新的方式，组件的 data 必须为函数
         if (!$.isFun(old)) {
             page.data = function() {
@@ -182,6 +152,11 @@ module.exports = (function(win, doc) {
                     mgpage = {params: null, wrapper: null};
                     mgpage.wrapper = $wrap;
                     mgpage.params  = {};
+                }
+
+                // 给包含容器添加私有的样式类
+                if (page && page.style) {
+                    mgpage.wrapper.addClass(page.style.page);
                 }
 
                 // 绑定对象句柄到 DOM 上
@@ -360,6 +335,12 @@ module.exports = (function(win, doc) {
                 $show.$emit("mgViewShow");
                 $show.$broadcast("mgViewShow");
             }
+
+            // 切换进入和退出页面的显示状态
+            $.rafCall(function() {
+                $wshow.removeClass("hide");
+                $whide && $whide.addClass("hide");
+            });
 
             // 必选先执行 routeOn 回调，保证 loader 插入到页面中
             $$.emit("routeOn", $wshow, $whide, nowMatch, $route);

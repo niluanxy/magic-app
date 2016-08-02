@@ -72,7 +72,7 @@ module.exports = (function(win) {
 
             // 如果隐藏的页面存在，隐藏页面同时触发 页面隐藏事件
             if ($whide && $whide[0].MG_CHILDREN) {
-                $whide.off(transend).removeClass(animateCls);
+                $whide.off(transend).removeClass(animateCls + " hide");
                 $whide[0].MG_CHILDREN.$emit("mgViewHide");
             }
         })

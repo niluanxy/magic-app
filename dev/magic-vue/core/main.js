@@ -7,6 +7,7 @@ require("./plugin/animate.js");
 require("./plugin/filter.js");
 require("./plugin/store.js");
 require("./plugin/navbar.js");
+require("./plugin/native.js");
 
 require("./extend/key.js");
 require("./extend/tip.js");

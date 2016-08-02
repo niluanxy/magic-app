@@ -428,7 +428,7 @@ module.exports = (function() {
         });
 
         // 监控元素的点击事件，如果有 link 跳转
-        $(document).on("tap", function(e) {
+        $(document).on("tap.route", function(e) {
             var tar = e.target, link;
 
             while(tar != document.body) {
@@ -445,15 +445,18 @@ module.exports = (function() {
 
     /* 判断给定的URL状态是不是当前状态表的最后一项 */
     Route.prototype.check = function(state, type) {
-        var tables = this.state, len = tables.length-1, ret = false;
+        var tables = this.state, len = tables.length-1,
+            ret = false, find;
 
-        if (state && type) {
+        find = type == "last" ? tables[len] : tables[0];
+
+        if (state && type && find) {
             switch (type) {
                 case "last" :
-                    ret = state.id == tables[len].id;
+                    ret = state.id == find.id;
                     break;
                 case "first" :
-                    ret = state.id == tables[0].id;
+                    ret = state.id == find.id;
                     break;
             }
         }
