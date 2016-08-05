@@ -155,7 +155,7 @@ module.exports = (function(win, doc) {
                 }
 
                 // 给包含容器添加私有的样式类
-                if (page && page.style) {
+                if (page && page.style && page.style.page) {
                     mgpage.wrapper.addClass(page.style.page);
                 }
 

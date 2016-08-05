@@ -338,7 +338,10 @@ module.exports = (function() {
 
         /* 创建底部控制按钮 */
         html  = "<div class='bottom'><a class='cancel button button-clear'>取消</a>";
-        html += (show.length>3)?"<a class='toggle button button-clear'>下一项</a>":"";
+        if (opt.show.search("-") > 0) {
+            // 有分页标识符，才创建分页按钮
+            html += "<a class='toggle button button-clear'>下一项</a>";
+        }
         html += "<a class='ok button button-clear'>确认</a></div>";
 
         that.el.append(html).appendTo("body");  // 插入到页面中

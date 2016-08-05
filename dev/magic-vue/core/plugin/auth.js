@@ -31,7 +31,7 @@ module.exports = (function() {
         return false;
     }
 
-    $$.on("routeBefore", function(lastUrl, nowUrl, match, $route) {
+    $$.on("routeBefore.auth", function(lastUrl, nowUrl, match, $route) {
         var config = $config.routeOption, mnow = match[match.length-1],
             atest  = config.authCheck || 1;
 
@@ -60,16 +60,24 @@ module.exports = (function() {
                 AUTH.before = nowUrl;
                 AUTH.repath = false;
                 $route.stop();  // 阻止加载页面
+            } else {
+                AUTH.before = null;
             }
         }
     })
 
-    $$.on("routeAlways", function(lastUrl, nowUrl, match, $route) {
+    $$.on("routeAlways.auth", function(lastUrl, nowUrl, match, $route) {
         var authPage = $route.options.authPage;
 
         if (AUTH.before && !AUTH.repath) {
             AUTH.repath = true;
-            $route.go(authPage, false);
+
+            // 混合框架中页面内跳转
+            if ($route.local) {
+                $route.local(authPage, false);
+            } else {
+                $route.go(authPage, false);
+            }
         }
     });
 
@@ -82,14 +90,25 @@ module.exports = (function() {
 
         if (page && repatch) {
             AUTH.before = page;
-            $route.go(auth, false, true);
+
+            // 混合框架中页面内跳转
+            if ($route.local) {
+                $route.local(auth, false, true);
+            } else {
+                $route.go(auth, false, true);
+            }
         } else {
             before = AUTH.before || config.home;
 
             AUTH.repath = false;
             AUTH.before = ""
 
-            $route.go(before, true);
+            // 混合框架中页面内跳转
+            if ($route.local) {
+                $route.local(before, true);
+            } else {
+                $route.go(before, true);
+            }
         }
     }
 })();

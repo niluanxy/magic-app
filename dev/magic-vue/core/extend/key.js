@@ -8,20 +8,47 @@ module.exports = (function() {
     $$.__key_prefix = "";
 
     $$.key = (function() {
-        if (window.$J && $J.call) {
-            var _FUN = "MgNative.key";
+        if (window.MgNative && MgNative.core) {
+            var keyCall = MgNative.core.key,
+                valFix = /(\"_\#b_|_b\#_\"|\"_\#i_|_i\#_\"|\"_\#o_|_o\#_\")/g;
 
             return function(key, val) {
-                var args = {key: key};
+                var args = {key: key}, ret;
 
                 if (val !== undefined) {
-                    args.val = val;
+                    ret = val;  // 储存返回数据
 
-                    $J.call(_FUN, args);
-                    return val;
+                    // 保存是转换数据格式为字符串
+                    switch(typeof val) {
+                        case "number":
+                            val = '_#i_'+val+'_i#_';
+                            break;
+                        case "boolean":
+                            val = '_#b_'+val+'_b#_';
+                            break;
+                        case "undefined":
+                            val = '_#o_'+val+'_o#_';
+                            break;
+                        default: 
+                            if (val == null) {
+                                val = '_#o_'+val+'_o#_';
+                            }
+                    }
+
+                    args.val = JSON.stringify(val); keyCall(args);
                 } else {
-                    return $J.call(_FUN, args);
+                    ret = keyCall(args);
+
+                    // 读取时逆向还原数据
+                    ret = ret.replace(valFix, '');
+                    ret = ret.replace(/\'/g, '"');
+                    ret = ret.replace(/\"\{/g, '{');
+                    ret = ret.replace(/\}\"/g, '}');
+
+                    ret = JSON.parse(ret);
                 }
+
+                return ret;
             }
         } else {
             return function(key, val) {
@@ -45,9 +72,32 @@ module.exports = (function() {
         }
     })();
 
-    $$.keyRemove = function(key) {
-        var key_fix = $$.__key_prefix + key;
+    $$.keyRemove = (function(key) {
+        if (window.MgNative && MgNative.core) {
+            var keyCall = MgNative.core.keyRemove;
 
-        localStorage.removeItem(key_fix);
-    };
+            return function(key) {
+                keyCall({key: key});
+            }
+        } else {
+            return function(key) {
+                var key_fix = $$.__key_prefix + key;
+                localStorage.removeItem(key_fix);
+            }
+        }
+    })();
+
+    $$.keyClear = (function() {
+        if (window.MgNative && MgNative.core) {
+            var keyCall = MgNative.core.keyClear;
+
+            return function() {
+                keyCall();
+            }
+        } else {
+            return function() {
+                localStorage.clear();
+            }
+        }
+    })();
 })();

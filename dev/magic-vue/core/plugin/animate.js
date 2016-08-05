@@ -1,4 +1,6 @@
 module.exports = (function(win) {
+    if (window.MgNative && MgNative.core) return;
+    
     var $$ = win.mvue, CACHE = [], createLoading = null,
         transend    = "transitionend.load animationend.load",
         slideInCls  = "slideInRight slideInLeft",
@@ -47,7 +49,7 @@ module.exports = (function(win) {
         return html+"</div>";
     }
 
-    $$.on("routeOn", function($wshow, $whide, nowMatch, $route) {
+    $$.on("routeOn.animate", function($wshow, $whide, nowMatch, $route) {
         var $config = $$.config.common, showCls, hideCls,
             $loader = $wshow.find(".loader"),
             match = nowMatch[nowMatch.length-1], item = match.item;
@@ -90,7 +92,7 @@ module.exports = (function(win) {
         })
     });
 
-    $$.on("viewReady", function($wshow, scope) {
+    $$.on("viewReady.animate", function($wshow, scope) {
         if (!$$.isRunPage(scope)) return;
 
         var $el = $(scope.$el), $load = $wshow.find(".loader");

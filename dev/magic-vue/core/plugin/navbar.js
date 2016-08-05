@@ -30,7 +30,7 @@ module.exports = (function() {
         return -1;
     }
 
-    $$.on("routeInit", function($route, options) {
+    $$.on("routeInit.navbar", function($route, options) {
         var navfoot = options.navFoot, match = [], wrap;
 
         if (navfoot && navfoot.template) {
@@ -50,12 +50,12 @@ module.exports = (function() {
 
             wrap = $navs.html("").outerHtml();
 
-            $$.on("routeBefore", function(lastUrl, nowUrl, match, handle) {
+            $$.on("routeBefore.navbar", function(lastUrl, nowUrl, match, handle) {
                 goUrl = nowUrl; // 缓存前往的URL，防止同步组件URL获取错误
             })
 
             // 如果有相关对象和配置，才绑定事件
-            $$.on("viewReady", function($wshow, scope) {
+            $$.on("viewReady.navbar", function($wshow, scope) {
                 var $dom, url = goUrl || $route.geturl(),
                     find = testMatch(match, url);
 

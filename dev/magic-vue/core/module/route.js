@@ -38,7 +38,7 @@ module.exports = (function(win) {
      * @return {[type]}         [description]
      */
     $$.init = function(option, repath) {
-        var $route = $$.location, fire, backOld,
+        var $route = $$.location, fire, backOld, goOld,
             rouopt = $.extend($route.options, rouext, option || {}, true);
 
         $config.common      = option || {};
@@ -47,17 +47,46 @@ module.exports = (function(win) {
         fire = $route.geturl();
         fire = fire == "#" || !fire ? rouopt.home : fire;
 
-        if (repath) {
-            $route.go(rouopt.home, true, false, true);
-        } else if (!$route.state.length) {
-            $route.go(fire, true, false, true);
+        goOld   = Router.prototype.go;
+        backOld = Router.prototype.back;
+
+        /** 如果运行在混合框架中，替换相关方法 */
+        if(window.MgNative && MgNative.core) {
+            $route.local = function() {
+                goOld.apply($route, arguments);
+            }
+
+            $route.go = function(url, replace, clear) {
+                var item = $route.fire(url), title;
+
+                if (item && item.length) {
+                    title = item[item.length-1].item.title;
+
+                    MgNative.core.goWeb({
+                        url    : url,           // 跳转URL
+                        title  : title,         // 页面标题
+                        clear  : !!clear,       // 是否 clear 模式
+                        replace: !!replace,     // 进入是否 replace 旧页面
+                    })
+                }
+            }
+
+            // 重写页面返回方法
+            $route.back = function(noCache) {
+                MgNative.core.back({cache: !!noCache});
+            }
+        } else {
+            // 覆盖返回方法，添加缓存选项
+            $route.back = function(cache) {
+                $$.refreshView = !cache;
+                backOld.call($route);
+            }
         }
 
-        // 覆盖返回方法，添加缓存选项
-        backOld = $route.back;
-        $route.back = function(cache) {
-            $$.refreshView = !cache;
-            backOld.call($$.route);
+        if (repath) {
+            goOld.call($route, rouopt.home, true, false, true);
+        } else if (!$route.state.length) {
+            goOld.call($route, fire, true, false, true);
         }
 
         // 路由对象创建完成后触发一个事件

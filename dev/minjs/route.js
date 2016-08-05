@@ -130,6 +130,8 @@ module.exports = (function() {
         regexp   : ":[^/-]*",           // 参数匹配正则语句，用于匹配参数信息
     }
 
+    Route.prototype.constructor = Route;
+
     /* 路由初始化方法，repath 为 true，则跳到首页 */
     Route.prototype.init = function(repath) {
         var that = this, opt = that.options;
@@ -570,15 +572,6 @@ module.exports = (function() {
     /* 前进URL地址，目前直接调用浏览器的方法 */
     Route.prototype.forward = function() {
         history.forward();
-    }
-
-    // MgNative 环境下重写方法
-    if (window.$J && $J.router) {
-        Route.prototype.back = function() {
-            $J.router.back();
-
-            return this;
-        }
     }
 
     /* 获取当前URL信息 */
