@@ -124,5 +124,16 @@ module.exports = (function() {
         return Vue.component(ids, opt);
     }
 
+    // 暴漏出 native 调用接口对象
+    if (window.MgNative && MgNative.core) {
+        $$.ncore = MgNative.core;
+        var bindWeb = MgNative.bindWeb;
+
+        // 通知原生框架，当前H5页面已经加载完成
+        $$.emitViewReady = function() {
+            $$.ncore.emitViewReady({bindId: bindWeb});
+        }
+    } 
+
     return window.$$ = $$;
 })();

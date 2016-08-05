@@ -178,6 +178,9 @@ module.exports = (function(win, doc) {
                 // 尝试通知父渲染容器，当前元素已经渲染完成
                 mgpage.mgwrap && mgpage.mgwrap.$emit("mgViewRender", this);
                 $$.emit("viewReady", $wrap, this);
+
+                // 如果是混合框架中，通知页面加载完成
+                if ($$.emitViewReady) $$.emitViewReady();
             },
 
             beforeDestroy: function() {
@@ -334,12 +337,15 @@ module.exports = (function(win, doc) {
 
                 $show.$emit("mgViewShow");
                 $show.$broadcast("mgViewShow");
+            
+                // 如果是混合框架中，通知页面加载完成
+                if ($$.emitViewReady) $$.emitViewReady();
             }
 
             // 切换进入和退出页面的显示状态
             $.rafCall(function() {
-                $wshow.removeClass("hide");
                 $whide && $whide.addClass("hide");
+                $wshow.removeClass("hide");
             });
 
             // 必选先执行 routeOn 回调，保证 loader 插入到页面中
