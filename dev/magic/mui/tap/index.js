@@ -59,7 +59,7 @@ $(function() {
          * 国产山寨设备建议设置为 30以上
          */
         checkMove: 4,
-        checkMoveBad: 30,
+        checkMoveBad: 4,
 
         doubleTime: 300,
         delayClass: 80,

@@ -49,6 +49,8 @@ module.exports = (function(win) {
         return html+"</div>";
     }
 
+    $$.off("routeOn.page");     // 移除默认的页面切换效果
+
     $$.on("routeOn.animate", function($wshow, $whide, nowMatch, $route) {
         var $config = $$.config.common, showCls, hideCls,
             $loader = $wshow.find(".loader"),

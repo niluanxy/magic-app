@@ -342,12 +342,6 @@ module.exports = (function(win, doc) {
                 if ($$.emitViewReady) $$.emitViewReady();
             }
 
-            // 切换进入和退出页面的显示状态
-            $.rafCall(function() {
-                $whide && $whide.addClass("hide");
-                $wshow.removeClass("hide");
-            });
-
             // 必选先执行 routeOn 回调，保证 loader 插入到页面中
             $$.emit("routeOn", $wshow, $whide, nowMatch, $route);
 
@@ -355,4 +349,12 @@ module.exports = (function(win, doc) {
             if (!$show) $$.renderView(cname, $wshow, params);
         }
     }
+
+    $$.on("routeOn.page", function($wshow, $whide) {
+        // 切换进入和退出页面的显示状态
+        $.rafCall(function() {
+            $whide && $whide.addClass("hide");
+            $wshow.removeClass("hide");
+        }); 
+    });
 })(window, document);

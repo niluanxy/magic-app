@@ -72,8 +72,8 @@ module.exports = (function(win) {
             }
 
             // 重写页面返回方法
-            $route.back = function(noCache) {
-                MgNative.core.back({cache: !!noCache});
+            $route.back = function(cache) {
+                MgNative.core.back({cache: !!cache});
             }
         } else {
             // 覆盖返回方法，添加缓存选项

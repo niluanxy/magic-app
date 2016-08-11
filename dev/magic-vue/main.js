@@ -53,7 +53,7 @@ module.exports = (function() {
 
         if (!data || data.length <= 0) return;
 
-        // 防止 once 方法执行报错
+        // 防止 once 方法执行报错
         copy = data.slice(0);
 
         for(var i=0; i<copy.length; i++) {
@@ -127,11 +127,11 @@ module.exports = (function() {
     // 暴漏出 native 调用接口对象
     if (window.MgNative && MgNative.core) {
         $$.ncore = MgNative.core;
-        var bindWeb = MgNative.bindWeb;
+        var webBind = MgNative.webBind;
 
         // 通知原生框架，当前H5页面已经加载完成
         $$.emitViewReady = function() {
-            $$.ncore.emitViewReady({bindId: bindWeb});
+            $$.ncore.emitViewReady({bindId: webBind});
         }
     } 
 

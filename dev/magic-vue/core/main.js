@@ -8,7 +8,7 @@ require("./plugin/filter.js");
 require("./plugin/store.js");
 require("./plugin/navbar.js");
 
-require("./extend/key.js");
 require("./extend/tip.js");
 require("./extend/log.js");
 require("./extend/object.js");
+require("./extend/key.js");

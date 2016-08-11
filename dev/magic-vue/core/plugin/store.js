@@ -1,5 +1,16 @@
 module.exports = (function() {
-    var $$ = window.mvue;
+    var $$ = window.mvue, $native = window.MgNative;
+
+    // MgNative 环境下数据同步方法
+    function trySync(name, store) {
+        if (!$native || !$native.core || !$native.webShow) return;
+
+        var data = store.$snapshot();
+        $native.core.syncStore({ 
+            bind: $native.webBind,
+            name: name, snap: data,
+        });
+    }
 
     /**
      * 数据 Store 相关方法
@@ -17,44 +28,13 @@ module.exports = (function() {
         if (option.modules) obj.modules = option.modules;
         if (option.middlewares) obj.middlewares = option.middlewares;
 
-        // 设置 数据快照 数据恢复底层方法
         if (!obj.mutations) obj.mutations = {};
-        obj.mutations._$RECOVER_ = function(state, snapshot) {
-            for(var key in snapshot) {
-                var copy, item = snapshot[key];
-
-                if ($.isArray(item) || $.isObject(item)) {
-                    copy = $.isArray(item) ? [] : {};
-
-                    $.extend(true, copy, snapshot[key]);
-                } else {
-                    copy = item;
-                }
-
-                state[key] = copy;
-            }
-        }
 
         actions = option.actions;
         delete option.actions;
         store = new Vuex.Store(obj);
 
-        // 数据快照 备份和恢复具体方法定义
-        if (!actions) actions   = {};
-        // 设置 数据快照 备份方法
-        actions.$snapshot = function() {
-            return $.extend(true, {}, store.state);
-        }
-        // 设置 数据快照 备份方法
-        actions.$recover = function(snapshot) {
-            if (arguments.length >= 2) {
-                snapshot = arguments[1];
-            }
-
-            if (typeof snapshot == "object") {
-                store.dispatch("_$RECOVER_", snapshot);
-            }
-        }
+        if (!actions) actions = {};
 
         // actions 方法绑定到对象上
         for(var key in actions) {
@@ -64,7 +44,7 @@ module.exports = (function() {
             if (type == "function") {
                 store[key] = (function(call) {
                     return function(/* store... */) {
-                        var args, _store;
+                        var args, _store, ret;
 
                         if (arguments[0] instanceof Vuex.Store) {
                             args = $.slice(arguments, 1);
@@ -75,13 +55,14 @@ module.exports = (function() {
                         _store = store;
                         args.unshift(_store);
 
-                        return call.apply(undefined, args);
+                        ret = call.apply(undefined, args);
+                        trySync(name, store); return ret;
                     }
                 })(item);
             } else if (type == "string") {
                 store[key] = (function(mutation) {
                     return function(/* store... */) {
-                        var dispatch, args, _store;
+                        var dispatch, args, _store, ret;
 
                         if (arguments[0] instanceof Vuex.Store) {
                             args = $.slice(arguments, 1);
@@ -93,9 +74,38 @@ module.exports = (function() {
                         dispatch = _store.dispatch;
                         args.unshift(mutation);
 
-                        return dispatch.apply(undefined, args);
+                        ret = dispatch.apply(undefined, args);
+                        trySync(name, store); return ret;
                     }
                 })(item);
+            }
+        }
+
+        // 设置 数据快照 备份方法
+        store.$snapshot = function() {
+            return $.extend(true, {}, store.state);
+        }
+
+        // 设置 数据快照 备份方法
+        store.$recover = function(snapshot) {
+            if (arguments.length >= 2) {
+                snapshot = arguments[1];
+            }
+
+            if (typeof snapshot == "object") {
+                for(var key in snapshot) {
+                    var copy, item = snapshot[key];
+
+                    if ($.isArray(item) || $.isObject(item)) {
+                        copy = $.isArray(item) ? [] : {};
+
+                        $.extend(true, copy, snapshot[key]);
+                    } else {
+                        copy = item;
+                    }
+
+                    store.state[key] = copy;
+                }
             }
         }
 
