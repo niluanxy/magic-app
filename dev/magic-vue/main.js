@@ -126,12 +126,27 @@ module.exports = (function() {
 
     // 暴漏出 native 调用接口对象
     if (window.MgNative && MgNative.core) {
-        $$.ncore = MgNative.core;
-        var webBind = MgNative.webBind;
+        $$.ncore = {};  // 声明快捷增强方法
+        var webBind = MgNative.webBind,
+            $native = MgNative.core;
 
         // 通知原生框架，当前H5页面已经加载完成
         $$.emitViewReady = function() {
-            $$.ncore.emitViewReady({bindId: webBind});
+            $native.emitViewReady({bindId: webBind});
+        }
+
+        $$.ncore.syncTitle = function() {
+            var fire = $$.location.fire();
+            if (fire != null && fire.length) {
+                fire = fire[fire.length-1];
+
+                if ($native.updateTitle) {
+                    $native.updateTitle({
+                        bindId: webBind,
+                        title: fire.item.title || ""
+                    })
+                }
+            }
         }
     } 
 
