@@ -56,19 +56,31 @@ module.exports = (function(win) {
                 goOld.apply($route, arguments);
             }
 
-            $route.go = function(url, replace, clear) {
-                var item = $route.fire(url), title;
+            $route.go = function(url, replace, clear, extend) {
+                var item = $route.fire(url), option = {};
 
                 if (item && item.length) {
-                    title = item[item.length-1].item.title;
+                    var title = item[item.length-1].item.title;
 
-                    MgNative.core.goWeb({
-                        url    : url,           // 跳转URL
-                        title  : title,         // 页面标题
-                        clear  : !!clear,       // 是否 clear 模式
-                        replace: !!replace,     // 进入是否 replace 旧页面
-                    })
+                    option.url = url;
+                    option.title = title;
+                    option.extend = extend || {};
+                    if (clear != undefined) option.clear = clear;
+                    if (replace != undefined) option.replace = replace;
+
+                    MgNative.core.goWeb(option);
                 }
+            }
+
+            $route.goNative = function(url, extend, replace, clear) {
+                var option = {};
+
+                option.url = url || "";
+                option.extend = extend || {};
+                if (clear != undefined) option.clear = clear;
+                if (replace != undefined) option.replace = replace;
+
+                MgNative.core.goNative(option);
             }
 
             // 重写页面返回方法

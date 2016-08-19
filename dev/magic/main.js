@@ -2,8 +2,6 @@
     if (w.$ && w.Magic) return;
     require("extend");      // 原生对象扩展
 
-    if (!w.$J) w.$J = undefined;
-
     /* 尽可能快的在dom加载完成后执行给定函数 */
     var _READYCALL = require("domready"),
         _QUERY     = require("query"),
@@ -60,7 +58,7 @@
     // platform 相关检测
     Magic.platform = /iP(hone|od|ad)/g.test(ua) ? "ios" :
                       /Android/g.test(ua) ? "android" : "other";
-    Magic.runtime  = w.$J ? "mgnative" :
+    Magic.runtime  = w.MgNative ? "mgnative" :
                      w.cordova ? "cordova" :
                      /MicroMessenger/ig.test(ua) ? "weixin" : "web";
 

@@ -127,7 +127,7 @@ module.exports = (function() {
     	after    : null,				// 页面 成功跳转后 的回调方法
         always   : null,                // 每次点击，不论是否阻止默认跳转，都会执行的方法
     	recurse  : false,				// 路由递归触发方式，forward 正序，backward 反序，默认最后项
-        regexp   : ":[^/-]*",           // 参数匹配正则语句，用于匹配参数信息
+        regexp   : ":[^/-]{1,}",        // 参数匹配正则语句，用于匹配参数信息
     }
 
     Route.prototype.constructor = Route;

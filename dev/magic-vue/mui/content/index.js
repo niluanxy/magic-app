@@ -16,11 +16,12 @@ module.exports = (function() {
 
             childs = $el.parent()[0].children;
             for(var i=0; i<childs.length; i++) {
-                var tagname = childs[i].tagName.toLowerCase();
+                var tag  = childs[i].tagName.toLowerCase(),
+                    test = "mg-footer mg-tabs";
 
-                if (tagname == "mg-header") {
+                if (tag == "mg-header") {
                     $el.addClass("has-header");
-                } else if ("mg-footer mg-tabs".search(tagname) > -1) {
+                } else if (test.match(new RegExp("^"+tag))) {
                     $el.addClass("has-footer");
                 }
             }
