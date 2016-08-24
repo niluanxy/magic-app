@@ -339,7 +339,19 @@ module.exports = (function(win, doc) {
                 $show.$broadcast("mgViewShow");
             
                 // 如果是混合框架中，通知页面加载完成
-                if ($$.emitViewReady) $$.emitViewReady();
+                if ($$.emitViewReady) {
+                    $whide && $whide.addClass("hide");
+
+                    // 路由变化后才发出页面加载完成通知
+                    $$.once("routeAlways", function() {
+                        $$.emitViewReady();
+                    })
+                }
+            }
+
+            // 混合框架中，通知页面已运行，不是缓存
+            if ($$.ncore.pageCacheRun) {
+                $$.ncore.pageCacheRun = false;
             }
 
             // 必选先执行 routeOn 回调，保证 loader 插入到页面中

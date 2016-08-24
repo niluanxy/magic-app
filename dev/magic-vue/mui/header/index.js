@@ -2,10 +2,12 @@ module.exports = (function() {
     $$.component("mg-header", {
     	template: "<slot></slot>",
         ready: function() {
+            var $el = $(this.$el);
+
             if (window.MgNative) {
-                $(this.$el).remove();
+                $el.addClass("hide");
             } else {
-                $(this.$el).addClass("bar bar-header");
+                $el.addClass("bar bar-header");
             }
         }
     });

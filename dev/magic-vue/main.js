@@ -126,13 +126,64 @@ module.exports = (function() {
 
     // 暴漏出 native 调用接口对象
     if (window.MgNative && MgNative.core) {
-        $$.ncore = {};  // 声明快捷增强方法
+        $$.ncore = {
+            pageCacheRun : true,    // 页面是否缓存没运行任何方法
+        };  // 声明快捷增强方法
         var webBind = MgNative.webBind,
             $native = MgNative.core;
 
         // 通知原生框架，当前H5页面已经加载完成
-        $$.emitViewReady = function() {
+        $$.emitViewReady = function(removeFix) {
+            $$.ncore.pageCacheRun = false;
+
+            var fire = $$.location.fire(), mitem,
+                $cache = $$._CACHE_, $fire, $button;
+
+            // 当前激活的页面DOM 显示出来
+            mitem = fire[fire.length-1].item;
+            for(var i=0; i<$cache.length; i++) {
+                if ($cache[i].item == mitem) {
+                    $fire = $cache[i].$wrap;
+
+                    // removeFix 为真则为缓存页面，需修复显示
+                    if (removeFix == true) {
+                        $cache[i].$wrap.removeClass("hide");
+                    }
+                }
+            }
+
+            // 添加 header 右上角按钮到原生界面
+            if ($fire && $fire.length) {
+                var $that = $fire[0].MG_CHILDREN, key;
+                $button = $fire.find("mg-header>.title+.button");
+
+                if ($button.length) {
+                    do {
+                        key = Math.random().toString(36).substr(2);
+                    } while(key.match(/^\d/) || window.key != undefined);
+
+                    console.log("extKeyName: "+key);
+                    window[key] = function() { $button.trigger("tap"); }
+                    $$.ncore.setExtButton($button.text(), key);
+
+                    $that.$on("mgViewDestroy", function() {
+                        delete window[key];
+                    })
+                }
+            }
+
             $native.emitViewReady({bindId: webBind});
+        }
+
+        $$.delayHideOld = function(time) {
+            time = parseInt(time) || 500;
+            $$.ncore.delayHide = setTimeout(function() {
+                for(var i=0; i<$$._CACHE_.length; i++) {
+                    $$._CACHE_[i].$wrap.addClass("hide");
+                }
+
+                $native.clearExtButton({bindId: webBind});
+            }, time);
         }
 
         $$.ncore.syncTitle = function() {
@@ -147,6 +198,15 @@ module.exports = (function() {
                     })
                 }
             }
+        }
+
+        $$.ncore.setExtButton = function(name, call) {
+            if (!name || !call) return;
+
+            $native.setExtButton({
+                bindId: webBind,
+                name: name, action: call
+            })
         }
     } 
 

@@ -19,7 +19,8 @@ module.exports = (function() {
                 var tag  = childs[i].tagName.toLowerCase(),
                     test = "mg-footer mg-tabs";
 
-                if (tag == "mg-header") {
+                // 非 native 环境检测到 header 才加 class
+                if (tag == "mg-header" && !window.MgNative) {
                     $el.addClass("has-header");
                 } else if (test.match(new RegExp("^"+tag))) {
                     $el.addClass("has-footer");

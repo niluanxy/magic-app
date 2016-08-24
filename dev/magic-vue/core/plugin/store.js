@@ -7,7 +7,7 @@ module.exports = (function() {
 
         var data = store.$snapshot();
         $native.core.syncStore({ 
-            bind: $native.webBind,
+            bindId: $native.webBind,
             name: name, snap: data,
         });
     }

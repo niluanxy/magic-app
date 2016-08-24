@@ -53,7 +53,15 @@ module.exports = (function(win) {
         /** 如果运行在混合框架中，替换相关方法 */
         if(window.MgNative && MgNative.core) {
             $route.local = function() {
+                clearTimeout($$.ncore.delayHide);
+
+                // 重置页面是否加载完成反馈标识
+                $$.ncore.pageCacheRun = true;
                 goOld.apply($route, arguments);
+
+                if ($$.ncore.pageCacheRun && !arguments[3]) {
+                    $$.emitViewReady(true); // 手动触发页面完成事件
+                }
             }
 
             $route.go = function(url, replace, clear, extend) {
