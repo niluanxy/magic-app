@@ -350,7 +350,7 @@ module.exports = (function(win, doc) {
             }
 
             // 混合框架中，通知页面已运行，不是缓存
-            if ($$.ncore.pageCacheRun) {
+            if ($$.ncore && $$.ncore.pageCacheRun) {
                 $$.ncore.pageCacheRun = false;
             }
 
