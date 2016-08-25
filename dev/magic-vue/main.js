@@ -136,42 +136,20 @@ module.exports = (function() {
         $$.emitViewReady = function(removeFix) {
             $$.ncore.pageCacheRun = false;
 
-            var fire = $$.location.fire(), mitem,
-                $cache = $$._CACHE_, $fire, $button;
+            var fire = $$.location.fire(),
+                $cache = $$._CACHE_, mitem;
 
             // 当前激活的页面DOM 显示出来
-            mitem = fire[fire.length-1].item;
-            for(var i=0; i<$cache.length; i++) {
-                if ($cache[i].item == mitem) {
-                    $fire = $cache[i].$wrap;
-
-                    // removeFix 为真则为缓存页面，需修复显示
-                    if (removeFix == true) {
+            if (removeFix == true) {
+                mitem = fire[fire.length-1].item;
+                for(var i=0; i<$cache.length; i++) {
+                    if ($cache[i].item == mitem) {
                         $cache[i].$wrap.removeClass("hide");
                     }
                 }
             }
 
-            // 添加 header 右上角按钮到原生界面
-            if ($fire && $fire.length) {
-                var $that = $fire[0].MG_CHILDREN, key;
-                $button = $fire.find("mg-header>.title+.button");
-
-                if ($button.length) {
-                    do {
-                        key = Math.random().toString(36).substr(2);
-                    } while(key.match(/^\d/) || window.key != undefined);
-
-                    console.log("extKeyName: "+key);
-                    window[key] = function() { $button.trigger("tap"); }
-                    $$.ncore.setExtButton($button.text(), key);
-
-                    $that.$on("mgViewDestroy", function() {
-                        delete window[key];
-                    })
-                }
-            }
-
+            $$.ncore.setHeader(false);
             $native.emitViewReady({bindId: webBind});
         }
 
@@ -186,18 +164,19 @@ module.exports = (function() {
             }, time);
         }
 
-        $$.ncore.syncTitle = function() {
-            var fire = $$.location.fire();
-            if (fire != null && fire.length) {
-                fire = fire[fire.length-1];
+        // 设置原生容器的 header 的标题内容
+        $$.ncore.setTitle = function(title) {
+            $native.setWebTitle({
+                bindId: webBind,
+                title: title || ""
+            })
+        }
 
-                if ($native.updateTitle) {
-                    $native.updateTitle({
-                        bindId: webBind,
-                        title: fire.item.title || ""
-                    })
-                }
-            }
+        // 设置原生容器的 header 是否显示
+        $$.ncore.setHeader = function(show) {
+            $native.setWebHeader({
+                bindId: webBind, display: !!show
+            })
         }
 
         $$.ncore.setExtButton = function(name, call) {

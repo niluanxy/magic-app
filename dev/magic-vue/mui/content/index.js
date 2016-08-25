@@ -20,7 +20,7 @@ module.exports = (function() {
                     test = "mg-footer mg-tabs";
 
                 // 非 native 环境检测到 header 才加 class
-                if (tag == "mg-header" && !window.MgNative) {
+                if (tag == "mg-header") {
                     $el.addClass("has-header");
                 } else if (test.match(new RegExp("^"+tag))) {
                     $el.addClass("has-footer");

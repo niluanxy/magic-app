@@ -4,11 +4,7 @@ module.exports = (function() {
         ready: function() {
             var $el = $(this.$el);
 
-            if (window.MgNative) {
-                $el.addClass("hide");
-            } else {
-                $el.addClass("bar bar-header");
-            }
+            $el.addClass("bar bar-header");
         }
     });
 })();
