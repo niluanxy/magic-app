@@ -139,12 +139,17 @@ module.exports = (function() {
             var fire = $$.location.fire(),
                 $cache = $$._CACHE_, mitem;
 
-            // 当前激活的页面DOM 显示出来
-            if (removeFix == true) {
-                mitem = fire[fire.length-1].item;
-                for(var i=0; i<$cache.length; i++) {
-                    if ($cache[i].item == mitem) {
-                        $cache[i].$wrap.removeClass("hide");
+            // 主要解决初次加载页面闪烁问题
+            if (!MgNative.webShow) {
+                $$.delayHideOld();
+            } else {
+                // 当前激活的页面DOM 显示出来
+                if (removeFix == true) {
+                    mitem = fire[fire.length-1].item;
+                    for(var i=0; i<$cache.length; i++) {
+                        if ($cache[i].item == mitem) {
+                            $cache[i].$wrap.removeClass("hide");
+                        }
                     }
                 }
             }
@@ -161,6 +166,10 @@ module.exports = (function() {
                 }
 
                 $native.clearExtButton({bindId: webBind});
+                
+                if ($native.pauseView) {
+                    $native.pauseView({bindId: webBind});
+                }
             }, time);
         }
 
