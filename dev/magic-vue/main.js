@@ -166,10 +166,6 @@ module.exports = (function() {
                 }
 
                 $native.clearExtButton({bindId: webBind});
-                
-                if ($native.pauseView) {
-                    $native.pauseView({bindId: webBind});
-                }
             }, time);
         }
 
