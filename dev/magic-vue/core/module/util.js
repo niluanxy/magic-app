@@ -73,4 +73,20 @@ module.exports = (function() {
     $$.getVmRoot = function(vm) {
         return vm.$root.$children[0];
     }
+
+    // 将给定对象添加到指定对象的事件链中
+    $$.bindEvent = function(scope, child) {
+        var eves = child._events || [],
+            pass = "hook:".split(' '),
+            bind = scope._eventsCount;
+
+        for(var key in eves) {
+            // 忽略掉列表中不监控的方法
+            if (pass.indexOf(key) != 0) {
+                bind[key] = bind[key] ? bind[key]++ : 1;
+            }
+        }
+
+        scope.$children.push(child);
+    }
 })();

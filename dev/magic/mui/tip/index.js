@@ -12,10 +12,12 @@ module.exports = (function() {
 
     Tip.DEFAULT = {
         icon  : "",             // 图标类型
-        show  : 1400,           // 默认显示时间
+        show  : 1800,           // 默认显示时间
         live  : false,          // 是否永久显示
         modal : false,          // 是否模态方式
         delay : 0,              // 默认延迟显示时间
+
+        hideCall: null,         // 隐藏以后的回调方法
 
         insertTo : "body",      // 插入到哪个元素
 
@@ -50,11 +52,18 @@ module.exports = (function() {
     };
 
     Tip.prototype.show = function(text, icon, option) {
-        var that = this, handle = that.$el._POPUP_, txt, opt;
+        var that = this, handle = that.$el._POPUP_, txt, opt,
+            type = typeof icon, len = arguments.length;
 
-        if (icon && typeof icon != "string" && !option) {
+        // show(text, option)
+        if (len == 2 && type == "object") {
             option = icon; icon = null;
         }
+
+        if (option && option.hideCall) {
+            that.options.hideCall = option.hideCall;
+        }
+
         opt = $.extend({}, that.options, option || {}, true);
 
         txt  = text || that.text;
@@ -69,7 +78,7 @@ module.exports = (function() {
 
             if (!opt.live) {
                 that.delay = setTimeout(function() {
-                    handle.hide();
+                    that.hide();
                 }, opt.show);
             }
         }, opt.delay || 0);
@@ -78,11 +87,16 @@ module.exports = (function() {
     };
 
     Tip.prototype.hide = function(delay) {
-        var handle = this.$el._POPUP_;
+        var that = this, opt = that.options,
+            call = opt.hideCall, handle = that.$el._POPUP_;
 
         clearTimeout(this.delay);
         this.delay = setTimeout(function() {
             handle.hide();
+            
+            if ($.isFun(call)) {
+                call(); opt.hideCall = null;
+            }
         }, delay || 0);
 
         return this;

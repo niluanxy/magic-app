@@ -40,18 +40,17 @@ module.exports = (function() {
 
     $$.objBind = function(obj, key, bind, bkey) {
         if (!obj || !key || !bind) return;
-
         bkey = bkey || key;
 
-        if (key.match(/^.+\..+$/)) {
-            var arrs = key.split(".");
+        if (key.match(/^.+[\.|\[].+$/)) {
+            var arrs = key.split(/[\[|\.]/);
 
             for(var i=0; i<arrs.length-1; i++) {
-                var key = arrs[i];
+                var key = arrs[i].replace("]", '');
                 obj = obj[key];
             }
 
-            key = arrs[i];
+            key = arrs[i].replace("]", '');
         } else {
             key = key.replace(".", '');
         }

@@ -37,7 +37,7 @@ var px2remOptions = {
         propertyWhiteList: [],
         replace: true,
         mediaQuery: false,
-        minPx: 1
+        minPx: 3
     };
 
 var release = false;    // 是否为发布输出，发布输出会压缩优化
@@ -617,6 +617,7 @@ gulp.task("clean", function() {
     del(DIR_APP_PUB + "main.css");
     del(DIR_APP_PUB + "main.scss");
     del(DIR_APP_PUB + "lib/magic*");
+    del(DIR_APP_PUB + "css/lib");
     del(DIR_APP_PUB + "lib/mixin.scss");
 })
 

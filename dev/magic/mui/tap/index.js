@@ -6,8 +6,8 @@
  */
 
 $(function() {
-    var $document = $(document), tap, fastmove, input;
-
+    var $document = $(document), tap, fastmove, input,
+        TAP_ITEM = "button item tab-item tap";
 
     /* 修复path对象，无则自己模拟一个出来 */
     function fixPath(e) {
@@ -28,7 +28,7 @@ $(function() {
 
         /* 转换为数组，便于后面操作 */
         cls  = (cls || "").split(" ");
-        find = (test || "button item tab-item btn").split(" ");
+        find = (test || TAP_ITEM).split(" ");
 
         for (var i=0; i<find.length; i++) {
             if (cls.indexOf(find[i]) >= 0) return true;
@@ -61,17 +61,17 @@ $(function() {
         checkMove: 4,
         checkMoveBad: 30,
 
+        /* 为true会在移动后，清除元素class */
+        moveClearSet: false,
+
         doubleTime: 300,
         delayClass: 80,
 
-        /* 为true会在移动后，清除元素class */
-        moveClear: true,
-        hasClear : false,
-
-        input: null,
+        input : null,
         target: null,
         lastType: "",
         disClick: false,
+        hasClear: false,
         delayStart: null,
         delayDefer: null,
         tapIsStart: false,
@@ -178,7 +178,7 @@ $(function() {
             this.delayDefer = $.defer();
 
             // 给按钮类的组件添加点击样式
-            if (this.moveClear) {
+            if (this.moveClearSet) {
                 this.delayStart = setTimeout(function() {
                     tap._addActive(e);
                     tap.delayDefer.resolve();
@@ -197,7 +197,7 @@ $(function() {
                 $(e.target).trigger("tapmove", e);
             }
 
-            if (tap.moveClear && !tap.hasClear && tap._isMove(e)) {
+            if (tap.moveClearSet && !tap.hasClear && tap._isMove(e)) {
                 // 清除 tap 自定义相关操作
                 clearTimeout(tap.delayStart);
 

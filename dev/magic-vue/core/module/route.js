@@ -50,57 +50,10 @@ module.exports = (function(win) {
         goOld   = Router.prototype.go;
         backOld = Router.prototype.back;
 
-        /** 如果运行在混合框架中，替换相关方法 */
-        if(window.MgNative && MgNative.core) {
-            $route.local = function() {
-                clearTimeout($$.ncore.delayHide);
-
-                // 重置页面是否加载完成反馈标识
-                $$.ncore.pageCacheRun = true;
-                goOld.apply($route, arguments);
-
-                if ($$.ncore.pageCacheRun && !arguments[3]) {
-                    $$.emitViewReady(true); // 手动触发页面完成事件
-                }
-            }
-
-            $route.go = function(url, replace, clear, extend) {
-                var item = $route.fire(url), option = {};
-
-                if (item && item.length) {
-                    var title = item[item.length-1].item.title;
-
-                    option.url = url;
-                    option.title = title;
-                    option.extend = extend || {};
-                    if (clear != undefined) option.clear = clear;
-                    if (replace != undefined) option.replace = replace;
-
-                    MgNative.core.goWeb(option);
-                }
-            }
-
-            $route.goNative = function(url, extend, replace, clear) {
-                var option = {};
-
-                option.url = url || "";
-                option.extend = extend || {};
-                if (clear != undefined) option.clear = clear;
-                if (replace != undefined) option.replace = replace;
-
-                MgNative.core.goNative(option);
-            }
-
-            // 重写页面返回方法
-            $route.back = function(cache) {
-                MgNative.core.back({cache: !!cache});
-            }
-        } else {
-            // 覆盖返回方法，添加缓存选项
-            $route.back = function(cache) {
-                $$.refreshView = !cache;
-                backOld.call($route);
-            }
+        // 覆盖返回方法，添加缓存选项
+        $route.back = function(cache) {
+            $$.refreshView = !cache;
+            backOld.call($route);
         }
 
         if (repath) {

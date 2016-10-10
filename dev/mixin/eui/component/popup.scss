@@ -14,7 +14,7 @@
     		height: 100%;
     		overflow: hidden;
     		display: none;
-            // 让点击事件传到后面去
+            // 让击事件传点到后面去
             pointer-events: none;
     		position: absolute;
 
@@ -29,7 +29,7 @@
                 z-index: -1;
                 top: 0; left: 0;
                 position: absolute;
-    			background-color: $modal-item-back;
+    			background-color: $popup-back-color;
     		}
     	}
     }

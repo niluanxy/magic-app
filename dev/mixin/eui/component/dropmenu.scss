@@ -9,6 +9,7 @@
         padding: 0 rem($dropmenu-padding);
         line-height: rem($dropmenu-height);
         display: block;
+        background-color: #FFF;
 
         &.active, &.actived {
             background-color: $dropmenu-active-bg;

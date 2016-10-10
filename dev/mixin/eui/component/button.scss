@@ -38,6 +38,7 @@
     min-height: rem($button-height);
     padding: 0 rem($button-padding);
 
+    z-index: 1;
     cursor: pointer;
     text-align: center;
     vertical-align: bottom;
@@ -73,12 +74,13 @@
 
     &:before {
         font-size: rem($button-icon-size);
-        margin-right: $button-icon-padding;
         float: left;
         display: inline-block;
-        line-height: rem($button-height - $button-border-width * 2) !important;
     }
 
+    &.icon-left:before {
+        margin-right: $button-icon-padding;
+    }
 
     &.icon-right:before {
         margin-left: $button-icon-padding;
@@ -134,7 +136,6 @@
             line-height: rem($button-large-height - $button-border-width * 2);
 
             min-width: rem(($button-large-padding * 3) + $button-large-font-size);
-            min-height: rem($button-large-height + 5);
             padding: 0 rem($button-large-padding);
 
             &.icon-right:before {

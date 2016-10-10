@@ -24,13 +24,19 @@ module.exports = (function() {
         $handle = $.popup($dom, {insertTo: opt.insertTo});
 
         if (opt.backShow && opt.backClass) {
-            $back = $('<div class="'+opt.backClass+'"></div>');
-            $handle.$el.append($back);
+            $('<div class="'+opt.backClass+'"></div>').appendTo($handle.$el);
+            $back = $handle.$el.find("."+opt.backClass);
 
             if (opt.autoHide == true) {
                 $back.on("tap.modal", function(e) {
-                    console.log("has run back")
-                    $handle.hide();
+                    $handle.hide(); // 隐藏组件
+                })
+
+                $dom.on("tap.modal", function(e) {
+                    // 非内容部分，触发 背景层 点击效果
+                    if ($dom[0] == e.target) {
+                        $back.trigger("tap.modal");
+                    }
                 })
             }
         }

@@ -72,12 +72,7 @@ module.exports = (function() {
         if (AUTH.before && !AUTH.repath) {
             AUTH.repath = true;
 
-            // 混合框架中页面内跳转
-            if ($route.local) {
-                $route.local(authPage, false);
-            } else {
-                $route.go(authPage, false);
-            }
+            $route.go(authPage, false);
         }
     });
 
@@ -91,24 +86,14 @@ module.exports = (function() {
         if (page && repatch) {
             AUTH.before = page;
 
-            // 混合框架中页面内跳转
-            if ($route.local) {
-                $route.local(auth, false, true);
-            } else {
-                $route.go(auth, false, true);
-            }
+            $route.go(auth, false, true);
         } else {
             before = AUTH.before || config.home;
 
             AUTH.repath = false;
             AUTH.before = ""
 
-            // 混合框架中页面内跳转
-            if ($route.local) {
-                $route.local(before, true);
-            } else {
-                $route.go(before, true);
-            }
+            $route.go(before, true);
         }
     }
 })();

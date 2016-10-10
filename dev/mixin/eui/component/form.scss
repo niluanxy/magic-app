@@ -79,6 +79,17 @@
             }
 
             &.checkbox {
+                &.circle {
+                    &:before {
+                        border-radius: 50%;
+                    }
+
+                    &:after {
+                        top: $input-check-top-circle;
+                        left: $input-check-left-circle;
+                    }
+                }
+
                 &:before {
                     border-radius: $input-check-radius;
                 }

@@ -22,6 +22,9 @@ module.exports = (function() {
         value   = prop.value.raw;
         disabled= prop.disabled.raw;
 
+        if (value) value = value.replace("$index", vmScope.$index);
+        if (disabled) disabled = disabled.replace("$index", vmScope.$index);
+
         $$.objBind(vmScope, value, $bind, "value");
         $$.objBind(vmScope, disabled, $bind, "disabled");
 
@@ -31,7 +34,9 @@ module.exports = (function() {
         $el.on("tap", function() {
             $bind.value = $el.val() == "on";
 
-            if ($.isFun(onChange)) onChange($bind.value);
+            if ($.isFun(onChange)) {
+                onChange($bind.value, $el.attr("key"));
+            }
         })
 
         vmScope.$watch(value, function(newVal) {

@@ -29,23 +29,26 @@ module.exports = (function(win, doc) {
      * 如果页面没有 resolve 方法，初始化操作
      */
     function pageDefaultInit(_params) {
-        /* 修复当前实例的 $parent 实例链 */
-        var $par = this.$el.parentNode, fsope;
-        do {
-            if ($par.MG_VUE_CTRL) {
-                fsope = $par.MG_VUE_CTRL;
-                break;
+        var that = this;
+
+        // 注册 数据接受事件，用于手动初始化数据
+        that.$on("__updateData", function(initData) {
+            if (typeof initData == "object") {
+                for(var key in initData) {
+                    that.$set(key, initData[key]);
+                }
             }
+        });
 
-            $par = $par.parentNode;
-        } while ($par && $par != doc.body);
-        fsope = fsope ? fsope : undefined;
-        this.$parent = fsope;
+        that.$update = function(initData) {
+            that.$emit("__updateData", initData);
+        }
 
-        this.$set('params', _params || {});
+        that.$set('params', _params || {});
+        that.$update(_params);
 
-        this.$emit("mgViewShow");
-        this.$broadcast("mgViewShow");
+        // this.$emit("mgViewShow");
+        // this.$broadcast("mgViewShow");
     }
 
     /**
@@ -73,23 +76,14 @@ module.exports = (function(win, doc) {
             init.call(that, params || _params, initDefer);
         })
 
-        // 注册 数据接受事件，用于手动初始化数据
-        that.$on("__updateData", function(initData) {
-            if (typeof initData == "object") {
-                for(var key in initData) {
-                    that.$set(key, initData[key]);
-                }
-            }
-        });
-
-        that.$emit("__refreshData");  // 手动触发一下更新
-
         // 通过前面注册的事件，将数据更新到对象实例上
         _defer.then(function(initData) {
             that.$emit("__updateData", initData);
         });
 
         pageDefaultInit.call(that, _params);
+
+        that.$emit("__refreshData");  // 手动触发一下更新
 
         // 绑定数据更新快捷方法
         that.$refresh = function(params, defer) {
@@ -165,9 +159,36 @@ module.exports = (function(win, doc) {
             },
 
             ready: function() {
-                var mgpage = this.MG_PAGE,
+                var mgpage = this.MG_PAGE, params,
                     $wrap  = mgpage.wrapper,
-                    params = _transParams(mgpage.params);
+                    inpara = $(this.$el).attr("params");
+
+                /* 修复当前实例的 $parent 实例链 */
+                var $par = this.$el.parentNode, fscope;
+                do {
+                    if ($par.MG_VUE_CTRL) {
+                        fscope = $par.MG_VUE_CTRL;
+                        break;
+                    }
+
+                    $par = $par.parentNode;
+                } while ($par && $par != doc.body);
+                fscope = fscope ? fscope : undefined;
+                this.$parent = fscope;
+
+                if (inpara != null) {
+                    if (fscope && fscope[inpara] !== undefined) {
+                        inpara = fscope[inpara]
+                    } else if (typeof inpara == "string") {
+                        inpara = $.parseJSON(inpara);
+                    }
+
+                    if (typeof inpara == "object") {
+                        mgpage.params = inpara;
+                    }
+                }
+
+                params = _transParams(mgpage.params);
 
                 if ($.isFun(page.resolve)) {
                     pageResolveInit.call(this, page.resolve, params);
@@ -178,15 +199,13 @@ module.exports = (function(win, doc) {
                 // 尝试通知父渲染容器，当前元素已经渲染完成
                 mgpage.mgwrap && mgpage.mgwrap.$emit("mgViewRender", this);
                 $$.emit("viewReady", $wrap, this);
-
-                // 如果是混合框架中，通知页面加载完成
-                if ($$.emitViewReady) $$.emitViewReady();
             },
 
             beforeDestroy: function() {
                 var $wrap = this.MG_PAGE.wrapper;
 
                 $$.emit("viewDestroy", $wrap, this);
+                this.$emit("mgViewHide");
                 this.$emit("mgViewDestroy");
             },
         }
@@ -337,21 +356,6 @@ module.exports = (function(win, doc) {
 
                 $show.$emit("mgViewShow");
                 $show.$broadcast("mgViewShow");
-            
-                // 如果是混合框架中，通知页面加载完成
-                if ($$.emitViewReady) {
-                    $whide && $whide.addClass("hide");
-
-                    // 路由变化后才发出页面加载完成通知
-                    $$.once("routeAlways", function() {
-                        $$.emitViewReady();
-                    })
-                }
-            }
-
-            // 混合框架中，通知页面已运行，不是缓存
-            if ($$.ncore && $$.ncore.pageCacheRun) {
-                $$.ncore.pageCacheRun = false;
             }
 
             // 必选先执行 routeOn 回调，保证 loader 插入到页面中

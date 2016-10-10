@@ -21,14 +21,7 @@
 // 文字两端对齐
 @mixin text-justify() {
     text-align: justify;
-
-    &:after {
-        display: inline-block;
-        overflow: hidden;
-        width: 100%;
-        height: 0;
-        content: '';
-    }
+    text-align-last: justify;
 }
 
 @mixin disabled($opacity: 0.4) {

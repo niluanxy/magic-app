@@ -14,11 +14,16 @@ module.exports = (function() {
             if (scope[ctrl] !== undefined || scope[show] !== undefined) {
                 view  = $el.attr("view");
                 clen  = $el.children.length;
-                paras = scope[paras] || {};
+
+                if (scope[paras] !== undefined) {
+                    paras = scope[paras];
+                } else {
+                    paras = null;
+                }
 
                 option = {
                     align    : $el.attr("align"),
-                    autoHide : false,
+                    autoHide : $el.attr("autoHide") == "true",
                     backShow : true,
                 };
 
@@ -54,6 +59,9 @@ module.exports = (function() {
                         childScope.$parent       = scope;
                         childScope._MODAL_       = handle;
 
+                        // 修正接收不到父元素事件问题
+                        $$.bindEvent(scope, childScope);
+
                         if ($.isFun(_call)) {
                             childScope._MODAL_CALL = _call;
                         }
@@ -64,6 +72,7 @@ module.exports = (function() {
                             hideOld = handle.hide;
 
                         handle.show = function() {
+                            childScope.$emit("__updateData", paras);
                             childScope.$emit("mgViewShow");
                             showOld.call(handle);
                         }
@@ -72,6 +81,9 @@ module.exports = (function() {
                             childScope.$emit("mgViewHide");
                             hideOld.call(handle);
                         }
+
+                        // 默认 modal 页面为隐藏状态
+                        childScope.$emit("mgViewHide");
 
                         // 监听 ui_back 事件，发生则隐藏自身
                         childScope.$on("_ui_back", function() {

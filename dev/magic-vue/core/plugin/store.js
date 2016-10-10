@@ -1,17 +1,6 @@
 module.exports = (function() {
     var $$ = window.mvue, $native = window.MgNative;
 
-    // MgNative 环境下数据同步方法
-    function trySync(name, store) {
-        if (!$native || !$native.core || !$native.webShow) return;
-
-        var data = store.$snapshot();
-        $native.core.syncStore({ 
-            bindId: $native.webBind,
-            name: name, snap: data,
-        });
-    }
-
     /**
      * 数据 Store 相关方法
      */
@@ -56,7 +45,7 @@ module.exports = (function() {
                         args.unshift(_store);
 
                         ret = call.apply(undefined, args);
-                        trySync(name, store); return ret;
+                        return ret;
                     }
                 })(item);
             } else if (type == "string") {
@@ -75,7 +64,7 @@ module.exports = (function() {
                         args.unshift(mutation);
 
                         ret = dispatch.apply(undefined, args);
-                        trySync(name, store); return ret;
+                        return ret;
                     }
                 })(item);
             }
