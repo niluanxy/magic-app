@@ -34,7 +34,7 @@ exports.module = (function(doc, undefined) {
 		if (!el || !relative || !top || !left) return;
 
         // 如果是 $ 对象，修复对象
-        el = el[0] ? el[0] : el;
+        el = el instanceof Magic ? el[0] : el;
         relative = relative[0] ? relative[0] : relative;
 
 		zindex = zindex || Place.zindex || 100;
@@ -83,8 +83,9 @@ exports.module = (function(doc, undefined) {
 		offset.top  += ele.height * topfix;
 		offset.left += ele.width  * leftfix;
 
-		style = "top:"+offset.top+"px;left:"+offset.left+"px;"
-				+"z-index:"+zindex+";position:absolute;";
+		style  = $el.attr("style") || '';
+        style += "top:"+offset.top+"px;left:"+offset.left+"px;"
+                +"z-index:"+zindex+";position:absolute;";
 		$el.attr("style", style);
 		$el.appendTo(parent);
 	};
