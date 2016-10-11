@@ -135,6 +135,8 @@ module.exports = (function() {
     Dropdown.prototype.toggle = function(show) {
         show = show === undefined ? !this.visible : !!show;
         this.$el.place(this.$wrap, "bottom", "left", {float: true});
+
+        this.$wrap.toggleClass("rever", !!this.$wrap[0]._MG_PLACE_REVER);
         this.$wrap.toggleClass("hide", !show);
         this.visible = show;
 

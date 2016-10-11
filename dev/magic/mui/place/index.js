@@ -97,25 +97,34 @@ exports.module = (function(doc, undefined) {
         offset.top  += ele.height * topfix;
         offset.left += ele.width  * leftfix;
 
+        // 重置元素位置反转标记
+        $el[0]._MG_PLACE_REVER = false;
+
         // 如果设置了自动浮动，检测是否超出显示
         if (float === true) {
             var screen = Place.outerRect(document),
                 fwidth = ele.width - rel.width,
                 fheight= ele.height + rel.height,
                 pleft  = place[1][0] == "left",
-                pbottom= place[0][0] == "bottom";
+                pbottom= place[0][0] == "bottom", rever = false;
 
             if (pleft && rel.left + ele.width > screen.width) {
                 offset.left -= fwidth;
+                rever = true;
             } else if (!pleft && rel.left - fwidth < 0) {
                 offset.left += fwidth;
+                rever = true;
             }
 
             if (pbottom && rel.top + fheight > screen.height) {
                 offset.top -= fheight;
+                rever = true;
             } else if (!pbottom && offset.top < 0 && rel.top - ele.height < 0) {
                 offset.top += fheight;
+                rever = true;
             }
+
+            if ($el[0] && rever) $el[0]._MG_PLACE_REVER = true;
         }
 
         $el.css("top", offset.top+"px");
