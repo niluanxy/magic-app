@@ -20,7 +20,6 @@ module.exports = (function() {
 
         for(var i=start; i<args.length; i++) {
             if (end && i > end) {
-                console.log("break")
                 break;
             }
 

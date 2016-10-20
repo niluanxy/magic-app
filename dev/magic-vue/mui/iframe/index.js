@@ -1,5 +1,3 @@
-require("./style.scss");
-
 module.exports = (function() {
     // 检测是否是 iFrame ，依赖于全局 runid
     window.isFrame = function(dom) {
